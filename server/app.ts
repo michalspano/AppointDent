@@ -4,7 +4,7 @@ import { config } from 'dotenv';
 config(); // init dotenv environment
 
 const app: Express = express();
-const port: string = process.env.PORT ?? '8000';
+const port: string = process.env.PORT ?? '3000';
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello from AppointDent!');
