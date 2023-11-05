@@ -4,5 +4,8 @@
     },
     "eslint.validate": [
         "javascript"
+    ],
+    "cSpell.words": [
+        "appointdent"
     ]
 }
