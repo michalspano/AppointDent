@@ -1,44 +1,11 @@
 import { type JSX } from 'solid-js/jsx-runtime'
 import './Navbar.css'
 import logo from '../../assets/logo.png'
-import { For, Show, createSignal } from 'solid-js'
+import { For, Show } from 'solid-js'
 import { routes } from './routes'
+import { fadeIn, fadeOut, hamburger, notify, slideIn, slideOut, toggleHamburger, toggleNotification } from './animation'
 
 export default function Navbar (): JSX.Element {
-  const [notify, setNotify] = createSignal(false)
-  const [hamburger, setHamburger] = createSignal(false)
-  const [fadeOut, setFadeOut] = createSignal(false)
-  const [fadeIn, setFadeIn] = createSignal(false)
-  const [slideOut, setSlideOut] = createSignal(false)
-  const [slideIn, setSlideIn] = createSignal(false)
-  function toggleNotification (): void {
-    if (notify()) {
-      setFadeIn(false)
-      setFadeOut(true)
-      setTimeout(() => {
-        setNotify(false)
-      }, 200)
-    } else {
-      setFadeIn(true)
-      setFadeOut(false)
-      setNotify(true)
-    }
-  }
-
-  function toggleHamburger (): void {
-    if (hamburger()) {
-      setSlideIn(false)
-      setSlideOut(true)
-      setTimeout(() => {
-        setHamburger(false)
-      }, 200)
-    } else {
-      setSlideIn(true)
-      setSlideOut(false)
-      setHamburger(true)
-    }
-  }
-
   return <>
     <nav class="bg-primary text-white zAbove">
         <div class="mx-auto px-2 sm:px-6 lg:px-8">
