@@ -1,0 +1,28 @@
+a {
+    color:white;
+}
+
+.notification {
+     stroke:white;
+}
+
+.notification div {
+    background-color: #8DC9CD;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+.fade-in-element {
+animation: fadeIn 0.2s ease-in-out;
+}
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+  
+.fade-out-element {
+animation: fadeOut 0.2s ease-in-out;
+}
