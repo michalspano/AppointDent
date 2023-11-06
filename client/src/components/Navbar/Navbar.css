@@ -3,11 +3,11 @@ a {
 }
 
 .notification {
-     stroke:white;
+    stroke:white;
 }
 
 .notification div {
-    background-color: #8DC9CD;
+  background-color: #8DC9CD;
 }
 
 @keyframes fadeIn {
@@ -16,7 +16,7 @@ a {
   }
   
 .fade-in-element {
-animation: fadeIn 0.2s ease-in-out;
+  animation: fadeIn 0.2s ease-in-out;
 }
 @keyframes fadeOut {
     from { opacity: 1; }
@@ -24,5 +24,44 @@ animation: fadeIn 0.2s ease-in-out;
   }
   
 .fade-out-element {
-animation: fadeOut 0.2s ease-in-out;
+  animation: fadeOut 0.2s ease-in-out;
+}
+
+@keyframes slideOut {
+  from {
+    margin-top: 0;
+  }
+  to {
+    margin-top: -100%;
+  }
+}
+@keyframes slideIn {
+  0% {
+    margin-top: -100%;
+  }
+  100% {
+    margin-top: 0;
+  }
+}
+.slide-out-element {
+  position: relative;
+  animation: slideOut 0.5s forwards;
+}
+.slide-in-element {
+  position: relative;
+  animation: slideIn 0.5s forwards;
+}
+
+.zUnder {
+  position: relative;
+  z-index: 1;
+}
+
+.zAbove {
+  position: relative;
+  z-index: 2;
+}
+
+.hamburger svg {
+  stroke:white;
 }

@@ -6,9 +6,11 @@ import { routes } from './routes'
 
 export default function Navbar (): JSX.Element {
   const [notify, setNotify] = createSignal(false)
+  const [hamburger, setHamburger] = createSignal(false)
   const [fadeOut, setFadeOut] = createSignal(false)
   const [fadeIn, setFadeIn] = createSignal(false)
-
+  const [slideOut, setSlideOut] = createSignal(false)
+  const [slideIn, setSlideIn] = createSignal(false)
   function toggleNotification (): void {
     if (notify()) {
       setFadeIn(false)
@@ -23,12 +25,26 @@ export default function Navbar (): JSX.Element {
     }
   }
 
+  function toggleHamburger (): void {
+    if (hamburger()) {
+      setSlideIn(false)
+      setSlideOut(true)
+      setTimeout(() => {
+        setHamburger(false)
+      }, 200)
+    } else {
+      setSlideIn(true)
+      setSlideOut(false)
+      setHamburger(true)
+    }
+  }
+
   return <>
-    <nav class="bg-primary text-white">
+    <nav class="bg-primary text-white zAbove">
         <div class="mx-auto px-2 sm:px-6 lg:px-8">
             <div class="relative flex h-16 items-center justify-between">
             <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
-                <button type="button" class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
+                <button onClick={toggleHamburger} type="button" class="hamburger relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none" aria-controls="mobile-menu" aria-expanded="false">
                 <span class="absolute -inset-0.5"></span>
                 <span class="sr-only">Open main menu</span>
 
@@ -64,7 +80,7 @@ export default function Navbar (): JSX.Element {
                 </div>
 
                 </div>
-            <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+            <div class="flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                 <button onClick={toggleNotification} type="button" class="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none">
                 <span class="absolute -inset-1.5"></span>
                 <span class="sr-only">View notifications</span>
@@ -72,26 +88,31 @@ export default function Navbar (): JSX.Element {
                     <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
                 </svg>
                 </button>
-
-                <Show when={notify()}>
-                    <div class={ fadeIn() ? 'notification fade-in-element' : fadeOut() ? 'notification fade-out-element' : 'notification' }>
-                    <div class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
-                        <p class="block px-4 py-2 text-sm text-primary">No notifications!</p>
-                    </div>
+                <div class="inset-y-0 right-0 absolute top-10">
+                    <Show when={notify()}>
+                        <div class={ fadeIn() ? 'notification fade-in-element' : fadeOut() ? 'notification fade-out-element' : 'notification' }>
+                            <div class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
+                                <p class="block px-4 py-2 text-sm text-primary">No notifications!</p>
+                            </div>
+                        </div>
+                    </Show>
                 </div>
-                </Show>
             </div>
             </div>
         </div>
 
-        <div class="sm:hidden" id="mobile-menu">
-            <div class="space-y-1 px-2 pb-3 pt-2">
-            <a href="#" class="bg-gray-900 text-white block rounded-md px-3 py-2 text-base font-medium" aria-current="page">Dashboard</a>
-            <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Team</a>
-            <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Projects</a>
-            <a href="#" class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Calendar</a>
+    </nav>
+    <Show when={hamburger()}>
+        <div class={ slideIn() ? 'slide-in-element bg-primary zUnder' : slideOut() ? 'slide-out-element bg-primary zUnder' : 'bg-primary zUnder' }>
+            <div id="">
+                <div class="space-y-1 px-2 pb-3 pt-2">
+                <For each={routes}>{(route) =>
+                        <a href={route.href} class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">{route.name}</a>
+
+                    }</For>
+                </div>
             </div>
         </div>
-    </nav>
+        </Show>
     </>
 }
