@@ -8,7 +8,7 @@
         "ecmaVersion": "latest",
         "sourceType": "module"
     },
-    "ignorePatterns": ["vite.config.ts","tailwind.config.js","postcss.config.js"],
+    "ignorePatterns": ["vite.config.ts","tailwind.config.js","postcss.config.js","*.test.js","jest.config.cjs"],
 
     "rules": {
     }

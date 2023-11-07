@@ -27,10 +27,9 @@ export default function Navbar (): JSX.Element {
             <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
                 <div class="flex flex-shrink-0 items-center">
                 <img class="h-8 w-auto" src={logo} alt="AppointDent"></img>
-
                 </div>
                 <div class="hidden sm:ml-6 sm:block">
-                <div class="flex space-x-4">
+                <div class="desk-routes flex space-x-4">
                     <For each={routes}>{(route) =>
                         <a href={route.href} class="rounded-md px-3 py-2 text-sm font-medium">{route.name}</a>
                     }</For>
@@ -72,7 +71,7 @@ export default function Navbar (): JSX.Element {
     <Show when={hamburger()}>
         <div class={ slideIn() ? 'slide-in-element bg-primary zUnder' : slideOut() ? 'slide-out-element bg-primary zUnder' : 'bg-primary zUnder' }>
             <div id="">
-                <div class="space-y-1 px-2 pb-3 pt-2">
+                <div class="mobile-routes space-y-1 px-2 pb-3 pt-2">
                 <For each={routes}>{(route) =>
                         <a href={route.href} class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">{route.name}</a>
 
