@@ -12,7 +12,7 @@ const options: object = Object.freeze({
 /**
  * @description the name of the database file.
  */
-const DB_FILE: string = 'sessions.db';
+const DB_FILE: string = 'db/sessions.db';
 
 /**
  * @description the database instance with the options and the local
