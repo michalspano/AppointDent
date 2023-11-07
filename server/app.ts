@@ -24,18 +24,24 @@ fs.readdir(servicesPath,((err,services)=>{
   if(err) throw Error(err.message)
 
   for(let i=0;i<services.length;i++) {
-    let service=servicesPath+"/"+services[i]
-    const child:ChildProcess = spawn('npm', ['run', 'dev'],{cwd:service});
-    child.stdout!.on('data', (data) => {
-      console.log(`stdout: ${data}`);
-    });
+    let assumedService=servicesPath+"/"+services[i]
+    let isService=fs.lstat(assumedService,((err,stats)=>{
+      if(err) throw Error(err.message)
+      if(stats.isDirectory()){
+        const child:ChildProcess = spawn('npm', ['run', 'dev'],{cwd:assumedService});
+        child.stdout!.on('data', (data) => {
+          console.log(`stdout: ${data}`);
+        });
+    
+        child.stderr!.on('data', (data) => {
+          console.error(`stderr: ${data}`);
+        });
+    
+        child.on('close', (code) => {
+          console.log(`child process exited with code ${code}`);
+        }); 
+      }
+    }))
 
-    child.stderr!.on('data', (data) => {
-      console.error(`stderr: ${data}`);
-    });
-
-    child.on('close', (code) => {
-      console.log(`child process exited with code ${code}`);
-    }); 
   }
 }))
