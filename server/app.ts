@@ -1,7 +1,7 @@
 import express, { type Express, type Request, type Response } from 'express';
 import { config } from 'dotenv';
 import fs from "fs"
-import { ChildProcess, SpawnOptions } from 'child_process';
+import { ChildProcess } from 'child_process';
 config(); // init dotenv environment
 
 const app: Express = express();
