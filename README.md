@@ -6,6 +6,10 @@ AppointDent is a service that allows residents of Gothenburg to book dentist app
 
 The solution is based on a distributed system that combines various architectural styles. ​
 
+## Entity Relationship Diagram
+
+![ER Diagram](./docs/assets/ERdiagram.png)
+
 ## Pre-Requirements
 TBD
 ## Getting started
@@ -16,6 +20,7 @@ TBD
 - Express.js
 - Solid.js
 - Postgresql
+- Tailwind
 
 
 ## Development team
