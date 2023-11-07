@@ -1,6 +1,5 @@
 # ADR 1: Microservices pattern
 ## Context
----
 There is a new request for building a dentist appointment-booking system that allows users to book appointments for dentists in Gothenburg.
 </br>
 </br>
@@ -13,15 +12,12 @@ Moreover, the system should allow users to create (login and sign up features), 
 Stakeholders deem the system to be scalable, modifiable, secure, and fault tolerant.
 </br>
 ## Descision
----
 We will make use of the microservices architectural pattern. The microservices architectural pattern is a combination of the client-server and publish-subscribe architectural patterns. 
 </br>
 ## Status
----
 Accepted
 </br>
 ## Consequences
----
 #### Positives:
 The microservices architecture decouples the services from one another. This makes the system both modifiable, fault tolerant, and secure. 
 </br>
