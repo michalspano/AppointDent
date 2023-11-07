@@ -21,25 +21,46 @@ app.listen(port, () => {
 });
 
 fs.readdir(servicesPath,((err,services)=>{
+
   if(err) throw Error(err.message)
+  console.log("Building services...")
 
   for(let i=0;i<services.length;i++) {
+    let serviceName=services[i].toLocaleUpperCase();
     let assumedService=servicesPath+"/"+services[i]
     let isService=fs.lstat(assumedService,((err,stats)=>{
       if(err) throw Error(err.message)
       if(stats.isDirectory()){
-        const child:ChildProcess = spawn('npm', ['run', 'dev'],{cwd:assumedService});
-        child.stdout!.on('data', (data) => {
-          console.log(`stdout: ${data}`);
+        const build_process:ChildProcess = spawn('npm', ['run', 'build'],{cwd:assumedService});
+
+    
+        build_process.stderr!.on('data', (data) => {
+          console.log(`${serviceName} build failed`);
+          throw new Error(data)
         });
     
-        child.stderr!.on('data', (data) => {
-          console.error(`stderr: ${data}`);
-        });
+        build_process.on('close', (code) => {
+          console.log(`${serviceName} build process exited with code ${code}`);
+          if(code===0) {
+            console.log(`${serviceName} build succeeded, spawning...`);
+            const child:ChildProcess = spawn('npm', ['run', 'start'],{cwd:assumedService,env:{}});
+            child.stdout!.on('data', (data) => {
+              console.log(`${serviceName}: ${data}`);
     
-        child.on('close', (code) => {
-          console.log(`child process exited with code ${code}`);
+            });
+        
+            child.stderr!.on('data', (data) => {
+              console.error(`${serviceName}: ${data}`);
+    
+            });
+        
+            child.on('close', (code) => {
+              console.log(`${serviceName} process exited with code ${code}`);
+            }); 
+          }
         }); 
+
+
       }
     }))
 

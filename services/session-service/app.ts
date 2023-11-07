@@ -8,7 +8,6 @@ config();
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello from: AppointDent - Session Service');
 });
-
 app.listen(port, () => {
   console.log('AppointDent - Sessions Service');
   console.log(`Server is running at http://localhost:${port}`);
