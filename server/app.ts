@@ -5,6 +5,7 @@ import { ChildProcess, SpawnOptions } from 'child_process';
 config(); // init dotenv environment
 
 const app: Express = express();
+app.use(express.json()); // for parsing application/json
 const port: string = process.env.PORT ?? '3000';
 const servicesPath:string=process.env.SERVICES_PATH || "../services"
 const spawn = require('child_process').spawn
