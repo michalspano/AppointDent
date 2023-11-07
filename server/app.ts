@@ -4,6 +4,7 @@ import { config } from 'dotenv';
 config(); // init dotenv environment
 
 const app: Express = express();
+app.use(express.json()); // for parsing application/json
 const port: string = process.env.PORT ?? '3000';
 
 app.get('/', (req: Request, res: Response) => {
