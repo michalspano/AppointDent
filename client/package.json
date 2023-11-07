@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "eslint 'src/**/*.{js,jsx,ts,tsx}' && vite",
-    "build": "eslint 'src/**/*.{js,jsx,ts,tsx}' && vite build",
+    "dev": "eslint 'src/**/*.{js,jsx,ts,tsx,css}' && vite",
+    "build": "eslint 'src/**/*.{js,jsx,ts,tsx,css}' && vite build",
     "preview": "vite preview"
   },
   "dependencies": {

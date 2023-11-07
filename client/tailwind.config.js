@@ -2,6 +2,7 @@
 module.exports = {
   content: [
     "./src/*.{js,jsx,ts,tsx}",
+    "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
     screens: {
@@ -12,15 +13,13 @@ module.exports = {
       xl: '1440px',
     },
     colors: {
-      'blue': '#1fb6ff',
-      'purple': '#7e5bef',
-      'pink': '#ff49db',
-      'orange': '#ff7849',
-      'green': '#13ce66',
-      'yellow': '#ffc82c',
-      'gray-dark': '#273444',
-      'gray': '#8492a6',
-      'gray-light': '#d3dce6',
+      'primary': '#12878D',
+      'secondary': '#275E61',
+      'accent': '#1BD0DA',
+      'neutral': '#094548',
+      'success': '#8CDB9E',
+      'warning': '#ECEE82',
+      'error': '#DA1B1B',
     },
     extend: {
     }
