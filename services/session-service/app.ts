@@ -12,7 +12,6 @@ app.get('/', (req: Request, res: Response) => {
 app.listen(port, () => {
   console.log('AppointDent - Sessions Service');
   console.log(`Server is running at http://localhost:${port}`);
-  console.log(`Using database: ${database.name}`);
-  // TODO: add proper mechanism for checking the database connection
-  console.log(`Database connection: ${database.open ? 'OK' : 'ERROR'}`);
+  console.log(`Using database: ${database?.name}`);
+  console.log(`Database connection: ${database?.open ? 'OK' : 'ERROR'}`);
 });

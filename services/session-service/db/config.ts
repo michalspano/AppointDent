@@ -20,7 +20,14 @@ const DB_FILE: string = 'db/sessions.db';
  * Set the journal mode to WAL (Write-Ahead Logging) for better
  * and more optimized performance.
  */
-const database: DatabaseType = new Database(DB_FILE, options);
-database.pragma('journal_mode = WAL');
+const database: DatabaseType | undefined = (() => {
+  try {
+    const db = new Database(DB_FILE, options);
+    db.pragma('journal_mode = WAL');
+    return db;
+  } catch (error: Error | unknown) { 
+    return undefined;
+  }
+})();
 
 export default database;
