@@ -1,14 +1,13 @@
 import express, { type Express, type Request, type Response } from 'express';
 import { config } from 'dotenv';
-import fs from "fs"
-import { ChildProcess } from 'child_process';
+import fs from "fs";
+import { ChildProcess,spawn } from 'child_process';
 config(); // init dotenv environment
 
 const app: Express = express();
 app.use(express.json()); // for parsing application/json
 const port: string = process.env.PORT ?? '3000';
-const servicesPath:string=process.env.SERVICES_PATH || "../services"
-const spawn = require('child_process').spawn
+const servicesPath:string=process.env.SERVICES_PATH || "../services";
 
 
 app.get('/', (req: Request, res: Response) => {
@@ -22,21 +21,20 @@ app.listen(port, () => {
 
 fs.readdir(servicesPath,((err,services)=>{
 
-  if(err) throw Error(err.message)
-  console.log("Building services...")
+  if(err) throw Error(err.message);
+  console.log("Building services...");
 
   for(let i=0;i<services.length;i++) {
-    let serviceName=services[i].toLocaleUpperCase();
-    let assumedService=servicesPath+"/"+services[i]
-    let isService=fs.lstat(assumedService,((err,stats)=>{
-      if(err) throw Error(err.message)
+    const serviceName=services[i].toLocaleUpperCase();
+    const assumedService=servicesPath+"/"+services[i];
+    fs.lstat(assumedService,((err,stats)=>{
+      if(err) throw Error(err.message);
       if(stats.isDirectory()){
         const build_process:ChildProcess = spawn('npm', ['run', 'build'],{cwd:assumedService});
 
-    
         build_process.stderr!.on('data', (data) => {
           console.log(`${serviceName} build failed`);
-          throw new Error(data)
+          throw new Error(data);
         });
     
         build_process.on('close', (code) => {
@@ -62,7 +60,7 @@ fs.readdir(servicesPath,((err,services)=>{
 
 
       }
-    }))
+    }));
 
   }
-}))
+}));
