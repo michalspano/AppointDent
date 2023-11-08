@@ -17,6 +17,7 @@ $ npm install
 - `config/`: configuration files for the server-side application.
 - `controllers/`: communication middleware between the server-side application and other components of the application.
 - `routes/`: routing definitions based on the middleware.
+- `scripts/`: scripts for the server-side application.
 - `public/`: static files for the server-side application.
 - `dist/`: the build folder for the server-side application.
 
