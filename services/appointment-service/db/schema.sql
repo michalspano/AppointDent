@@ -5,6 +5,6 @@ CREATE TABLE IF NOT EXISTS appointments (
     _dateTime DATETIME NOT NULL, -- date + time combined
     long VARCHAR(255) NOT NULL,
     lat VARCHAR(255) NOT NULL,
-    dentist VARCHAR REFERENCES dentists(email) NOT NULL,
-    patient VARCHAR REFERENCES patients(email) NOT NULL
+    dentistId VARCHAR(64) NOT NULL,
+    patientId VARCHAR(64) NOT NULL,
 );
