@@ -41,7 +41,10 @@ fs.readdir(servicesPath,((err,services)=>{
           console.log(`${serviceName} build process exited with code ${code}`);
           if(code===0) {
             console.log(`${serviceName} build succeeded, spawning...`);
-            const child:ChildProcess = spawn('npm', ['run', 'start'],{cwd:assumedService,env:{}});
+            const child_env=process.env;
+            delete child_env.PORT;
+
+            const child:ChildProcess = spawn('npm', ['run', 'start'],{cwd:assumedService,env:child_env});
             child.stdout!.on('data', (data) => {
               console.log(`${serviceName}: ${data}`);
     
