@@ -42,7 +42,7 @@ fs.readdir(servicesPath,((err,services)=>{
           if(code===0) {
             console.log(`${serviceName} build succeeded, spawning...`);
             const child_env=process.env;
-            delete child_env.PORT;
+            delete child_env.PORT; //We do not want to pass down port.
 
             const child:ChildProcess = spawn('npm', ['run', 'start'],{cwd:assumedService,env:child_env});
             child.stdout!.on('data', (data) => {

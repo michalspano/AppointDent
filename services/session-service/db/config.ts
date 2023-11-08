@@ -13,12 +13,12 @@ const options: object = Object.freeze({
 /**
  * @description the name of the database file.
  */
-const DB_FILE: string = 'db/sessions.db';
+const DB_FILE: string = './db/sessions.db';
 
 /**
  * @description the path to the schema file.
  */
-const schemaFilePath: string = 'db/schema.sql';
+const schemaFilePath: string = './db/schema.sql';
 
 /**
  * @description the database instance with the options and the local
