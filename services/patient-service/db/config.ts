@@ -38,6 +38,7 @@ const database: DatabaseType | undefined = (() => {
 
     return db;
   } catch (error: Error | unknown) {
+    console.log(error);
     return undefined;
   }
 })();
