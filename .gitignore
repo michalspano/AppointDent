@@ -1,2 +1,15 @@
+# Ignore all node_modules directories
+node_modules
 
+# Ignore builds (dist, build, etc)
+dist
+build
+
+# Ignore all .DS_Store files (OSX)
 .DS_Store
+
+# Ignore all .env files
+.env
+
+# Ignore all .log files
+*.log
