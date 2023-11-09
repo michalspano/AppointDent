@@ -14,53 +14,91 @@ variables:
   SESSION_SERVICE_PATH: services/session-service
   # add any additional paths
 
+# We permit four stages: (i) install, (ii) lint, (iii) test (iv) test.
 stages:
-  - client
-  - server
-  - service1
-  - service2
-  - service3
-  - service4
-  - service5
+  - install
+  - lint
+  - test
+  - build
+
+before_script:
+  - apk update && apk add --no-cache bash 
+
+# TODO: fix caching of dependencies to ensure faster
+# pipeline performance.
 
 install-client:
-  stage: client
+  stage: install
   image: node:alpine
   tags:
     - docker
+  needs: []
   before_script:
-    - cd $SERVER_PATH
-    - npm ci --cache .npm
-    - apk update && apk add --no-cache bash
+    - cd $CLIENT_PATH
   script:
     - echo "Installing dependencies for client..."
     - npm install 
     - echo "Dependencies for client have been installed!"
 
-lint-client:
-  stage: client
+install-server:
+  stage: install
   image: node:alpine
   tags:
     - docker
+  needs: []
+  before_script:
+    - cd $SERVER_PATH
+  script:
+    - echo "Installing dependencies for server..."
+    - npm install 
+    - echo "Dependencies for client have been installed!"
+
+lint-client:
+  stage: lint
+  image: node:alpine
+  tags:
+    - docker
+  needs: ["install-client"]
+  before_script:
+    - cd $CLIENT_PATH
   script:
     - echo "Linting client..."
     - npm run lint
     - echo "Lint successful!"
   allow_failure: true
-  needs: ["install-client"]
 
-build-client:
-  stage: client
+lint-server:
+  stage: lint
   image: node:alpine
   tags:
     - docker
+  needs: ["install-server"]
+  before_script:
+    - cd $SERVER_PATH
   script:
+    - echo "Linting server..."
+    - npm run lint
+    - echo "Lint successful!"
+  allow_failure: true
+
+# TODO: add testing stage for server (via Postman)
+
+# TODO: finish the building stage
+
+build-client:
+  stage: build
+  image: node:alpine
+  tags:
+    - docker
+  needs: ["install-client"]
+  before_script:
+    - cd $CLIENT_PATH
+  script:
+    - echo "Building the client..."
     - npm run build
+    - echo "Build successful!"
   artifacts:
     paths:
-      - echo "Building the client..."
-      - $SERVER_PATH/dist
-      - echo "Build successful!"
+      - $CLIENT_PATH/dist
   only:
     - main # we don't want to excessively exhaust the servers
-  needs: ["install-client"]
