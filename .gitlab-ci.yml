@@ -5,13 +5,13 @@ services:
   - docker:dind
 
 variables:
-  - SERVER_PATH: server
-  - CLIENT_PATH: client
-  - APPOINTMENT_SERVICE_PATH: services/appointment-service
-  - DENTIST_SERVICE_PATH: services/dentist-service
-  - NOTIFICATION_SERVICE_PATH: services/notification-service
-  - PATIENT_SERVICE_PATH: services/patient-service
-  - SESSION_SERVICE_PATH: services/session-service
+  SERVER_PATH: server
+  CLIENT_PATH: client
+  APPOINTMENT_SERVICE_PATH: services/appointment-service
+  DENTIST_SERVICE_PATH: services/dentist-service
+  NOTIFICATION_SERVICE_PATH: services/notification-service
+  PATIENT_SERVICE_PATH: services/patient-service
+  SESSION_SERVICE_PATH: services/session-service
   # add any additional paths
 
 stages:
