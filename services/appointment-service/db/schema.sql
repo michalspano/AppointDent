@@ -6,5 +6,5 @@ CREATE TABLE IF NOT EXISTS appointments (
     long VARCHAR(255) NOT NULL,
     lat VARCHAR(255) NOT NULL,
     dentistId VARCHAR(64) NOT NULL,
-    patientId VARCHAR(64) NOT NULL,
+    patientId VARCHAR(64) NOT NULL
 );
