@@ -60,8 +60,8 @@ install-server:
         - $SERVER_PATH/package-lock.json 
     paths:
       - $SERVER_PATH/.npm 
-    before_script:
-    - cd $SERVER_PATH
+  before_script:
+  - cd $SERVER_PATH
   script:
     - echo "Installing dependencies for server..."
     - npm ci --cache .npm --prefer-offline
