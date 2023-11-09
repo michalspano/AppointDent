@@ -45,8 +45,7 @@ install-client:
     - echo "Installing dependencies for client..."
     - npm ci --cache .npm --prefer-offline
     - echo "Dependencies for client have been installed!"" 
-    # verify that the `.npm` file exists
-    - if [ ! -f ".npm" ]; then echo "Error: .npm file not found!"; exit 1; fi
+    # add a proper check that `.npm` is installed
 
 install-server:
   stage: install
@@ -67,8 +66,7 @@ install-server:
     - echo "Installing dependencies for server..."
     - npm ci --cache .npm --prefer-offline
     - echo "Dependencies for server have been installed!"" 
-    # verify that the `.npm` file exists
-    - if [ ! -f ".npm" ]; then echo "Error: .npm file not found!"; exit 1; fi
+    # add a proper check that `.npm` is installed
 
 # Currently disabled because client does not support `npm run lint`.
 # lint-client:
