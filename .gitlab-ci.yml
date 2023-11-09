@@ -1,0 +1,66 @@
+# Entry point for GitLab CI for the AppointDent Project
+
+image: node:docker
+services:
+  - docker:dind
+
+variables:
+  - SERVER_PATH: server
+  - CLIENT_PATH: client
+  - APPOINTMENT_SERVICE_PATH: services/appointment-service
+  - DENTIST_SERVICE_PATH: services/dentist-service
+  - NOTIFICATION_SERVICE_PATH: services/notification-service
+  - PATIENT_SERVICE_PATH: services/patient-service
+  - SESSION_SERVICE_PATH: services/session-service
+  # add any additional paths
+
+stages:
+  - client
+  - server
+  - service1
+  - service2
+  - service3
+  - service4
+  - service5
+
+install-client:
+  stage: client
+  image: node:alpine
+  tags:
+    - docker
+  before-script:
+    - cd $SERVER_PATH
+    - npm ci --cache .npm
+    - apk update && apk add --no-cache bash
+  script:
+    - echo "Installing dependencies for client..."
+    - npm install 
+    - echo "Dependencies for client have been installed!"
+
+lint-client:
+  stage: client
+  image: node:alpine
+  tags:
+    - docker
+  script:
+    - echo "Linting client..."
+    - npm run lint
+    - echo "Lint successful!"
+  allow-failure: true
+  needs: ["install-client"]
+
+build-client:
+  stage: client
+  image: node:alpine
+  tags:
+    - docker
+  script:
+    - npm run build
+  artifacts:
+    paths:
+      - echo "Building the client..."
+      - $SERVER_PATH/dist
+      - echo "Build successful!"
+  only:
+    - main # we don't want to excessively exhaust the servers
+  needs: ["install-client"]
