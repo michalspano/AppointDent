@@ -91,6 +91,7 @@ lint-server:
   needs: ["install-server"]
   before_script:
     - cd $SERVER_PATH
+    - npm ci --cache .npm --prefer-offline
   script:
     - echo "Linting server..."
     - npm run lint
