@@ -2,7 +2,7 @@
 import { render } from 'solid-js/web'
 import { Router, Route, Routes } from '@solidjs/router'
 import './index.css'
-import Login from './components/Login/Login.tsx'
+import Login from './routes/Login'
 import Home from './routes/Home'
 
 const root = document.getElementById('root')
