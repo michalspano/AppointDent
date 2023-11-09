@@ -6,7 +6,7 @@ import { A } from '@solidjs/router'
 export default function LoginForm (): JSX.Element {
   return <>
   <div class="h-full w-full bg-white flex flex-col items-center justify-center">
-        <div class="lg:w-2/3 w-3/4 flex flex-col text-black rounded-sm bg-gradient-to-b from-neutral ... px-10 py-10 text-sm font-medium">
+        <div class="lg:w-3/4 w-3/4 flex flex-col text-black rounded-sm bg-gradient-to-b from-neutral ... px-10 py-10 text-sm font-medium">
             <div class="flex items-center justify-center">
                 <img class="w-40 " src={logo} alt="AppointDent" />
             </div>
