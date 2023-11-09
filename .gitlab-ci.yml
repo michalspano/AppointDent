@@ -33,12 +33,20 @@ install-client:
   tags:
     - docker
   needs: []
+  cache:
+    key:
+      files: 
+        - $CLIENT_PATH/package-lock.json
+    paths:
+      - $CLIENT_PATH/.npm
   before_script:
     - cd $CLIENT_PATH
   script:
     - echo "Installing dependencies for client..."
-    - npm install 
-    - echo "Dependencies for client have been installed!"
+    - npm ci --cache .npm --prefer-offline
+    - echo "Dependencies for client have been installed!"" 
+    # verify that the `.npm` file exists
+    - if [ ! -f ".npm" ]; then echo "Error: .npm file not found!"; exit 1; fi
 
 install-server:
   stage: install
@@ -46,26 +54,36 @@ install-server:
   tags:
     - docker
   needs: []
-  before_script:
+  # Cache dependencies using the `package-lock.json` file.
+  cache:
+    key:
+      files:
+        - $SERVER_PATH/package-lock.json 
+    paths:
+      - $SERVER_PATH/.npm 
+    before_script:
     - cd $SERVER_PATH
   script:
     - echo "Installing dependencies for server..."
-    - npm install 
-    - echo "Dependencies for client have been installed!"
+    - npm ci --cache .npm --prefer-offline
+    - echo "Dependencies for server have been installed!"" 
+    # verify that the `.npm` file exists
+    - if [ ! -f ".npm" ]; then echo "Error: .npm file not found!"; exit 1; fi
 
-lint-client:
-  stage: lint
-  image: node:alpine
-  tags:
-    - docker
-  needs: ["install-client"]
-  before_script:
-    - cd $CLIENT_PATH
-  script:
-    - echo "Linting client..."
-    - npm run lint
-    - echo "Lint successful!"
-  allow_failure: true
+# Currently disabled because client does not support `npm run lint`.
+# lint-client:
+#   stage: lint
+#   image: node:alpine
+#   tags:
+#     - docker
+#   needs: ["install-client"]
+#   before_script:
+#     - cd $CLIENT_PATH
+#   script:
+#     - echo "Linting client..."
+#     - npm run lint
+#     - echo "Lint successful!"
+#   allow_failure: true
 
 lint-server:
   stage: lint
