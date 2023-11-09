@@ -46,7 +46,7 @@ lint-client:
     - echo "Linting client..."
     - npm run lint
     - echo "Lint successful!"
-  allow-failure: true
+  allow_failure: true
   needs: ["install-client"]
 
 build-client:
