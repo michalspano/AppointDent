@@ -28,7 +28,7 @@ install-client:
   image: node:alpine
   tags:
     - docker
-  before-script:
+  before_script:
     - cd $SERVER_PATH
     - npm ci --cache .npm
     - apk update && apk add --no-cache bash
