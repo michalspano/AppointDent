@@ -49,7 +49,7 @@ export default function LoginForm (): JSX.Element {
             <input
               class="input h-12 w-full px-3 py-2 mb-3  mr-2  border rounded-xl"
               type="text"
-              placeholder="Number"
+              placeholder="House number"
             />
             <input
               class="input h-12 w-full px-3 py-2 mb-3  border rounded-xl"
