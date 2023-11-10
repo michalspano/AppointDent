@@ -47,6 +47,20 @@ lint-service1:
     - npm run lint
     - echo "Lint successful!"
 
+lint-service2:
+  stage: lint
+  # Image override: Python is required for the `better-sqlite3` dependency.
+  image: "nikolaik/python-nodejs:python3.10-nodejs18"
+  tags:
+    - docker
+  before_script:
+    - cd $DENTIST_SERVICE_PATH
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Linting dentist-service..."
+    - npm run lint
+    - echo "Lint successful!"
+
 # TODO: add testing stage for server (via Postman)
 
 test-server:
@@ -72,7 +86,21 @@ test-service1:
     - cd $APPOINTMENT_SERVICE_PATH
     - npm ci --cache .npm --prefer-offline
   script:
-    - echo "Running tests on the server..."
+    - echo "Running tests on the appointment-service..."
+    - exit 0 # TODO: execute the tests
+
+test-service2:
+  stage: test
+  # Image override: Python is required for the `better-sqlite3` dependency.
+  image: "nikolaik/python-nodejs:python3.10-nodejs18"
+  tags:
+    - docker
+  needs: ["lint-service2"]
+  before_script:
+    - cd $DENTIST_SERVICE_PATH
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Running tests on the dentist-service..."
     - exit 0 # TODO: execute the tests
 
 # TODO: finish the building stage
@@ -132,6 +160,27 @@ build-service1:
   artifacts:
     paths:
       - $APPOINTMENT_SERVICE_PATH/dist
+  # Disabled for testing purposes.
+  # only:
+  #   - main # we don't want to excessively exhaust the servers
+
+build-service2:
+  stage: build
+  # Image override: Python is required for the `better-sqlite3` dependency.
+  image: "nikolaik/python-nodejs:python3.10-nodejs18"
+  tags:
+    - docker
+  needs: ["test-service2"]
+  before_script:
+    - cd $DENTIST_SERVICE_PATH
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Building the dentist-service..."
+    - npm run build
+    - echo "Build successful!"
+  artifacts:
+    paths:
+      - $DENTIST_SERVICE_PATH/dist
   # Disabled for testing purposes.
   # only:
   #   - main # we don't want to excessively exhaust the servers
