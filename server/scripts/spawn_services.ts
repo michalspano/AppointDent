@@ -6,6 +6,7 @@ import { ChildProcess, spawn } from 'child_process';
  * @description spawn the services in the services directory.
  */
 function spawnServices(servicesPath: string): void {
+    return;
     fs.readdir(servicesPath, ((err: NodeJS.ErrnoException | null, services: string[]) => {
 
         if (err) throw Error(err.message);
