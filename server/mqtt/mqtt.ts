@@ -1,21 +1,21 @@
 import * as mqtt from "mqtt";
+import { listenForHeartbeat } from "./heartbeatListener";
 
-// export const client = mqtt.connect("mqtt://broker.hivemq.com");
+let client = undefined as mqtt.MqttClient | undefined;
+
+
+
 export const mqttClient = {
-    "client": undefined as mqtt.MqttClient | undefined,
-    "setup":(async (serviceName:string)=>{
-        mqttClient.client = mqtt.connect("mqtt://broker.hivemq.com") as (mqtt.MqttClient);
-        mqttClient.client.on("connect", () => {
-            mqttClient.client?.subscribe("HEARTBEAT/", (err) => {
-                if(!err) {
-                    heartbeat(mqttClient.client!,serviceName,1000);
-                }
-            });
-          });
-        
-          mqttClient.client?.on("message", (topic, message) => {
-            console.log(message.toString());
-            //mqttClient.client?.end();
+    "setup":(async (services:string[],topics:string[])=>{
+        console.log("Setting up MQTT");
+        client = mqtt.connect("mqtt://broker.hivemq.com") as (mqtt.MqttClient);
+        client.on("connect", () => {
+            listenForHeartbeat(services,client!,5);
+            for(let i=0;i<topics.length;i++) {
+                client?.subscribe(topics[i], (err) => {
+                    if(err) throw Error(err.message);
+                });
+              }    
           });
     })
 };
