@@ -2,9 +2,11 @@
 
 image: node:alpine
 
+# Global variables used throughout the pipeline. This is especially
+# helpful in the case of a mono-repository.
 variables:
-  SERVER_PATH: server
   CLIENT_PATH: client
+  SERVER_PATH: server
   APPOINTMENT_SERVICE_PATH: services/appointment-service
   DENTIST_SERVICE_PATH: services/dentist-service
   NOTIFICATION_SERVICE_PATH: services/notification-service
@@ -20,6 +22,18 @@ stages:
 
 before_script:
   - apk update && apk add --no-cache bash 
+
+lint-client:
+  stage: lint
+  tags:
+    - docker
+  before_script:
+    - cd $CLIENT_PATH
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Linting client..."
+    - npm run lint
+    - echo "Lint successful!"
 
 lint-server:
   stage: lint
@@ -103,7 +117,7 @@ lint-service5:
     - npm run lint
     - echo "Lint successful!"
 
-# TODO: add testing stage for server (via Postman)
+# Note: the client does not have a test stage.
 
 test-server:
   stage: test
@@ -187,13 +201,11 @@ test-service5:
     - echo "Running tests on the session-service..."
     - exit 0 # TODO: execute the tests
 
-# TODO: finish the building stage
-
 build-client:
   stage: build
   tags:
     - docker
-  needs: [] # the client has no tests (as of now)
+  needs: ["lint-client"] # the client has no tests
   before_script:
     - cd $CLIENT_PATH
     - npm ci --cache .npm --prefer-offline
@@ -204,9 +216,8 @@ build-client:
   artifacts:
     paths:
       - $CLIENT_PATH/dist
-  # Disabled for testing purposes.
-  # only:
-  #   - main # we don't want to excessively exhaust the servers
+  only:
+    - main # we don't want to excessively exhaust the servers
 
 build-server:
   stage: build
@@ -223,9 +234,8 @@ build-server:
   artifacts:
     paths:
       - $SERVER_PATH/dist
-  # Disabled for testing purposes.
-  # only:
-  #   - main # we don't want to excessively exhaust the servers
+  only:
+    - main # we don't want to excessively exhaust the servers
 
 build-service1:
   stage: build
@@ -244,9 +254,8 @@ build-service1:
   artifacts:
     paths:
       - $APPOINTMENT_SERVICE_PATH/dist
-  # Disabled for testing purposes.
-  # only:
-  #   - main # we don't want to excessively exhaust the servers
+  only:
+    - main # we don't want to excessively exhaust the servers
 
 build-service2:
   stage: build
@@ -265,9 +274,8 @@ build-service2:
   artifacts:
     paths:
       - $DENTIST_SERVICE_PATH/dist
-  # Disabled for testing purposes.
-  # only:
-  #   - main # we don't want to excessively exhaust the servers
+  only:
+    - main # we don't want to excessively exhaust the servers
 
 build-service3:
   stage: build
@@ -286,9 +294,8 @@ build-service3:
   artifacts:
     paths:
       - $NOTIFICATION_SERVICE_PATH/dist
-  # Disabled for testing purposes.
-  # only:
-  #   - main # we don't want to excessively exhaust the servers
+  only:
+    - main # we don't want to excessively exhaust the servers
 
 build-service4:
   stage: build
@@ -307,9 +314,8 @@ build-service4:
   artifacts:
     paths:
       - $PATIENT_SERVICE_PATH/dist
-  # Disabled for testing purposes.
-  # only:
-  #   - main # we don't want to excessively exhaust the servers
+  only:
+    - main # we don't want to excessively exhaust the servers
 
 build-service5:
   stage: build
@@ -328,6 +334,5 @@ build-service5:
   artifacts:
     paths:
       - $SESSION_SERVICE_PATH/dist
-  # Disabled for testing purposes.
-  # only:
-  #   - main # we don't want to excessively exhaust the servers
+  only:
+    - main # we don't want to excessively exhaust the servers
