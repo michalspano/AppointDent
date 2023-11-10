@@ -17,38 +17,36 @@ app.get('/', (req: Request, res: Response) => {
   res.send('Hello from AppointDent!');
 });
 
-async function parseServices(){
+async function parseService(service:string,servicesPath:string): Promise<void>{
   return new Promise((resolve)=>{
-    fs.readdir(servicesPath, ((err: NodeJS.ErrnoException | null, services: string[]) => {
-      while(services.length>0) {
-        const service=services.pop();
-        const assumedService: string = servicesPath + "/" + service;
-        fs.lstat(assumedService, ((err: NodeJS.ErrnoException | null, stats: Stats) => {
-            if (err) throw Error(err.message);
-            if (stats.isDirectory()) {
-              parsedServices.push(service!);
-            }
-          }));  
-      }
-      const watcher=setInterval(()=>{
-        if(services.length===0) {
-          resolve(true);
-          clearInterval(watcher);
+    const assumedService: string = servicesPath + "/" + service;
+    fs.lstat(assumedService, ((err: NodeJS.ErrnoException | null, stats: Stats) => {
+        if (err) throw Error(err.message);
+        if (stats.isDirectory()) {
+          parsedServices.push(service!);
         }
-      });
+        resolve();
+      }));  
+  });
+}
 
+async function parseServices(): Promise<void>{ 
+  return new Promise((resolve)=>{
+    fs.readdir(servicesPath, (async (err: NodeJS.ErrnoException | null, services: string[]) => {
+      const parseRequests = services.map(service => parseService(service, servicesPath));
+      const results=await Promise.allSettled(parseRequests);
+      results.forEach((result, index) => {
+        if(result.status==="rejected") throw Error(`Parsing ${services[index]} failed`);
+      });
+      resolve();
     }));
   });
-   
 }
 
 app.listen(port,async () => {
   console.log('Hello from AppointDent!');
   console.log(`Server is running at http://localhost:${port}`);
-  //Retrieve all services.
     await parseServices();
-    console.log(parsedServices);
     await spawnServices(servicesPath,parsedServices);
     mqttClient.setup(parsedServices,TOPICS);
-
 });

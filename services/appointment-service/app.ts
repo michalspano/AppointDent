@@ -8,7 +8,7 @@ const SERVICES_PATH = path.basename(path.dirname(__dirname));
 mqttClient.setup(SERVICES_PATH);
 
 config();
-
+ 
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello from: AppointDent - Appointments Service');
 });
@@ -17,5 +17,4 @@ app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
   console.log(`Using database: ${database?.name}`);
   console.log(`Database connection: ${database?.open ? 'OK' : 'ERROR'}`);
-  console.log('Connecting to MQTT');
 });
