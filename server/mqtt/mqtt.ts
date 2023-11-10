@@ -7,7 +7,6 @@ let client = undefined as mqtt.MqttClient | undefined;
 
 export const mqttClient = {
     "setup":(async (services:string[],topics:string[])=>{
-        console.log("Setting up MQTT");
         client = mqtt.connect("mqtt://broker.hivemq.com") as (mqtt.MqttClient);
         client.on("connect", () => {
             listenForHeartbeat(services,client!,5);

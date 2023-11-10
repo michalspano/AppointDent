@@ -28,4 +28,5 @@ export async function listenForHeartbeat(services: string[], client: mqtt.MqttCl
             }
         }
     });
+    console.log("Hearbeat Monitor Started");
 }
