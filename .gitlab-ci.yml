@@ -1,8 +1,6 @@
 # Entry point for GitLab CI for the AppointDent Project
 
-image: node:docker
-services:
-  - docker:dind
+image: node:alpine
 
 variables:
   SERVER_PATH: server
@@ -25,7 +23,6 @@ before_script:
 
 lint-server:
   stage: lint
-  image: node:alpine
   tags:
     - docker
   before_script:
@@ -35,15 +32,14 @@ lint-server:
     - echo "Linting server..."
     - npm run lint
     - echo "Lint successful!"
-  allow_failure: true
   
 # TODO: add testing stage for server (via Postman)
 
 test-server:
   stage: test
-  image: node:alpine
   tags:
     - docker
+  needs: ["lint-server"]
   before_script:
     - cd $SERVER_PATH
     - npm ci --cache .npm --prefer-offline
@@ -55,7 +51,6 @@ test-server:
 
 build-client:
   stage: build
-  image: node:alpine
   tags:
     - docker
   needs: [] # the client has no tests (as of now)
@@ -75,7 +70,6 @@ build-client:
 
 build-server:
   stage: build
-  image: node:alpine
   tags:
     - docker
   needs: ["test-server"]
