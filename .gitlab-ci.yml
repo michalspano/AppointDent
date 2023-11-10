@@ -61,6 +61,20 @@ lint-service2:
     - npm run lint
     - echo "Lint successful!"
 
+lint-service3:
+  stage: lint
+  # Image override: Python is required for the `better-sqlite3` dependency.
+  image: "nikolaik/python-nodejs:python3.10-nodejs18"
+  tags:
+    - docker
+  before_script:
+    - cd $NOTIFICATION_SERVICE_PATH
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Linting notification-service..."
+    - npm run lint
+    - echo "Lint successful!"
+
 # TODO: add testing stage for server (via Postman)
 
 test-server:
@@ -103,6 +117,19 @@ test-service2:
     - echo "Running tests on the dentist-service..."
     - exit 0 # TODO: execute the tests
 
+test-service3:
+  stage: test
+  # Image override: Python is required for the `better-sqlite3` dependency.
+  image: "nikolaik/python-nodejs:python3.10-nodejs18"
+  tags:
+    - docker
+  needs: ["lint-service3"]
+  before_script:
+    - cd $NOTIFICATION_SERVICE_PATH
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Running tests on the notification-service..."
+    - exit 0 # TODO: execute the tests
 # TODO: finish the building stage
 
 build-client:
@@ -181,6 +208,27 @@ build-service2:
   artifacts:
     paths:
       - $DENTIST_SERVICE_PATH/dist
+  # Disabled for testing purposes.
+  # only:
+  #   - main # we don't want to excessively exhaust the servers
+
+build-service3:
+  stage: build
+  # Image override: Python is required for the `better-sqlite3` dependency.
+  image: "nikolaik/python-nodejs:python3.10-nodejs18"
+  tags:
+    - docker
+  needs: ["test-service3"]
+  before_script:
+    - cd $NOTIFICATION_SERVICE_PATH
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Building the notification-service..."
+    - npm run build
+    - echo "Build successful!"
+  artifacts:
+    paths:
+      - $NOTIFICATION_SERVICE_PATH/dist
   # Disabled for testing purposes.
   # only:
   #   - main # we don't want to excessively exhaust the servers
