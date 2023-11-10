@@ -19,6 +19,7 @@ stages:
   - lint
   - test
   - build
+  # deploy?
 
 before_script:
   - apk update && apk add --no-cache bash 
@@ -336,3 +337,5 @@ build-service5:
       - $SESSION_SERVICE_PATH/dist
   only:
     - main # we don't want to excessively exhaust the servers
+
+# TODO: discuss the feasibility of the deploy stage
