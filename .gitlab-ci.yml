@@ -32,7 +32,21 @@ lint-server:
     - echo "Linting server..."
     - npm run lint
     - echo "Lint successful!"
-  
+
+lint-service1:
+  stage: lint
+  # Image override: Python is required for the `better-sqlite3` dependency.
+  image: "nikolaik/python-nodejs:python3.10-nodejs18"
+  tags:
+    - docker
+  before_script:
+    - cd $APPOINTMENT_SERVICE_PATH
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Linting appointment-service..."
+    - npm run lint
+    - echo "Lint successful!"
+
 # TODO: add testing stage for server (via Postman)
 
 test-server:
@@ -83,6 +97,26 @@ build-server:
   artifacts:
     paths:
       - $SERVER_PATH/dist
+  # Disabled for testing purposes.
+  # only:
+  #   - main # we don't want to excessively exhaust the servers
+
+ build-service1:
+  stage: build
+  image: "nikolaik/python-nodejs:python3.10-nodejs18"
+  tags:
+    - docker
+  needs: ["test-service1"]
+  before_script:
+    - cd $APPOINTMENT_SERVICE_PATH
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Building the appointment-service..."
+    - npm run build
+    - echo "Build successful!"
+  artifacts:
+    paths:
+      - $APPOINTMENT_SERVICE_PATH/dist
   # Disabled for testing purposes.
   # only:
   #   - main # we don't want to excessively exhaust the servers
