@@ -3,7 +3,7 @@
 The dentist appointment-booking application needs a GUI for the users to interact with the system. All kinds of devices, irrelevant of the operating systems installed on them, need to be able to use the system.
 </br>
 ## Decision
-We will have make use of SolidJS as a front-end framewok and make a web application.
+We will use SolidJS as a front-end framework
 </br>
 ## Status
 Accepted

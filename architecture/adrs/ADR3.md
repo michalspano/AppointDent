@@ -3,7 +3,7 @@
 A dentist appointment-booking application needs to offer integrity and confidentiality of data to its users. Users should be able to see and change, only their own data and not other users' data. To achieve good security and offer these qualities, the system needs to use some kind of authorisation.
 </br>
 ## Decision
-We will have an authorisation service that talks to the other services via the broker. This service will handle the aupthrisation of users.
+We will have an authorisation service that talks to the other services via the broker. This service will handle the authorisation of users.
 </br>
 ## Status
 Accepted
