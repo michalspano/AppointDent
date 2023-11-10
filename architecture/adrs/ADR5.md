@@ -2,8 +2,8 @@
 ## Context
 The services that process client requests, which make use of REST (ADR 2), need to be able to handle REST requests.
 </br>
-## Descision
-We will make use of NodeJS and ExpressJS for each service. Even though, different environments, frameworks, programming languages can be used for different services, we want to stay consisitent. As a result, NodeJS and ExpressJS will be used in all services.
+## Decision
+We will make use of NodeJS and ExpressJS for each service.We want to stay consistent. As a result, NodeJS and ExpressJS will be used in all services.
 </br>
 ## Status
 Accepted
