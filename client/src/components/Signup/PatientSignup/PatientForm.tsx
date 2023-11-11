@@ -1,9 +1,23 @@
 import { type JSX } from 'solid-js/jsx-runtime'
 import logo from '../../../assets/logo.png'
 import { A } from '@solidjs/router'
+import { createSignal } from 'solid-js'
 
-export default function LoginForm (): JSX.Element {
+export default function PatientForm (): JSX.Element {
   const today = new Date().toISOString().split('T')[0]
+  const [userEmail, setUserEmail] = createSignal('')
+  const [userPassword, setUserPassword] = createSignal('')
+  const [userFirstName, setUserFirstName] = createSignal('')
+  const [userLastName, setUserLastName] = createSignal('')
+  const [userBirthday, setUserBirthday] = createSignal('')
+
+  const signup = (): void => {
+    console.log(userEmail())
+    console.log(userPassword())
+    console.log(userFirstName())
+    console.log(userLastName())
+    console.log(userBirthday())
+  }
 
   return <>
   <div class="h-full w-full bg-white flex flex-col items-center justify-center">
@@ -17,22 +31,26 @@ export default function LoginForm (): JSX.Element {
           class="input h-12 px-3 py-2 mb-3 border rounded-xl"
           type="text"
           placeholder="Email"
+          onChange={(event) => setUserEmail(event.target.value)}
         />
         <input
           class="input h-12 px-3 py-2 mb-3 border rounded-xl"
           type="password"
           placeholder="Password"
+          onChange={(event) => setUserPassword(event.target.value)}
         />
           <div class="flex flex-row">
             <input
               class="input h-12 w-full px-3 py-2 mb-3 md:mb-0 mr-2 border rounded-xl"
               type="text"
               placeholder="First name"
+              onChange={(event) => setUserFirstName(event.target.value)}
             />
             <input
               class="input h-12 w-full px-3 py-2 mb-3 border rounded-xl"
               type="text"
               placeholder="Last name"
+              onChange={(event) => setUserLastName(event.target.value)}
             />
           </div>
           <input
@@ -40,9 +58,10 @@ export default function LoginForm (): JSX.Element {
               type="date"
               max={today}
               placeholder="Date of birth"
+              onChange={(event) => setUserBirthday(event.target.value)}
             />
 
-        <button type="submit" class="log-in-btn h-12 mb-6 bg-secondary rounded-xl text-base" >
+        <button type="submit" class="log-in-btn h-12 mb-6 bg-secondary rounded-xl text-base" onClick={signup}>
             Create account
             </button>
         <p class="font-extralight">Already have an account?

@@ -2,8 +2,17 @@ import { type JSX } from 'solid-js/jsx-runtime'
 import './LoginForm.css'
 import logo from '../../assets/logo.png'
 import { A } from '@solidjs/router'
+import { createSignal } from 'solid-js'
 
 export default function LoginForm (): JSX.Element {
+  const [userEmail, setUserEmail] = createSignal('')
+  const [userPassword, setUserPassword] = createSignal('')
+
+  const login = (): void => {
+    console.log(userEmail())
+    console.log(userPassword())
+  }
+
   return <>
   <div class="h-full w-full bg-white flex flex-col items-center justify-center">
         <div class="lg:w-3/4 w-3/4 flex flex-col text-black rounded-sm bg-gradient-to-b from-neutral ... px-10 py-10 text-sm font-medium">
@@ -16,13 +25,15 @@ export default function LoginForm (): JSX.Element {
           class="input h-12 px-3 py-2 mb-5 border rounded-xl"
           type="text"
           placeholder="Email"
-        />
+          onChange={(event) => setUserEmail(event.target.value)}
+          />
         <input
           class="input h-12 px-3 py-2 mb-8 border rounded-xl"
           type="password"
           placeholder="Password"
+          onChange={(event) => setUserPassword(event.target.value)}
         />
-        <button type="submit" class="log-in-btn h-12 mb-10 bg-secondary rounded-xl text-base" >
+        <button type="submit" class="log-in-btn h-12 mb-10 bg-secondary rounded-xl text-base" onClick={login}>
             Log in
             </button>
         <p class="font-extralight">Not registered yet?
