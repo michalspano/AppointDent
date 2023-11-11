@@ -9,7 +9,6 @@ export default function LoginNav (): JSX.Element {
 
   createEffect(() => {
     setCurrentRoute(location.pathname)
-    console.log(currentRoute())
   })
 
   onCleanup(() => {})

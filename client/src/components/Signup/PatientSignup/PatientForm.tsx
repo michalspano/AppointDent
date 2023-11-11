@@ -10,13 +10,26 @@ export default function PatientForm (): JSX.Element {
   const [userFirstName, setUserFirstName] = createSignal('')
   const [userLastName, setUserLastName] = createSignal('')
   const [userBirthday, setUserBirthday] = createSignal('')
+  const [error, setError] = createSignal<string | null>(null)
+  const fields = [
+    userEmail,
+    userPassword,
+    userFirstName,
+    userLastName,
+    userBirthday
+  ]
 
   const signup = (): void => {
+    if (fields.some((field) => field() === '')) {
+      setError('Please fill in all fields.')
+      return
+    }
     console.log(userEmail())
     console.log(userPassword())
     console.log(userFirstName())
     console.log(userLastName())
     console.log(userBirthday())
+    setError(null)
   }
 
   return <>
@@ -60,7 +73,7 @@ export default function PatientForm (): JSX.Element {
               placeholder="Date of birth"
               onChange={(event) => setUserBirthday(event.target.value)}
             />
-
+        {error() !== null && <p class="text-error">{error()}</p>}
         <button type="submit" class="log-in-btn h-12 mb-6 bg-secondary rounded-xl text-base" onClick={signup}>
             Create account
             </button>

@@ -7,10 +7,16 @@ import { createSignal } from 'solid-js'
 export default function LoginForm (): JSX.Element {
   const [userEmail, setUserEmail] = createSignal('')
   const [userPassword, setUserPassword] = createSignal('')
+  const [error, setError] = createSignal<string | null>(null)
 
   const login = (): void => {
+    if (userEmail() === '' || userPassword() === '') {
+      setError('Please fill in all fields.')
+      return
+    }
     console.log(userEmail())
     console.log(userPassword())
+    setError(null)
   }
 
   return <>
@@ -33,6 +39,7 @@ export default function LoginForm (): JSX.Element {
           placeholder="Password"
           onChange={(event) => setUserPassword(event.target.value)}
         />
+        {error() !== null && <p class="text-error">{error()}</p>}
         <button type="submit" class="log-in-btn h-12 mb-10 bg-secondary rounded-xl text-base" onClick={login}>
             Log in
             </button>

@@ -13,8 +13,24 @@ export default function DentistForm (): JSX.Element {
   const [userHouseNumber, setUserHouseNumber] = createSignal('')
   const [userZipcode, setUserZipcode] = createSignal('')
   const [userPicture, setUserPicture] = createSignal('')
+  const [error, setError] = createSignal<string | null>(null)
 
+  const fields = [
+    userEmail,
+    userPassword,
+    userFirstName,
+    userLastName,
+    userCity,
+    userStreet,
+    userHouseNumber,
+    userZipcode,
+    userPicture
+  ]
   const signup = (): void => {
+    if (fields.some((field) => field() === '')) {
+      setError('Please fill in all fields.')
+      return
+    }
     console.log(userEmail())
     console.log(userPassword())
     console.log(userFirstName())
@@ -24,6 +40,8 @@ export default function DentistForm (): JSX.Element {
     console.log(userHouseNumber())
     console.log(userZipcode())
     console.log(userPicture())
+
+    setError(null)
   }
 
   return <>
@@ -96,6 +114,7 @@ export default function DentistForm (): JSX.Element {
               onChange={(event) => setUserPicture(event.target.value)}
             />
 
+        {error() !== null && <p class="text-error">{error()}</p>}
         <button type="submit" class="log-in-btn h-12 mb-6 bg-secondary rounded-xl text-base" onclick={signup} >
             Create account
             </button>
