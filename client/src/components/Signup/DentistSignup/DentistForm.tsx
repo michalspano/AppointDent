@@ -8,10 +8,10 @@ export default function DentistForm (): JSX.Element {
   const [userPassword, setUserPassword] = createSignal('')
   const [userFirstName, setUserFirstName] = createSignal('')
   const [userLastName, setUserLastName] = createSignal('')
-  const [userCity, setUserCity] = createSignal('')
-  const [userStreet, setUserStreet] = createSignal('')
-  const [userHouseNumber, setUserHouseNumber] = createSignal('')
-  const [userZipcode, setUserZipcode] = createSignal('')
+  const [clinicCity, setClinicCity] = createSignal('')
+  const [clinicStreet, setClinicStreet] = createSignal('')
+  const [clinicHouseNumber, setClinicHouseNumber] = createSignal('')
+  const [clinicZipcode, setClinicZipcode] = createSignal('')
   const [userPicture, setUserPicture] = createSignal('')
   const [error, setError] = createSignal<string | null>(null)
 
@@ -20,10 +20,10 @@ export default function DentistForm (): JSX.Element {
     userPassword,
     userFirstName,
     userLastName,
-    userCity,
-    userStreet,
-    userHouseNumber,
-    userZipcode,
+    clinicCity,
+    clinicStreet,
+    clinicHouseNumber,
+    clinicZipcode,
     userPicture
   ]
   const signup = (): void => {
@@ -35,10 +35,10 @@ export default function DentistForm (): JSX.Element {
     console.log(userPassword())
     console.log(userFirstName())
     console.log(userLastName())
-    console.log(userCity())
-    console.log(userStreet())
-    console.log(userHouseNumber())
-    console.log(userZipcode())
+    console.log(clinicCity())
+    console.log(clinicStreet())
+    console.log(clinicHouseNumber())
+    console.log(clinicZipcode())
     console.log(userPicture())
 
     setError(null)
@@ -78,18 +78,21 @@ export default function DentistForm (): JSX.Element {
               onChange={(event) => setUserLastName(event.target.value)}
             />
           </div>
+          <label class="block pl-2 text-xs font-extralight pb-1">
+                Address of the clinic
+          </label>
           <div class="flex flex-row">
             <input
               class="input h-12 w-full px-3 py-2 mb-3  mr-2  border rounded-xl"
               type="text"
               placeholder="City"
-              onChange={(event) => setUserCity(event.target.value)}
+              onChange={(event) => setClinicCity(event.target.value)}
             />
             <input
               class="input h-12 w-full px-3 py-2 mb-3  border rounded-xl"
               type="text"
               placeholder="Street"
-              onChange={(event) => setUserStreet(event.target.value)}
+              onChange={(event) => setClinicStreet(event.target.value)}
             />
           </div>
           <div class="flex flex-row">
@@ -97,13 +100,13 @@ export default function DentistForm (): JSX.Element {
               class="input h-12 w-full px-3 py-2 mb-3  mr-2  border rounded-xl"
               type="text"
               placeholder="House number"
-              onChange={(event) => setUserHouseNumber(event.target.value)}
+              onChange={(event) => setClinicHouseNumber(event.target.value)}
             />
             <input
               class="input h-12 w-full px-3 py-2 mb-3  border rounded-xl"
               type="text"
               placeholder="Zipcode"
-              onChange={(event) => setUserZipcode(event.target.value)}
+              onChange={(event) => setClinicZipcode(event.target.value)}
             />
           </div>
           <label class="block pl-2 text-xs font-extralight pb-1">

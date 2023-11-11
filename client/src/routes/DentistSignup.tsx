@@ -5,7 +5,7 @@ import LoginNav from '../components/LoginNav/LoginNav'
 
 export default function DentistSignup (): JSX.Element {
   return <>
-      <div class="flex h-screen w-full">
+      <div class="flex h-full w-full">
           <div class="w-1/2 md:block hidden">
               <LoginImage/>
           </div>
