@@ -106,6 +106,9 @@ export default function DentistForm (): JSX.Element {
               onChange={(event) => setUserZipcode(event.target.value)}
             />
           </div>
+          <label class="block pl-2 text-xs font-extralight pb-1">
+                Upload a profile image
+          </label>
           <input
               class="input h-12 w-full px-3 py-2 mb-6  border rounded-xl"
               type="file"
