@@ -1,62 +1,80 @@
-import fs, { type Stats } from "fs";
-import { ChildProcess, spawn } from 'child_process';
+import { type ChildProcess, spawn } from 'child_process';
+
+async function spawnService (serviceName: string, servicesPath: string): Promise<ChildProcess> {
+  const servicePath = servicesPath + '/' + serviceName;
+  return await new Promise((resolve, reject) => {
+    const buildProcess: ChildProcess = spawn('npm', ['run', 'build'], { cwd: servicePath });
+
+    buildProcess.stderr?.on('data', () => {
+      reject(new Error(`${serviceName} build failed`));
+    });
+
+    buildProcess.on('close', (code: number | null) => {
+      console.log(`${serviceName} build process exited with code ${code}`);
+
+      if (code === 0) {
+        console.log(`${serviceName} build succeeded, spawning...`);
+
+        // Remove PORT from the child process environment
+        const childEnv: NodeJS.ProcessEnv = process.env;
+        delete childEnv.PORT;
+
+        const child: ChildProcess = spawn('npm', ['run', 'start'], {
+          cwd: servicePath,
+          env: childEnv
+        });
+
+        child.stdout?.on('data', (data) => {
+          console.log(`${serviceName}: ${data}`);
+          resolve(child);
+        });
+
+        child.stderr?.on('data', (data) => {
+          console.error(`${serviceName}: ${data}`);
+        });
+
+        child.on('close', (code: number | null) => {
+          console.log(`${serviceName} process exited with code ${code}`);
+        });
+      }
+    });
+  });
+}
 
 /**
- * @param servicesPath the path to the services directory.
- * @description spawn the services in the services directory.
+ *
+ * @param servicesPath
+ * @param services
+ * @description Spawns all services that are listed in the specified servicesPath
+ * as separate processes. Adds event handlers for interrupt signals to ensure graceful shutdown.
  */
-function spawnServices(servicesPath: string): void {
-    fs.readdir(servicesPath, ((err: NodeJS.ErrnoException | null, services: string[]) => {
+async function spawnServices (servicesPath: string, services: string[]): Promise<void> {
+  try {
+    const startRequests = services.map(async service => await spawnService(service, servicesPath));
+    const results: Array<PromiseSettledResult<ChildProcess>> = await Promise.allSettled(startRequests);
+    const children: Array<{ name: string, process: ChildProcess }> = [];
 
-        if (err) throw Error(err.message);
-        console.log("Building services...");
+    results.forEach((result: PromiseSettledResult<ChildProcess>, index: number) => {
+      if (result.status === 'rejected') throw Error(`Service ${services[index]} failed`);
+      children.push({
+        name: services[index],
+        process: result.value
+      });
+    });
 
-        for (let i = 0; i < services.length; i++) {
-            const serviceName: string = services[i].toLocaleUpperCase();
-            const assumedService: string = servicesPath + "/" + services[i];
-
-            fs.lstat(assumedService, ((err: NodeJS.ErrnoException | null, stats: Stats) => {
-                if (err) throw Error(err.message);
-                if (stats.isDirectory()) {
-                    const build_process: ChildProcess = spawn('npm', ['run', 'build'], { cwd: assumedService });
-
-                    build_process.stderr!.on('data', (data) => {
-                        console.log(`${serviceName} build failed`);
-                        throw new Error(data);
-                    });
-
-                    build_process.on('close', (code: number | null) => {
-                        console.log(`${serviceName} build process exited with code ${code}`);
-
-                        if (code === 0) {
-                            console.log(`${serviceName} build succeeded, spawning...`);
-
-                            // Remove PORT from the child process environment
-                            const child_env: NodeJS.ProcessEnv = process.env;
-                            delete child_env.PORT;
-
-                            const child: ChildProcess = spawn('npm', ['run', 'start'], {
-                                cwd: assumedService,
-                                env: child_env
-                            });
-
-                            child.stdout!.on('data', (data) => {
-                                console.log(`${serviceName}: ${data}`);
-                            });
-
-                            child.stderr!.on('data', (data) => {
-                                console.error(`${serviceName}: ${data}`);
-                            });
-
-                            child.on('close', (code: number | null) => {
-                                console.log(`${serviceName} process exited with code ${code}`);
-                            });
-                        }
-                    });
-                }
-            }));
+    ['SIGINT', 'SIGTERM', 'SIGQUIT', 'exit'].forEach((event: string) => {
+      process.on(event, () => {
+        while (children.length > 0) {
+          const child = children.pop();
+          child?.process.kill();
+          console.log('Killed ' + child?.name);
         }
-    }));
+        process.exit(0);
+      });
+    });
+  } catch (error: any) {
+    throw Error(`An error occurred while spawning services: ${error}`);
+  }
 }
 
 export default spawnServices;
