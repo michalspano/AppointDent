@@ -1,8 +1,8 @@
 import { config } from 'dotenv'
 import express, { type Express, type Request, type Response } from 'express'
 import spawnServices from './scripts/spawn_services'
-import fs, { type Stats } from 'fs'
 import { mqttClient } from './mqtt/mqtt'
+import { parseServices } from './scripts/parse_services'
 config() // init dotenv environment
 
 const TOPICS = ['HEARTBEAT']
@@ -17,37 +17,8 @@ app.get('/', (req: Request, res: Response) => {
   res.send('Hello from AppointDent!')
 })
 
-async function parseService (service: string, servicesPath: string): Promise<void> {
-  await new Promise<void>((resolve) => {
-    const assumedService: string = servicesPath + '/' + service
-    fs.lstat(assumedService, (err: NodeJS.ErrnoException | null, stats: Stats) => {
-      if (err != null) throw Error(err.message)
-      if (stats.isDirectory()) {
-        parsedServices.push(service)
-      }
-      resolve()
-    })
-  })
-}
-
-async function parseServices (): Promise<void> {
-  await new Promise<void>((resolve) => {
-    fs.readdir(servicesPath, (_err: NodeJS.ErrnoException | null, services: string[]) => {
-      const parseRequests = services.map(async service => { await parseService(service, servicesPath) })
-      Promise.allSettled(parseRequests).then((results) => {
-        results.forEach((result, index) => {
-          if (result.status === 'rejected') throw Error(`Parsing ${services[index]} failed`)
-        })
-        resolve()
-      }).catch((err) => {
-        console.error(err)
-      })
-    })
-  })
-}
-
 async function setupServices (): Promise<void> {
-  await parseServices()
+  await parseServices(servicesPath, parsedServices)
   await spawnServices(servicesPath, parsedServices)
 }
 

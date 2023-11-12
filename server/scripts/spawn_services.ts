@@ -42,8 +42,11 @@ async function spawnService (serviceName: string, servicesPath: string): Promise
 }
 
 /**
- * @param servicesPath the path to the services directory.
- * @description spawn the services in the services directory.
+ *
+ * @param servicesPath
+ * @param services
+ * @description Spawns all services that are listed in the specified servicesPath
+ * as separate processes. Adds event handlers for interrupt signals to ensure graceful shutdown.
  */
 async function spawnServices (servicesPath: string, services: string[]): Promise<void> {
   try {
@@ -51,7 +54,7 @@ async function spawnServices (servicesPath: string, services: string[]): Promise
     const results: Array<PromiseSettledResult<ChildProcess>> = await Promise.allSettled(startRequests)
     const children: Array<{ name: string, process: ChildProcess }> = []
 
-    results.forEach((result, index) => {
+    results.forEach((result: PromiseSettledResult<ChildProcess>, index: number) => {
       if (result.status === 'rejected') throw Error(`Service ${services[index]} failed`)
       children.push({
         name: services[index],
@@ -59,7 +62,7 @@ async function spawnServices (servicesPath: string, services: string[]): Promise
       })
     });
 
-    ['SIGINT', 'SIGTERM', 'SIGQUIT', 'exit'].forEach((event) => {
+    ['SIGINT', 'SIGTERM', 'SIGQUIT', 'exit'].forEach((event: string) => {
       process.on(event, () => {
         while (children.length > 0) {
           const child = children.pop()
