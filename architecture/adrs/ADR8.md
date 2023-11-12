@@ -16,4 +16,4 @@ There were many choices for a DBMS including Postgresql, MongoDB and etc. When w
 Moreover, Sqlite3 can read <code>.sql</code> files directly, thus removing the need to make a model using some library (As we had do if we used sequelize).
 </br>
 #### Negatives:
-Sqlite3 is light-weighted and only recommended if up to 1TB of data is to be saved on it. Therefore, the developers must ensure that each services' DB size does not exceed 1TB. After this threshold, performance may be degraded.
+Sqlite3 is lightweight and only recommended if up to 1TB of data is to be saved on it. Therefore, the developers must ensure that each services' DB size does not exceed 1TB. After this threshold, performance may be degraded.

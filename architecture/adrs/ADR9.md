@@ -1,6 +1,6 @@
 # ADR 9: Sqlite3 for database
 ## Context
-The system needs to be informed if one of the services has failed. Detection of faults is an important quality that the system needs to posses in order to find sources of faults during development time. 
+The system needs to be informed if one of the services has failed. Detection of faults is an important quality that the system needs to possess in order to find sources of faults during development time. 
 </br>
 ## Decision
 We will make use of the heartbeat availability technique by forcing each service to publish their heartbeat to the broker. Other services can subscribe to the topic and be notified of errors

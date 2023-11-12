@@ -3,7 +3,7 @@
 The project will make use of the microservices pattern (ADR 1) to build the dentist appointment-booking application requested by the customers.
 </br>
 </br>
-Moreover, upon deployment on a cloud, the services may become redundant. Therefore, there is a need for having stateless requests. 
+Moreover, upon deployment on a cloud-based service, the services may become redundant. Therefore, there is a need for having stateless requests. 
 </br>
 </br>
 REST also causes separation of concerns by forcing the separation of presentation and logic views into client and server blocks.
