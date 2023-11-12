@@ -1,12 +1,12 @@
-# ADR 7: TypeScript for type-chcking
+# ADR 7: TypeScript for type-checking
 ## Context
 The system is being developed using JavaScript both in front-end and back-end (ADR 4 and 5).
 </br>
 </br>
-JavaScript is a dynamically (loosely) typed programming langauge. Therefore, it is error-prone as it has no type-checking chracteristics such as Java or C++. 
+JavaScript is a dynamically (loosely) typed programming language. Therefore, it is error-prone as it has no type-checking characteristics such as Java or C++. 
 </br>
 </br>
-Even though, JavaScript's characteristics give freedom to developers, they also make it hard to find bugs (that is if developers learn about their existance). The system needs to be maintainable, meanining that bugs are found easier and the cost of maintenance is reduced.
+Even though, JavaScript's characteristics give freedom to developers, they also make it hard to find bugs (that is if developers learn about their existence). The system needs to be maintainable, meaning that bugs are found easier and the cost of maintenance is reduced.
 </br>
 ## Decision
 We will use TypeScript for writing code on both client and server sides.

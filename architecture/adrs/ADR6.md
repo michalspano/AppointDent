@@ -1,6 +1,6 @@
 # ADR 6: MQTT protocol to communicate with the broker
 ## Context
-The system uses the microservices architectural pattern (ADR 1). Different services need to communicate to each other using a broker. The services need to make use of a suitable potocol to communicate with the broker.
+The system uses the microservices architectural pattern (ADR 1). Different services need to communicate to each other using a broker. The services need to make use of a suitable protocol to communicate with the broker.
 </br>
 ## Decision
 We will make use of the MQTT protocol to communicate with the broker. The services, moreover, will make use of the [mqtt](https://www.npmjs.com/package/mqtt) library to make the connection. 
