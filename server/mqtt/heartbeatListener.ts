@@ -19,7 +19,7 @@ export async function listenForHeartbeat (services: string[], client: mqtt.MqttC
   }
   void panicMonitor(500, panicThreshold)
 
-  client?.on('message', (topic: string, message: Buffer): void => {
+  client?.on('message', (topic: string, message: Buffer) => {
     if (topic === 'HEARTBEAT') {
       for (const key in heartbeatMonitor) {
         if (message.toString() === key) {
