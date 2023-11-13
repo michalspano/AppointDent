@@ -259,7 +259,7 @@ test-server:
     - npm ci --cache .npm --prefer-offline
   script:
     - echo "Running tests on the server..."
-    - exit 0 # TODO: execute the tests
+    - npm run test # test and ci-test are the same (no db used in server)
 
 test-service1:
   stage: test
