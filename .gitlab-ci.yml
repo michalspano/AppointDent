@@ -318,7 +318,7 @@ test-service4:
     - npm ci --cache .npm --prefer-offline
   script:
     - echo "Running tests on the patient-service..."
-    - exit 0 # TODO: execute the tests
+    - npm run ci-test
 
 # Because service5 (i.e., session-service) does not use Express, it cannot
 # be tested using Postman, hence the test stage is disabled for now.
