@@ -9,9 +9,9 @@ module.exports = {
     "es2021": true,
     "node": true
   },
-  rules: {
+  "rules": {
     '@typescript-eslint/semi': ['error', 'always'],
-    'no-var': 'error',
+    'no-var': 'error'
   }
 };
 
