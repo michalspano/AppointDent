@@ -2,17 +2,20 @@
 import { render } from 'solid-js/web'
 import { Router, Route, Routes } from '@solidjs/router'
 import './index.css'
-
-import Home from './routes/Home'
-import Navbar from './components/Navbar/Navbar'
+import Login from './routes/Login.tsx'
+import Signup from './routes/Signup.tsx'
+import DentistSignup from './routes/DentistSignup.tsx'
+import PatientSignup from './routes/PatientSignup.tsx'
 
 const root = document.getElementById('root')
 if (root === null) throw Error('Root undefined!')
 render(() => <div>
-  <Navbar/>
     <Router>
       <Routes>
-        <Route path="/" component={Home} />
+        <Route path="/" component={Login} />
+        <Route path="/signup" component={Signup} />
+        <Route path="/dentist-signup" component={DentistSignup} />
+        <Route path="/patient-signup" component={PatientSignup} />
       </Routes>
     </Router>
 
