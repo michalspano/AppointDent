@@ -121,6 +121,9 @@ lint-service5:
     - echo "Lint successful!"
 
 # Note: the client does not have a test stage.
+# Therefore, it's sufficient if it's only built
+# on the main branch. Lint is still executed on
+# all branches.
 
 build-client:
   stage: build
@@ -191,8 +194,6 @@ build-service2:
   artifacts:
     paths:
       - $DENTIST_SERVICE_PATH/dist
-  only:
-    - main # we don't want to excessively exhaust the servers
 
 build-service3:
   stage: build
