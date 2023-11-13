@@ -1,0 +1,350 @@
+# Entry point for GitLab CI for the AppointDent Project
+
+image: node:alpine
+
+# Global variables used throughout the pipeline. This is especially
+# helpful in the case of a mono-repository.
+variables:
+  CLIENT_PATH: client
+  SERVER_PATH: server
+  APPOINTMENT_SERVICE_PATH: services/appointment-service
+  DENTIST_SERVICE_PATH: services/dentist-service
+  NOTIFICATION_SERVICE_PATH: services/notification-service
+  PATIENT_SERVICE_PATH: services/patient-service
+  SESSION_SERVICE_PATH: services/session-service
+  # add any additional paths
+
+# We permit three stages: (i) lint, (ii) build (transpile) (iii) test.
+# To be able to test the source code, it first needs to be transpiled
+# from TS to JS, hence the order of the stages.
+stages:
+  - lint
+  - build
+  - test
+  # deploy?
+
+before_script:
+  - apk update && apk add --no-cache bash 
+
+lint-client:
+  stage: lint
+  tags:
+    - docker
+  before_script:
+    - cd $CLIENT_PATH
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Linting client..."
+    - npm run lint
+    - echo "Lint successful!"
+
+lint-server:
+  stage: lint
+  tags:
+    - docker
+  before_script:
+    - cd $SERVER_PATH
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Linting server..."
+    - npm run lint
+    - echo "Lint successful!"
+
+lint-service1:
+  stage: lint
+  # Image override: Python is required for the `better-sqlite3` dependency.
+  image: "nikolaik/python-nodejs:python3.10-nodejs18"
+  tags:
+    - docker
+  before_script:
+    - cd $APPOINTMENT_SERVICE_PATH
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Linting appointment-service..."
+    - npm run lint
+    - echo "Lint successful!"
+
+lint-service2:
+  stage: lint
+  # Image override: Python is required for the `better-sqlite3` dependency.
+  image: "nikolaik/python-nodejs:python3.10-nodejs18"
+  tags:
+    - docker
+  before_script:
+    - cd $DENTIST_SERVICE_PATH
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Linting dentist-service..."
+    - npm run lint
+    - echo "Lint successful!"
+
+lint-service3:
+  stage: lint
+  # Image override: Python is required for the `better-sqlite3` dependency.
+  image: "nikolaik/python-nodejs:python3.10-nodejs18"
+  tags:
+    - docker
+  before_script:
+    - cd $NOTIFICATION_SERVICE_PATH
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Linting notification-service..."
+    - npm run lint
+    - echo "Lint successful!"
+
+lint-service4:
+  stage: lint
+  # Image override: Python is required for the `better-sqlite3` dependency.
+  image: "nikolaik/python-nodejs:python3.10-nodejs18"
+  tags:
+    - docker
+  before_script:
+    - cd $PATIENT_SERVICE_PATH
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Linting patient-service..."
+    - npm run lint
+    - echo "Lint successful!"
+
+lint-service5:
+  stage: lint
+  # Image override: Python is required for the `better-sqlite3` dependency.
+  image: "nikolaik/python-nodejs:python3.10-nodejs18"
+  tags:
+    - docker
+  before_script:
+    - cd $SESSION_SERVICE_PATH
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Linting session-service..."
+    - npm run lint
+    - echo "Lint successful!"
+
+# Note: the client does not have a test stage.
+# Therefore, it's sufficient if it's only built
+# on the main branch. Lint is still executed on
+# all branches.
+
+build-client:
+  stage: build
+  tags:
+    - docker
+  needs: ["lint-client"]
+  before_script:
+    - cd $CLIENT_PATH
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Building the client..."
+    - npm run build
+    - echo "Build successful!"
+  artifacts:
+    paths:
+      - $CLIENT_PATH/dist
+  only:
+    - main # we don't want to excessively exhaust the servers
+
+build-server:
+  stage: build
+  tags:
+    - docker
+  needs: ["lint-server"]
+  before_script:
+    - cd $SERVER_PATH
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Building the server..."
+    - npm run build
+    - echo "Build successful!"
+  artifacts:
+    paths:
+      - $SERVER_PATH/dist
+
+build-service1:
+  stage: build
+  # Image override: Python is required for the `better-sqlite3` dependency.
+  image: "nikolaik/python-nodejs:python3.10-nodejs18"
+  tags:
+    - docker
+  needs: ["lint-service1"]
+  before_script:
+    - cd $APPOINTMENT_SERVICE_PATH
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Building the appointment-service..."
+    - npm run build
+    - echo "Build successful!"
+  artifacts:
+    paths:
+      - $APPOINTMENT_SERVICE_PATH/dist
+
+build-service2:
+  stage: build
+  # Image override: Python is required for the `better-sqlite3` dependency.
+  image: "nikolaik/python-nodejs:python3.10-nodejs18"
+  tags:
+    - docker
+  needs: ["lint-service2"]
+  before_script:
+    - cd $DENTIST_SERVICE_PATH
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Building the dentist-service..."
+    - npm run build
+    - echo "Build successful!"
+  artifacts:
+    paths:
+      - $DENTIST_SERVICE_PATH/dist
+
+build-service3:
+  stage: build
+  # Image override: Python is required for the `better-sqlite3` dependency.
+  image: "nikolaik/python-nodejs:python3.10-nodejs18"
+  tags:
+    - docker
+  needs: ["lint-service3"]
+  before_script:
+    - cd $NOTIFICATION_SERVICE_PATH
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Building the notification-service..."
+    - npm run build
+    - echo "Build successful!"
+  artifacts:
+    paths:
+      - $NOTIFICATION_SERVICE_PATH/dist
+
+build-service4:
+  stage: build
+  # Image override: Python is required for the `better-sqlite3` dependency.
+  image: "nikolaik/python-nodejs:python3.10-nodejs18"
+  tags:
+    - docker
+  needs: ["lint-service4"]
+  before_script:
+    - cd $PATIENT_SERVICE_PATH
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Building the patient-service..."
+    - npm run build
+    - echo "Build successful!"
+  artifacts:
+    paths:
+      - $PATIENT_SERVICE_PATH/dist
+  
+build-service5:
+  stage: build
+  # Image override: Python is required for the `better-sqlite3` dependency.
+  image: "nikolaik/python-nodejs:python3.10-nodejs18"
+  tags:
+    - docker
+  needs: ["lint-service5"]
+  before_script:
+    - cd $SESSION_SERVICE_PATH
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Building the session-service..."
+    - npm run build
+    - echo "Build successful!"
+  artifacts:
+    paths:
+      - $SESSION_SERVICE_PATH/dist
+
+test-server:
+  stage: test
+  tags:
+    - docker
+  needs: ["build-server"]
+  before_script:
+    - cd $SERVER_PATH
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Running tests on the server..."
+    - npm run test # test and ci-test are the same (no db used in server)
+
+test-service1:
+  stage: test
+  # Image override: Python is required for the `better-sqlite3` dependency.
+  image: "nikolaik/python-nodejs:python3.10-nodejs18"
+  # Override the default DB path to use a test DB.
+  variables:
+    CUSTOM_DB_PATH: db/appointments-test.db
+  tags:
+    - docker
+  needs: ["build-service1"]
+  before_script:
+    - cd $APPOINTMENT_SERVICE_PATH
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Running tests on the appointment-service..."
+    - npm run ci-test
+
+test-service2:
+  stage: test
+  # Image override: Python is required for the `better-sqlite3` dependency.
+  image: "nikolaik/python-nodejs:python3.10-nodejs18"
+  # Override the default DB path to use a test DB.
+  variables:
+    CUSTOM_DB_PATH: db/dentists-test.db
+  tags:
+    - docker
+  needs: ["build-service2"]
+  before_script:
+    - cd $DENTIST_SERVICE_PATH
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Running tests on the dentist-service..."
+    - npm run ci-test
+
+test-service3:
+  stage: test
+  # Image override: Python is required for the `better-sqlite3` dependency.
+  image: "nikolaik/python-nodejs:python3.10-nodejs18"
+  # Override the default DB path to use a test DB.
+  variables:
+    CUSTOM_DB_PATH: db/notifications-test.db
+  tags:
+    - docker
+  needs: ["build-service3"]
+  before_script:
+    - cd $NOTIFICATION_SERVICE_PATH
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Running tests on the notification-service..."
+    - npm run ci-test
+
+test-service4:
+  stage: test
+  # Image override: Python is required for the `better-sqlite3` dependency.
+  image: "nikolaik/python-nodejs:python3.10-nodejs18"
+  # Override the default DB path to use a test DB.
+  variables:
+    CUSTOM_DB_PATH: db/patients-test.db
+  tags:
+    - docker
+  needs: ["build-service4"]
+  before_script:
+    - cd $PATIENT_SERVICE_PATH
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Running tests on the patient-service..."
+    - npm run ci-test
+
+# Because service5 (i.e., session-service) does not use Express, it cannot
+# be tested using Postman, hence the test stage is disabled for now.
+# TODO: add sensible tests for the session-service (e.g., using Jest).
+# Remove the dot in the beginning to unhide it.
+.test-service5:
+  stage: test
+  # Image override: Python is required for the `better-sqlite3` dependency.
+  image: "nikolaik/python-nodejs:python3.10-nodejs18"
+  tags:
+    - docker
+  needs: ["build-service5"]
+  before_script:
+    - cd $SESSION_SERVICE_PATH
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - echo "Running tests on the session-service..."
+    - exit 0 # TODO: execute the tests
+
+# TODO: discuss the feasibility of the deploy stage

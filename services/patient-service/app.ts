@@ -3,8 +3,9 @@ import { type Request, type Response } from 'express';
 import database from './db/config';
 import { app, port } from './config/config';
 import { mqttClient } from './mqtt/mqtt';
-import path from 'path';
-const SERVICES_PATH = path.basename(path.dirname(__dirname));
+import { basename, dirname } from 'path';
+
+const SERVICES_PATH: string = basename(dirname(__dirname));
 void mqttClient.setup(SERVICES_PATH);
 
 config();
@@ -12,6 +13,7 @@ config();
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello from: AppointDent - Patients Service');
 });
+
 app.listen(port, () => {
   console.log('AppointDent - Patients Service');
   console.log(`Server is running at http://localhost:${port}`);

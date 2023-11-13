@@ -1,0 +1,41 @@
+{
+	"info": {
+		"_postman_id": "3a98ab8c-7853-414f-b5e6-cce87b03cbc9",
+		"name": "notification-service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "29461036",
+		"_collection_link": "https://lively-robot-331309.postman.co/workspace/DIT356---Group-2~5bf71687-ed30-4209-b09f-e41d5824efd9/collection/29461036-3a98ab8c-7853-414f-b5e6-cce87b03cbc9?action=share&source=collection_link&creator=29461036"
+	},
+	"item": [
+		{
+			"name": "GET /",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response code shall be 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
