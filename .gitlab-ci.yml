@@ -180,7 +180,7 @@ build-service2:
   image: "nikolaik/python-nodejs:python3.10-nodejs18"
   tags:
     - docker
-  needs: ["test-service2"]
+  needs: ["lint-service2"]
   before_script:
     - cd $DENTIST_SERVICE_PATH
     - npm ci --cache .npm --prefer-offline
