@@ -320,7 +320,11 @@ test-service4:
     - echo "Running tests on the patient-service..."
     - exit 0 # TODO: execute the tests
 
-test-service5:
+# Because service5 (i.e., session-service) does not use Express, it cannot
+# be tested using Postman, hence the test stage is disabled for now.
+# TODO: add sensible tests for the session-service (e.g., using Jest).
+# Remove the dot in the beginning to unhide it.
+.test-service5:
   stage: test
   # Image override: Python is required for the `better-sqlite3` dependency.
   image: "nikolaik/python-nodejs:python3.10-nodejs18"
