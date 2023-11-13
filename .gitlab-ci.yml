@@ -290,7 +290,7 @@ test-service2:
     - npm ci --cache .npm --prefer-offline
   script:
     - echo "Running tests on the dentist-service..."
-    - exit 0 # TODO: execute the tests
+    - npm run ci-test
 
 test-service3:
   stage: test
