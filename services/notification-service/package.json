@@ -6,7 +6,7 @@
     "build": "npm i && npx tsc",
     "start": "node dist/app.js",
     "dev": "npm i && concurrently \"npx tsc --watch\" \"nodemon -q dist/app.js\"",
-    "test": "cross-env-shell CUSTOM_DB_PATH=db/appointments-test.db \"npm run newman-server\"",
+    "test": "cross-env-shell CUSTOM_DB_PATH=db/notifications-test.db \"npm run newman-server\"",
     "ci-test": "npm run newman-server",
     "newman-server": "npm run dropdb && run-p --race start newman-wait",
     "newman-wait": "wait-on http://127.0.0.1:3004/ && npm run newman",
