@@ -1,7 +1,6 @@
-import { readFileSync } from 'fs';
+import fs from 'fs';
 import Database from 'better-sqlite3';
 import type { Database as DatabaseType } from 'better-sqlite3';
-import fs from 'fs';
 
 /**
  * @description the options for the database connection.
@@ -43,7 +42,7 @@ const database: DatabaseType | undefined = (() => {
     const db = new Database(DB_FILE, options);
     db.pragma('journal_mode = WAL');
     // Load the schema file to the database.
-    db.exec(readFileSync(schemaFilePath, 'utf8'));
+    db.exec(fs.readFileSync(schemaFilePath, 'utf8'));
 
     return db;
   } catch (error: Error | unknown) {
