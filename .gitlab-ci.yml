@@ -282,6 +282,9 @@ test-service2:
   stage: test
   # Image override: Python is required for the `better-sqlite3` dependency.
   image: "nikolaik/python-nodejs:python3.10-nodejs18"
+  # Override the default DB path to use a test DB.
+  variables:
+    CUSTOM_DB_PATH: db/dentists-test.db
   tags:
     - docker
   needs: ["build-service2"]
@@ -296,6 +299,9 @@ test-service3:
   stage: test
   # Image override: Python is required for the `better-sqlite3` dependency.
   image: "nikolaik/python-nodejs:python3.10-nodejs18"
+  # Override the default DB path to use a test DB.
+  variables:
+    CUSTOM_DB_PATH: db/notifications-test.db
   tags:
     - docker
   needs: ["build-service3"]
@@ -310,6 +316,9 @@ test-service4:
   stage: test
   # Image override: Python is required for the `better-sqlite3` dependency.
   image: "nikolaik/python-nodejs:python3.10-nodejs18"
+  # Override the default DB path to use a test DB.
+  variables:
+    CUSTOM_DB_PATH: db/patients-test.db
   tags:
     - docker
   needs: ["build-service4"]
