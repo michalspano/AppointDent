@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs';
+import fs from 'fs';
 import Database from 'better-sqlite3';
 import type { Database as DatabaseType } from 'better-sqlite3';
 
@@ -12,13 +12,21 @@ const options: object = Object.freeze({
 
 /**
  * @description the name of the database file.
+ * When the test environment is used, the value of
+ * DB_FILE is set to a custom path (typically <service>-test.db).
+ * This way, we can seamlessly switch which local .db file is used.
  */
-const DB_FILE: string = './db/dentists.db';
+const DB_FILE: string = process.env.CUSTOM_DB_PATH ?? './db/dentists.db';
 
 /**
  * @description the path to the schema file.
  */
 const schemaFilePath: string = './db/schema.sql';
+
+/* Verify that DB_FILE exists. If not, create it (just an empty file).
+ * This eliminates the error that occurs when the database file does not exist
+ * on the local machine. */
+if (!fs.existsSync(DB_FILE)) fs.writeFileSync(DB_FILE, '');
 
 /**
  * @description the database instance with the options and the local
@@ -34,7 +42,7 @@ const database: DatabaseType | undefined = (() => {
     const db = new Database(DB_FILE, options);
     db.pragma('journal_mode = WAL');
     // Load the schema file to the database.
-    db.exec(readFileSync(schemaFilePath, 'utf8'));
+    db.exec(fs.readFileSync(schemaFilePath, 'utf8'));
 
     return db;
   } catch (error: Error | unknown) {
