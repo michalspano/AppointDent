@@ -6,6 +6,12 @@
     "build": "npm i && npx tsc",
     "start": "node dist/app.js",
     "dev": "npm i && concurrently \"npx tsc --watch\" \"nodemon -q dist/app.js\"",
+    "test": "cross-env-shell CUSTOM_DB_PATH=db/notifications-test.db \"npm run newman-server\"",
+    "ci-test": "npm run newman-server",
+    "newman-server": "npm run dropdb && run-p --race start newman-wait",
+    "newman-wait": "wait-on http://127.0.0.1:3004/ && npm run newman",
+    "newman": "newman run tests/Test.postman_collection.json -e tests/Test.postman_environment.json",
+    "dropdb": "node dist/scripts/dropdb.js",
     "lint": "eslint **/*.ts",
     "lint:fix": "eslint **/*.ts --fix"
   },
@@ -15,9 +21,13 @@
   "dependencies": {
     "@types/better-sqlite3": "^7.6.7",
     "better-sqlite3": "^9.0.0",
+    "cross-env": "^7.0.3",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "mqtt": "^5.1.4"
+    "mqtt": "^5.1.4",
+    "newman": "^6.0.0",
+    "npm-run-all": "^4.1.5",
+    "wait-on": "^7.1.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.20",

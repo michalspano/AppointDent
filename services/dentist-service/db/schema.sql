@@ -6,7 +6,10 @@ CREATE TABLE IF NOT EXISTS dentists (
     fName VARCHAR(64) NOT NULL,
     lName VARCHAR(64) NOT NULL,
     birthDate DATE NOT NULL,
-    -- TODO: add address (composite type)
-    -- location ...
+    clinic_country VARCHAR NOT NULL,
+    clinic_city VARCHAR NOT NULL,
+    clinic_street VARCHAR NOT NULL,
+    clinic_house_number INT NOT NULL,
+    clinic_zipcode INT NOT NULL,
     picture VARCHAR NOT NULL -- a base64 encoded image (taken as a string)
 );
