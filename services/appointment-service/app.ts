@@ -1,5 +1,5 @@
 import { config } from 'dotenv';
-import { type Request, type Response } from 'express';
+import router from './routes';
 import database from './db/config';
 import { app, port } from './config/config';
 import { mqttClient } from './mqtt/mqtt';
@@ -10,12 +10,14 @@ void mqttClient.setup(SERVICES_PATH);
 
 config();
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('Hello from: AppointDent - Appointments Service');
-});
+// Use the routes defined in routes/index.ts.
+app.use('/api', router);
+
+// TODO: add mechanism to add undefined routes. 
+
 app.listen(port, () => {
   console.log('AppointDent - Appointments Service');
-  console.log(`Server is running at http://localhost:${port}`);
+  console.log(`Server is running at http://localhost:${port}/api`);
   console.log(`Using database: ${database?.name}`);
   console.log(`Database connection: ${((database?.open) ?? false) ? 'OK' : 'ERROR'}`);
 });
