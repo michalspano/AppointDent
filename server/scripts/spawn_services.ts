@@ -1,17 +1,19 @@
 import { type ChildProcess, spawn } from 'child_process';
-import { BuildError, ServiceError } from '../errors/errors';
 
+/**
+ * Spawn an individual service using ChildProcess
+ * @param serviceName
+ * @param servicesPath
+ * @param retryOnBuildFault
+ * @returns A running child process
+ */
 async function spawnService (serviceName: string, servicesPath: string, retryOnBuildFault: boolean): Promise<ChildProcess> {
   const servicePath = servicesPath + '/' + serviceName;
   return await new Promise((resolve, reject) => {
     const buildProcess: ChildProcess = spawn('npm', ['run', 'build'], { cwd: servicePath });
 
     buildProcess.on('close', (code: number | null) => {
-      console.log(`${serviceName} build process exited with code ${code}`);
-
       if (code === 0) {
-        console.log(`${serviceName} build succeeded, spawning...`);
-
         // Remove PORT from the child process environment
         const childEnv: NodeJS.ProcessEnv = process.env;
         delete childEnv.PORT;
@@ -31,44 +33,53 @@ async function spawnService (serviceName: string, servicesPath: string, retryOnB
         });
 
         child.on('close', (code: number | null) => {
-          console.log(`${serviceName} process exited with code ${code}`);
           if (code !== 0) {
-            throw new ServiceError(`Service ${serviceName} exited with non-zero code`);
+            throw new Error(`${serviceName}: Exited with non-zero code`);
           }
         });
       } else if (retryOnBuildFault) {
+        /**
+         * In the event of an initial fault, we attempt to recover the system using a fault recovery
+         * tactic through implemented by npm ci. When working with multiple projects, sometimes the
+         * dependecies can conflict, cache can fail or simply miss dependencies.
+         *
+         * In that case we want to
+         * ensure that we have the correct dependencies which we can do through npm ci, which removes node_modules,
+         * bypasses package.json and uses package-lock.json to install the exact dependency.
+         */
+        console.log('Initial attempt failed. Attempting to reinstall node_modules through clean install.');
         const purgeChild: ChildProcess = spawn('npm', ['ci'], {
           cwd: servicePath
         });
         purgeChild.on('close', (code: number | null) => {
           if (code === 0) {
-            console.log('Successful purge');
             resolve(spawnService(serviceName, servicesPath, false));
+          } else {
+            reject(new Error(`${serviceName}: clean install failed`));
           }
         });
       } else {
-        reject(new BuildError(`${serviceName} build failed`));
+        reject(new Error(`${serviceName}: Consequent build attempts failed`));
       }
     });
   });
 }
 
 /**
- *
+ * Spawns all services that are listed in the specified servicesPath
  * @param servicesPath
  * @param services
- * @description Spawns all services that are listed in the specified servicesPath
- * as separate processes. Adds event handlers for interrupt signals to ensure graceful shutdown.
  */
 async function spawnServices (servicesPath: string, services: string[]): Promise<void> {
   await new Promise<void>((resolve, reject) => {
+    console.log('Building and spawning services...');
     const startRequests = services.map(async service => await spawnService(service, servicesPath, true));
     Promise.allSettled(startRequests).then((results: Array<PromiseSettledResult<ChildProcess>>) => {
       const children: Array<{ name: string, process: ChildProcess }> = [];
 
       results.forEach((result: PromiseSettledResult<ChildProcess>, index: number) => {
         if (result.status === 'rejected') throw Error(`Service ${services[index]} failed`);
-        children.push({
+        children.push({ // Store all children in an array so that we can kill them upon shutdown.
           name: services[index],
           process: result.value
         });
@@ -79,7 +90,7 @@ async function spawnServices (servicesPath: string, services: string[]): Promise
           while (children.length > 0) {
             const child = children.pop();
             child?.process.kill();
-            console.log('Killed ' + child?.name);
+            console.log('Killed ' + child?.name + ' with code SIGTERM');
           }
           process.exit(0);
         });
