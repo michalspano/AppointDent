@@ -130,7 +130,7 @@ export const updateDentistController = (req: Request, res: Response): void => {
     }
 
     const updatedDentist = { email, ...updatedInfo };
-    res.json({ updatedDentist });
+    res.json(updatedDentist);
   } catch (error) {
     console.error('Error updating dentist:', error);
     res.status(500).json({ message: 'Internal Server Error' });
