@@ -1,8 +1,10 @@
 // import database from '../db/config';
 import type { Request, Response } from 'express';
+import database from '../db/config';
 // import { type Statement } from 'better-sqlite3';
-
 export const getAllAppointments = (req: Request, res: Response): void => {
+  const result = database?.prepare('SELECT * FROM appointments').all();
+  console.log(result);
   // TODO: Finish implementation
   res.status(400).json({ message: 'Not implemented.' });
 };
