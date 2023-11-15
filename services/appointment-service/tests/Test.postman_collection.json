@@ -1,22 +1,91 @@
 {
 	"info": {
-		"_postman_id": "b16f2572-725a-43df-abd8-7f81869f2e42",
+		"_postman_id": "21c30e5d-468f-44ab-9082-e624fd1f7faa",
 		"name": "appointment-service",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "29461036",
-		"_collection_link": "https://lively-robot-331309.postman.co/workspace/DIT356---Group-2~5bf71687-ed30-4209-b09f-e41d5824efd9/collection/29461036-b16f2572-725a-43df-abd8-7f81869f2e42?action=share&source=collection_link&creator=29461036"
+		"_exporter_id": "31133349",
+		"_collection_link": "https://appointdent.postman.co/workspace/AppointDent~3d7b8d88-ecc1-4d83-a513-eb9122453c58/collection/31133349-21c30e5d-468f-44ab-9082-e624fd1f7faa?action=share&source=collection_link&creator=31133349"
 	},
 	"item": [
 		{
-			"name": "GET /",
+			"name": "POST /api/appointments",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Response code shall be 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});"
+							"pm.test(\"Response code shall be 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response is in JSON format\", function () {",
+							"    pm.response.to.be.json;",
+							"});",
+							"",
+							"// TODO: add tests that check types and number of fields.",
+							"",
+							"// Set the ID for other tests.",
+							"const appointmentId = pm.response.json().id;",
+							"pm.environment.set(\"appointmentId\", appointmentId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"start_timestamp\": 123131312,\n    \"end_timestamp\": 123131987,\n    \"dentistId\": \"sdkashd123918\",\n    \"patientId\": \"1321madsjiadha2\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/appointments",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"appointments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /api/appointments",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// UNCOMMENT WHEN IMPLEMENTED",
+							"// pm.test(\"Response code shall be 200\", function () {",
+							"//     pm.response.to.have.status(200);",
+							"// });",
+							"",
+							"// // Parse the response JSON",
+							"// var jsonData = pm.response.json();",
+							"",
+							"// // Check if the response is an array",
+							"// pm.test(\"Response is an array\", function () {",
+							"//     pm.expect(jsonData).to.be.an('array');",
+							"// });",
+							"",
+							"// // Check if each item in the array is an object",
+							"// pm.test(\"Items in the array are objects\", function () {",
+							"//     if (jsonData.length > 0) {",
+							"//         jsonData.forEach(function (item) {",
+							"//             pm.expect(item).to.be.an('object');",
+							"//         });",
+							"//     }",
+							"// });",
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -26,12 +95,91 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/",
+					"raw": "{{host}}/api/appointments",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
-						""
+						"api",
+						"appointments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE /api/appointments/:id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response code shall be 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response is in JSON format\", function () {",
+							"    pm.response.to.be.json;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/appointments/:id",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"appointments",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{appointmentId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET invalid route",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response code shall be 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"Response text should match\", function () {",
+							"    pm.expect(pm.response.text()).to.equal(\"Not found.\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/foobar",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"foobar"
 					]
 				}
 			},
