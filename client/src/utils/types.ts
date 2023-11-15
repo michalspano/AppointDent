@@ -11,14 +11,15 @@ export interface Patient {
     firstName: string
     lastName: string
   }
-  dateOdBirth?: Date
+  dateOfBirth: Date
   session?: {
     hash: string
     expiry?: Date
   }
 }
 
-export interface Dentist extends Patient {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+interface HiddenDentist extends Patient {
   address: {
     street: string
     city: string
@@ -29,6 +30,11 @@ export interface Dentist extends Patient {
   picture: string
 }
 
+type RemoveDateOfBirth<Type> = {
+  [Property in keyof Type as Exclude<Property, 'dateOfBirth'>]: Type[Property]
+}
+
+export type Dentist = RemoveDateOfBirth<HiddenDentist>
 /*
 The start and end dates are timestamps in the backend. In my opinion,
 the backend should convert them to date and then send them to the front-end
