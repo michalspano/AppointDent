@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "build": "npm ci && npx tsc",
+    "purge":"npm ci",
+    "build": "npx tsc",
     "start": "node dist/app.js",
-    "dev": "npm ci && concurrently \"npx tsc --watch\" \"nodemon -q dist/app.js\"",
+    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/app.js\"",
     "test": "cross-env-shell CUSTOM_DB_PATH=db/notifications-test.db \"npm run newman-server\"",
     "ci-test": "npm run newman-server",
     "newman-server": "npm run dropdb && run-p --race start newman-wait",
