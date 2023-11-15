@@ -1,4 +1,4 @@
-# ADR 9: Sqlite3 for database
+# ADR 9: Heartbeat tactic
 ## Context
 The system needs to be informed if one of the services has failed. Detection of faults is an important quality that the system needs to possess in order to find sources of faults during development time. 
 </br>
