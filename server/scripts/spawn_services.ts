@@ -78,7 +78,7 @@ async function spawnServices (servicesPath: string, services: string[]): Promise
       const children: Array<{ name: string, process: ChildProcess }> = [];
 
       results.forEach((result: PromiseSettledResult<ChildProcess>, index: number) => {
-        if (result.status === 'rejected') throw Error(`Service ${services[index]} failed`);
+        if (result.status === 'rejected') throw Error(`Service ${services[index]}: ${result.reason}`);
         children.push({ // Store all children in an array so that we can kill them upon shutdown.
           name: services[index],
           process: result.value

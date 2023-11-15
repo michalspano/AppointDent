@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "purge":"npm ci",
-    "build": "npx tsc",
+    "build": "np tsc",
     "start": "node dist/app.js",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/app.js\"",
     "lint": "eslint **/*.ts",
