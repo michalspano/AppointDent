@@ -5,10 +5,6 @@ async function spawnService (serviceName: string, servicesPath: string): Promise
   return await new Promise((resolve, reject) => {
     const buildProcess: ChildProcess = spawn('npm', ['run', 'build'], { cwd: servicePath });
 
-    buildProcess.stderr?.on('data', () => {
-      reject(new Error(`${serviceName} build failed`));
-    });
-
     buildProcess.on('close', (code: number | null) => {
       console.log(`${serviceName} build process exited with code ${code}`);
 
@@ -36,6 +32,8 @@ async function spawnService (serviceName: string, servicesPath: string): Promise
         child.on('close', (code: number | null) => {
           console.log(`${serviceName} process exited with code ${code}`);
         });
+      } else {
+        reject(new Error(`${serviceName} build failed`));
       }
     });
   });
