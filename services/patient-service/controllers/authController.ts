@@ -24,7 +24,7 @@ export const loginController = async (req: Request, res: Response): Promise<void
     }
 
     try {
-      const passwordMatch = await bcrypt.compare(pass, patient.pass);
+      const passwordMatch: boolean = await bcrypt.compare(pass, patient.pass);
 
       if (!passwordMatch) {
         sendUnauthorized(res, 'Invalid email or password');
