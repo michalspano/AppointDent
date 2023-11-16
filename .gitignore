@@ -13,3 +13,6 @@ build
 
 # Ignore all .log files
 *.log
+*.db-shm
+*.db-shm
+*.db-wal
