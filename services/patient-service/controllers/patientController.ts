@@ -3,49 +3,6 @@ import database from '../db/config';
 import bcrypt from 'bcrypt';
 import type * as BetterSqlite3 from 'better-sqlite3';
 
-export const registerController = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { email, pass, birthDate, fName, lName } = req.body;
-
-    if (database?.prepare == null) {
-      sendServerError(res);
-      return;
-    }
-
-    try {
-      const hashedPassword = await bcrypt.hash(pass, 10);
-
-      function isDatabaseDefined (obj: any): obj is BetterSqlite3.Database {
-        return obj !== undefined && obj !== null && obj.prepare !== undefined;
-      }
-
-      if (!isDatabaseDefined(database)) {
-        sendServerError(res);
-        return;
-      }
-      const query = database.prepare(`
-        INSERT INTO patients 
-        (email, pass, birthDate, fName, lName) VALUES (?, ?, ?, ?, ?)`);
-
-      query.run(email, hashedPassword, birthDate, fName, lName);
-
-      const createdPatient = {
-        email,
-        birthDate,
-        fName,
-        lName
-      };
-      sendCreated(res, createdPatient);
-    } catch (hashError) {
-      console.error('Error hashing password:', hashError);
-      sendServerError(res);
-    }
-  } catch (error) {
-    console.error('Error registering patient:', error);
-    sendServerError(res);
-  }
-};
-
 export const updatePatientController = (req: Request, res: Response): Response<any, Record<string, any>> => {
   try {
     const email = req.params.email;
