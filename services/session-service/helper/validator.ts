@@ -1,7 +1,7 @@
 /**
  * Validate the format of an MQTT request array.
  * @param msgArr The array representing the MQTT request.
- * @description This method validates that the MQTT request ends with a '*'
+ * @description This method validates that the MQTT request has a correct format
  * and throws an error with the correct request format.
  */
 export async function validateRequestFormat (msgArr: string[]): Promise<void> {

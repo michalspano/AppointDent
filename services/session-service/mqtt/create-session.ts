@@ -56,10 +56,10 @@ async function createNewSession (request: CreateSessionRequest): Promise<string>
       }
 
       // Hash the session token
-      const hashedKey = crypto.createHash('sha256').update(key).digest('hex');
+      const hashedKey: string = crypto.createHash('sha256').update(key).digest('hex');
 
       // Calculate the session's expiration time (1 hour from now), this extends the expiry
-      const expiry = (Math.round(Date.now() / 1000) + EXPIRE_IN_SECONDS);
+      const expiry: number = (Math.round(Date.now() / 1000) + EXPIRE_IN_SECONDS);
 
       // Delete the previous session key
       executeQuery('DELETE FROM sessions WHERE hash = ?', [userResult.session_hash], false, false);
