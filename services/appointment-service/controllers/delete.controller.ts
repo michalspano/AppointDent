@@ -2,8 +2,30 @@ import database from '../db/config';
 import type { Request, Response } from 'express';
 import { type Statement } from 'better-sqlite3';
 
+// Delete all appointment entries; preserve the schema.
+export const deleteAllAppointments = (req: Request, res: Response): void => {
+  if (database === undefined) {
+    res.status(500).json({
+      message: 'Internal server error: database connection failed.'
+    });
+    return;
+  }
+
+  try {
+    database.prepare('DELETE FROM appointments').run();
+  } catch (err: Error | unknown) {
+    res.status(500).json({
+      message: 'Internal server error: query failed.'
+    });
+    return;
+  }
+
+  // Deletion was successful.
+  res.status(204).end();
+};
+
 // Delete an appointment by id.
-const deleteAppointment = (req: Request, res: Response): void => {
+export const deleteAppointment = (req: Request, res: Response): void => {
   if (database === undefined) {
     res.status(500).json({
       message: 'Internal server error: database connection failed.'

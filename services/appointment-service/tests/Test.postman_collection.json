@@ -233,27 +233,26 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"// TODO: UNCOMMENT WHEN IMPLEMENTED",
-							"// pm.test(\"Response code shall be 200\", function () {",
-							"//     pm.response.to.have.status(200);",
-							"// });",
+							"pm.test(\"Response code shall be 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
 							"",
-							"// // Parse the response JSON",
-							"// var jsonData = pm.response.json();",
+							"// Parse the response JSON",
+							"var jsonData = pm.response.json();",
 							"",
-							"// // Check if the response is an array",
-							"// pm.test(\"Response is an array\", function () {",
-							"//     pm.expect(jsonData).to.be.an('array');",
-							"// });",
+							"// Check if the response is an array",
+							"pm.test(\"Response is an array\", function () {",
+							"    pm.expect(jsonData).to.be.an('array');",
+							"});",
 							"",
-							"// // Check if each item in the array is an object",
-							"// pm.test(\"Items in the array are objects\", function () {",
-							"//     if (jsonData.length > 0) {",
-							"//         jsonData.forEach(function (item) {",
-							"//             pm.expect(item).to.be.an('object');",
-							"//         });",
-							"//     }",
-							"// });",
+							"// Check if each item in the array is an object",
+							"pm.test(\"Items in the array are objects\", function () {",
+							"    if (jsonData.length > 0) {",
+							"        jsonData.forEach(function (item) {",
+							"            pm.expect(item).to.be.an('object');",
+							"        });",
+							"    }",
+							"});",
 							""
 						],
 						"type": "text/javascript"
@@ -271,6 +270,126 @@
 					"path": [
 						"api",
 						"appointments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /api/appointments/:id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response code shall be 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Parse the response JSON",
+							"var jsonData = pm.response.json();",
+							"",
+							"// Check if the response is an object",
+							"pm.test(\"Response is an object\", function () {",
+							"    pm.expect(jsonData).to.be.an('object');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/appointments/:id",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"appointments",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{appointmentId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /api/appointments/:id (invalid)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response code shall be 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/appointments/:id",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"appointments",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "foobarbaz"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET invalid route",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response code shall be 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"Response text should match\", function () {",
+							"    pm.expect(pm.response.text()).to.equal(\"Not found.\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/foobar",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"foobar"
 					]
 				}
 			},
@@ -319,36 +438,32 @@
 			"response": []
 		},
 		{
-			"name": "GET invalid route",
+			"name": "DELETE *appointments",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Response code shall be 404\", function () {",
-							"    pm.response.to.have.status(404);",
-							"});",
-							"",
-							"pm.test(\"Response text should match\", function () {",
-							"    pm.expect(pm.response.text()).to.equal(\"Not found.\");",
-							"});",
-							""
+							"pm.test(\"Response code shall be 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
 						],
 						"type": "text/javascript"
 					}
 				}
 			],
 			"request": {
-				"method": "GET",
+				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/api/foobar",
+					"raw": "{{host}}/api/appointments/",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"api",
-						"foobar"
+						"appointments",
+						""
 					]
 				}
 			},
