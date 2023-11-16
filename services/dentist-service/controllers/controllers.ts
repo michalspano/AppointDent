@@ -15,11 +15,22 @@ interface Dentist {
   clinic_zipcode: number
   picture: string
 }
+interface RegistrationRequestBody {
+  email: string
+  pass: string
+  fName: string
+  lName: string
+  clinicCountry: string
+  clinicCity: string
+  clinicStreet: string
+  clinicHouseNumber: string
+  clinicZipCode: string
+  picture: string
+}
 
-export const registerController = (req: Request, res: Response): void => {
+export const registerController = (req: Request<string, unknown, RegistrationRequestBody>, res: Response): void => {
   try {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    const { email, pass, fName, lName, clinic_country, clinic_city, clinic_street, clinic_house_number, clinic_zipcode, picture } = req.body;
+    const { email, pass, fName, lName, clinicCountry, clinicCity, clinicStreet, clinicHouseNumber, clinicZipCode, picture } = req.body;
 
     // Hash password before storing
     bcrypt.hash(pass, 10, (hashError: Error | undefined, hashedPassword) => {
@@ -39,17 +50,17 @@ export const registerController = (req: Request, res: Response): void => {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
 
-      query.run(email, hashedPassword, fName, lName, clinic_country, clinic_city, clinic_street, clinic_house_number, clinic_zipcode, picture);
+      query.run(email, hashedPassword, fName, lName, clinicCountry, clinicCity, clinicStreet, clinicHouseNumber, clinicZipCode, picture);
 
       const createdDentist = {
         email,
         fName,
         lName,
-        clinic_country,
-        clinic_city,
-        clinic_street,
-        clinic_house_number,
-        clinic_zipcode,
+        clinicCountry,
+        clinicCity,
+        clinicStreet,
+        clinicHouseNumber,
+        clinicZipCode,
         picture
       };
 
