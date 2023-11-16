@@ -8,7 +8,7 @@ import { type Appointment } from '../types/types';
  * @description a helper function to convert an unknown object to an
  * Appointment object. This is used when retrieving an appointment from
  * the database (it returns, indeed, an unknown object).
- * 
+ *
  * @param obj an unknown object
  * @returns Appointment object
  */
