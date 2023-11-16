@@ -4,11 +4,24 @@ import { type Statement } from 'better-sqlite3';
 import { randomUUID } from 'crypto';
 import type { UUID } from 'crypto';
 
+/**
+ * @description the interface for the appointment object.
+ * The id is a UUID (Universally Unique Identifier) and is
+ * generated using the crypto module.
+ */
+interface Appointment {
+  id: UUID
+  start_timestamp: number
+  end_timestamp: number
+  dentistId: UUID
+  patientId: UUID
+};
+
 export const getAllAppointments = (req: Request, res: Response): void => {
   const result = database?.prepare('SELECT * FROM appointments').all();
   console.log(result);
   // TODO: Finish implementation
-  res.status(400).json({ message: 'Not implemented.' });
+  res.status(200).json({ message: 'Not implemented.' });
 };
 
 export const getAppointment = (req: Request, res: Response): void => {
@@ -25,35 +38,35 @@ export const createAppointment = (req: Request, res: Response): void => {
     return;
   }
 
-  const body: Record<string, number | string> | undefined = req.body;
-  if (body === undefined) {
+  const appointment: Appointment = {
+    id: randomUUID(),
+    start_timestamp: req.body.start_timestamp,
+    end_timestamp: req.body.end_timestamp,
+    dentistId: req.body.dentistId,
+    patientId: req.body.patientId
+  };
+
+  const stmt: Statement = database.prepare(`
+    INSERT INTO appointments
+    (id, start_timestamp, end_timestamp, dentistId, patientId)
+    VALUES (?, ?, ?, ?, ?)
+  `);
+
+  /* A query can fail because of a bad request (e.g. invalid object),
+   * or that something is wrong with the database (an internal server error).
+   * TODO: add proper error handling, so that the latter case is appropriately
+   * handled with a 500 status code.*/
+  try {
+    stmt.run(Object.values(appointment));
+  } catch (err: Error | unknown) {
     res.status(400).json({
-      message: 'Bad request: body is undefined.'
+      message: 'Bad request: invalid appointment object.'
     });
     return;
   }
 
-  // TODO: add a check that determines if the body is valid.
-  // By valid we mean that it contains all the required fields.
-  // If the body is not valid, return a 400 Bad Request response.
-
-  const id: UUID = randomUUID();
-  const stmt: Statement = database.prepare(
-    'INSERT INTO appointments' +
-    '(id, start_timestamp, end_timestamp, dentistId, patientId)' +
-    'VALUES (?, ?, ?, ?, ?)'
-  );
-
-  try {
-    stmt.run(id, Object.values(body)); // This is very unsafe and should only be done when the body is validated!
-  } catch (err: Error | unknown) {
-    res.status(500).json({
-      message: 'Internal server error: query failed.'
-    });
-  }
-
   // Everything went well, return the created object.
-  res.status(201).json({ id, ...body });
+  res.status(201).json({ ...appointment });
 };
 
 // Delete an appointment by id.
