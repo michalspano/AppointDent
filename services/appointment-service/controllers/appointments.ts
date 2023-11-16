@@ -2,20 +2,7 @@ import database from '../db/config';
 import type { Request, Response } from 'express';
 import { type Statement } from 'better-sqlite3';
 import { randomUUID } from 'crypto';
-import type { UUID } from 'crypto';
-
-/**
- * @description the interface for the appointment object.
- * The id is a UUID (Universally Unique Identifier) and is
- * generated using the crypto module.
- */
-interface Appointment {
-  id: UUID
-  start_timestamp: number
-  end_timestamp: number
-  dentistId: UUID
-  patientId: UUID
-};
+import { type Appointment } from '../types/types';
 
 export const getAllAppointments = (req: Request, res: Response): void => {
   const result = database?.prepare('SELECT * FROM appointments').all();
