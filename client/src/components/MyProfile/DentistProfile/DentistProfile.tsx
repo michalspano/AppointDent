@@ -4,8 +4,12 @@ import { type Dentist } from '../../../utils/types'
 import { createStore } from 'solid-js/store'
 import type { JSX } from 'solid-js'
 
-export default function DentistProfile (dentistProp: Dentist): JSX.Element {
-  const [dentist, setDentist] = createStore<Dentist>(dentistProp)
+interface DentistProfileProps {
+  dentistProp: Dentist
+}
+
+export default function DentistProfile (dentistProp: DentistProfileProps): JSX.Element {
+  const [dentist, setDentist] = createStore<Dentist>(dentistProp.dentistProp)
   return <>
     <div class="h-full w-full bg-white flex flex-col items-center justify-center">
       <div class="lg:w-3/4 w-5/6 flex flex-col text-black rounded-sm bg-gradient-to-b from-neutral ... lg:px-10 px-5 py-3 text-sm font-medium">
