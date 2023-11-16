@@ -1,5 +1,6 @@
 import { type Request, type Response } from 'express';
 import database from '../db/config';
+import { sendServerError, sendNotFound } from './controllerUtils';
 
 export const updatePatientController = (req: Request, res: Response): Response<any, Record<string, any>> => {
   try {
@@ -41,11 +42,3 @@ export const updatePatientController = (req: Request, res: Response): Response<a
     return res.sendStatus(500);
   }
 };
-
-function sendNotFound (res: Response, message: string): Response {
-  return res.status(404).json({ message });
-}
-
-function sendServerError (res: Response): Response {
-  return res.status(500).json({ message: 'Server Error' });
-}

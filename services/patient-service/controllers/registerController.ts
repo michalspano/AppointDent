@@ -2,6 +2,7 @@ import { type Request, type Response } from 'express';
 import database from '../db/config';
 import bcrypt from 'bcrypt';
 import type * as BetterSqlite3 from 'better-sqlite3';
+import { sendServerError, sendCreated } from './controllerUtils';
 
 export const registerController = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -45,11 +46,3 @@ export const registerController = async (req: Request, res: Response): Promise<v
     sendServerError(res);
   }
 };
-
-function sendCreated (res: Response, data: Record<string, any>): Response {
-  return res.status(201).json(data);
-}
-
-function sendServerError (res: Response): Response {
-  return res.status(500).json({ message: 'Server Error' });
-}
