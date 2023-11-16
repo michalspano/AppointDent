@@ -9,14 +9,37 @@ export default function LoginForm (): JSX.Element {
   const [userPassword, setUserPassword] = createSignal('')
   const [error, setError] = createSignal<string | null>(null)
 
-  const login = (): void => {
+  const login = async (): Promise<void> => {
     if (userEmail() === '' || userPassword() === '') {
       setError('Please fill in all fields.')
       return
     }
-    console.log(userEmail())
-    console.log(userPassword())
-    setError(null)
+    // console.log(userEmail())
+    // console.log(userPassword())
+    // setError(null)
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: userEmail(),
+          password: userPassword()
+        })
+      })
+      if (response.ok) {
+        const data = await response.json()
+        console.log('Login successful:', data)
+        setError(null)
+      } else {
+        const errorData = await response.json()
+        setError(errorData.message)
+      }
+    } catch (error) {
+      console.error('Error during login:', error)
+      setError('An unexpected error occurred.')
+    }
   }
 
   return <>
@@ -40,7 +63,15 @@ export default function LoginForm (): JSX.Element {
           onChange={(event) => setUserPassword(event.target.value)}
         />
         {error() !== null && <p class="text-error">{error()}</p>}
-        <button type="submit" class="log-in-btn h-12 mb-10 bg-secondary rounded-xl text-base" onClick={login}>
+        <button type="submit" class="log-in-btn h-12 mb-10 bg-secondary rounded-xl text-base"
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+        onClick={async () => {
+          try {
+            await login()
+          } catch (error) {
+            console.error('Login failed:', error)
+          }
+        }}>
             Log in
             </button>
         <p class="font-extralight">Not registered yet?
