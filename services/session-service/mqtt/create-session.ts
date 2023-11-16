@@ -5,21 +5,16 @@ import * as crypto from 'crypto';
 import { type User, type CreateSessionRequest } from '../types/types';
 import { executeQuery } from '../helper/query';
 import { EXPIRE_IN_SECONDS } from '../helper/constants';
+import { validateRequestFormat } from '../helper/validator';
+
 const TOPIC = 'CREATESESSION';
 const RESPONSE_TOPIC = 'SESSION';
-async function validateRequestFormat (msgArr: string[]): Promise<void> {
-  if (!msgArr[msgArr.length - 1].includes('*')) {
-    throw Error('Could not find "*" in message! Please double check that you are sending the full data!');
-  }
-  if (msgArr.length !== 4) {
-    throw Error('Invalid format: REQID/EMAIL/PASSWORD/*');
-  }
-}
+
 /**
- * Parse a raw MQTT authorisation request
+ * Parse a raw MQTT session creation request.
  * @param rawMsg
- * @returns AuthenticationRequest
- * @description Used to parse and validate an auth request over MQTT.
+ * @returns CreateSessionRequest
+ * @description Used to parse and validate a session creation request over MQTT.
  */
 async function parseRawRequest (rawMsg: string): Promise<CreateSessionRequest> {
   const msgArr: string[] = rawMsg.split('/');
@@ -32,44 +27,45 @@ async function parseRawRequest (rawMsg: string): Promise<CreateSessionRequest> {
   return request;
 }
 
-function dumpAll (): void {
-  console.log('---');
-  const sessionsDump: any = database?.prepare('SELECT * FROM sessions');
-  for (const session of sessionsDump.iterate()) {
-    console.log(session);
-  }
-  const userDump: any = database?.prepare('SELECT * FROM users');
-  for (const user of userDump.iterate()) {
-    console.log(user);
-  }
-}
-
 /**
  * Used to create a new session key with an expiry of 1 hour.
- * @param request Received request that wants to create a new session
- * @returns Secret session key
+ * @param request Received request that wants to create a new session.
+ * @returns Secret session key.
  */
 async function createNewSession (request: CreateSessionRequest): Promise<string> {
   return await new Promise<string>((resolve, reject) => {
     try {
+      // Retrieve user information from the database
       const user: Statement<any> | Statement<[any]> | undefined = database?.prepare('SELECT * FROM users WHERE email = ?');
       const userResult: User = user?.get(request.email) as User;
       if (userResult === undefined) reject(new Error('User undefined.'));
+
+      // Hash the user's provided password and compare it with the stored hash
       const hash: string = crypto.createHash('sha256').update(request.password).digest('hex');
       if (hash !== userResult.password_hash) reject(new Error('Unmatching hashes'));
+
+      // Generate a unique session token
       let key: string = crypto.randomUUID();
       let keyUnique: boolean = false;
+      // Ensure the key is unique
       while (!keyUnique) {
         const sessionQuery: Statement<any> | Statement<[any]> | undefined = database?.prepare('SELECT * FROM sessions WHERE token = ?');
         const session = sessionQuery?.get(key);
         if (session === undefined) keyUnique = true;
         key = crypto.randomUUID();
       }
-      const hashedKey = crypto.createHash('sha256').update(key).digest('hex');
-      const expiry = (Math.round(Date.now() / 1000) + EXPIRE_IN_SECONDS); // Extends the expiration
 
-      executeQuery('DELETE FROM sessions WHERE hash = ?', [userResult.session_hash], false, false); // Delete previous session key
+      // Hash the session token
+      const hashedKey = crypto.createHash('sha256').update(key).digest('hex');
+
+      // Calculate the session's expiration time (1 hour from now), this extends the expiry
+      const expiry = (Math.round(Date.now() / 1000) + EXPIRE_IN_SECONDS);
+
+      // Delete the previous session key
+      executeQuery('DELETE FROM sessions WHERE hash = ?', [userResult.session_hash], false, false);
+      // Insert new session
       executeQuery('INSERT INTO sessions (hash, token, expiry) VALUES (?, ?, ?)', [hashedKey, key, expiry], true, true);
+      // Update the session hash in the users table
       executeQuery('UPDATE users SET session_hash = ? WHERE email = ?', [hashedKey, request.email], true, true);
       resolve(key);
     } catch (err) {
@@ -82,22 +78,26 @@ async function createNewSession (request: CreateSessionRequest): Promise<string>
   });
 }
 /**
- * Start session creation listener
- * @param client
- * @description Used for creating new sessions in the system
- * expected message format: EMAIL/PASSWORD*
- * EMAIL: user email
- * SECRET: Session secret
+ * Start the MQTT session creation listener.
+ * @param client MQTT clent to listen for messages.
+ * @description Used for creating new sessions in the system.
+ * Expected message format: REQID/EMAIL/PASSWORD/*
+ * REQID: Random unique id that requestor sets to identify an authentication request. Is not stored persistently in a DB.
+ * EMAIL: User's email
+ * PASSWORD: User's password in plaintext
  */
 export async function listenForSessionCreation (client: mqtt.MqttClient): Promise<void> {
+  // Set up a listener for MQTT messages
   client?.on('message', (topic: string, message: Buffer) => {
-    dumpAll();
-
+    // Check if the message is on the CREATESESSION topic
     if (topic === TOPIC) {
+      // Parse the raw request, create a new session, and publish the response
       parseRawRequest(message.toString()).then((result: CreateSessionRequest) => {
         createNewSession(result).then((session: string) => {
+          // Publish success response
           client.publish(RESPONSE_TOPIC, `${result.reqId}/${session}/*`);
         }).catch((err) => {
+          // Publish error response. It is indicated by a 0.
           client.publish(RESPONSE_TOPIC, `${result.reqId}/0/*`);
           console.error(err);
         });
@@ -106,6 +106,7 @@ export async function listenForSessionCreation (client: mqtt.MqttClient): Promis
       });
     }
   });
+  // Subscribe client to the CREATESESSION topic
   client.subscribe(TOPIC);
   console.log('Session Creation Listener Started');
 }
