@@ -33,7 +33,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"email\": \"john.doe123@example.com\",\n  \"pass\": \"secretpassword\",\n  \"fName\": \"John\",\n  \"lName\": \"Doe\",\n  \"clinic_country\": \"Country\",\n  \"clinic_city\": \"City\",\n  \"clinic_street\": \"Street\",\n  \"clinic_house_number\": 123,\n  \"clinic_zipcode\": 12345,\n  \"picture\": \"base64encodedimage\"\n}",
+					"raw": "{\n  \"email\": \"john.doe1@example.com\",\n  \"pass\": \"secretpassword\",\n  \"fName\": \"John\",\n  \"lName\": \"Doe\",\n  \"clinicCountry\": \"Country\",\n  \"clinicCity\": \"City\",\n  \"clinicStreet\": \"Street\",\n  \"clinicHouseNumber\": 123,\n  \"clinicZipCode\": 12345,\n  \"picture\": \"base64encodedimage\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
