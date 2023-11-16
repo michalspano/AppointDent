@@ -1,57 +1,50 @@
 import { type Request, type Response } from 'express';
 import database from '../db/config';
-import crypto from 'crypto';
+import type * as BetterSqlite3 from 'better-sqlite3';
+import * as controllerUtils from './controllerUtils';
 
-interface Patient {
-  email: string
-  pass: string
-}
-
-export const loginController = async (req: Request, res: Response): Promise<void> => {
+export const registerController = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email, pass } = req.body;
+    const { email, pass, birthDate, fName, lName } = req.body;
 
-    if (database === undefined) {
-      sendServerError(res);
-      return;
-    }
-
-    const patient = database.prepare('SELECT * FROM patients WHERE email = ?').get(email) as Patient;
-
-    if (patient === undefined) {
-      sendUnauthorized(res, 'Invalid email or password');
+    if (database?.prepare == null) {
+      controllerUtils.sendServerError(res);
       return;
     }
 
     try {
-      const hashedInputPass = crypto.createHash('sha256').update(pass).digest('hex');
+      function isDatabaseDefined (obj: any): obj is BetterSqlite3.Database {
+        return obj !== undefined && obj !== null && obj.prepare !== undefined;
+      }
 
-      const passwordMatch: boolean = hashedInputPass === patient.pass;
-
-      if (!passwordMatch) {
-        sendUnauthorized(res, 'Invalid email or password');
+      if (!isDatabaseDefined(database)) {
+        controllerUtils.sendServerError(res);
         return;
       }
 
-      sendSuccess(res, 'Login successful');
-    } catch (compareError) {
-      console.error('Error during logging in:', compareError);
-      sendServerError(res);
+      const query = database.prepare(`
+        INSERT INTO patients 
+        (email, pass, birthDate, fName, lName) VALUES (?, ?, ?, ?, ?)`);
+
+      query.run(email, pass, birthDate, fName, lName);
+
+      const createdPatient = {
+        email,
+        birthDate,
+        fName,
+        lName
+      };
+      controllerUtils.sendCreated(res, createdPatient);
+    } catch (error) {
+      console.error('Error registering patient:', error);
+      controllerUtils.sendServerError(res);
     }
   } catch (error) {
-    console.error('Error during logging in:', error);
-    sendServerError(res);
-  }
-
-  function sendServerError (res: Response): Response {
-    return res.status(500).json({ message: 'Server Error' });
-  }
-
-  function sendUnauthorized (res: Response, message: string): Response {
-    return res.status(401).json({ message });
-  }
-
-  function sendSuccess (res: Response, message: string): Response {
-    return res.status(200).json({ message });
+    console.error('Error registering patient:', error);
+    controllerUtils.sendServerError(res);
   }
 };
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export function loginController (arg0: string, loginController: any) {
+  throw new Error('Function not implemented.');
+}

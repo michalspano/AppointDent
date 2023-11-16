@@ -1,6 +1,5 @@
 import { type Request, type Response } from 'express';
 import database from '../db/config';
-import crypto from 'crypto';
 import type * as BetterSqlite3 from 'better-sqlite3';
 import { sendServerError, sendCreated } from './controllerUtils';
 
@@ -14,8 +13,6 @@ export const registerController = async (req: Request, res: Response): Promise<v
     }
 
     try {
-      const hashedPassword = crypto.createHash('sha256').update(pass).digest('hex');
-
       function isDatabaseDefined (obj: any): obj is BetterSqlite3.Database {
         return obj !== undefined && obj !== null && obj.prepare !== undefined;
       }
@@ -24,11 +21,12 @@ export const registerController = async (req: Request, res: Response): Promise<v
         sendServerError(res);
         return;
       }
+
       const query = database.prepare(`
         INSERT INTO patients 
         (email, pass, birthDate, fName, lName) VALUES (?, ?, ?, ?, ?)`);
 
-      query.run(email, hashedPassword, birthDate, fName, lName);
+      query.run(email, pass, birthDate, fName, lName);
 
       const createdPatient = {
         email,
@@ -37,8 +35,8 @@ export const registerController = async (req: Request, res: Response): Promise<v
         lName
       };
       sendCreated(res, createdPatient);
-    } catch (hashError) {
-      console.error('Error hashing password:', hashError);
+    } catch (error) {
+      console.error('Error registering patient:', error);
       sendServerError(res);
     }
   } catch (error) {
