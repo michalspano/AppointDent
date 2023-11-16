@@ -126,7 +126,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"start_timestam\": 123131312,\n    \"end_timestamp\": 123131987,\n    \"dentistId\": \"sdkashd123918\",\n    \"patientId\": \"1321madsjiadha2\"\n}",
+					"raw": "{\n    \"Start_timest&m\": 123131312, // malformed\n    \"e(d_timest_p\": 123131987,   // malformed\n    \"dentistId\": \"sdkashd123918\",\n    \"patientId\": \"1321madsjiadha2\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -166,7 +166,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "",
+					"raw": "{\n    \"start_timestamp\": 123131312,\n    // \"end_timestamp\" is missing!\n    \"dentistId\": \"sdkashd123918\",\n    \"patientId\": \"1321madsjiadha2\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -206,7 +206,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"start_timestam\": 123131312,\n    \"end_timestamp\": 123131987,\n    \"dentistId\": 11123131.32132131,\n    \"patientId\": {}\n}",
+					"raw": "{}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -221,6 +221,324 @@
 					"path": [
 						"api",
 						"appointments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST /api/appointments (invalid) 4",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response code shall be 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"start_timestam\": 123131312,\n    \"end_timestamp\": 123131987,\n    \"dentistId\": 11123131.32132131, // invalid type\n    \"patientId\": {}                 // invalid type\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/appointments",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"appointments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PATCH /api/appointments/:id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response code shall be 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Get the response JSON",
+							"var jsonResponse = pm.response.json();",
+							"",
+							"// Check if the response is an object",
+							"pm.test(\"Response is an object\", function () {",
+							"    pm.expect(jsonResponse).to.be.an('object');",
+							"});",
+							"",
+							"// Check if the response has the required properties",
+							"pm.test(\"Check start_timestamp property\", function() {",
+							"    pm.expect(jsonResponse).to.have.property('start_timestamp');",
+							"    pm.expect(jsonResponse.start_timestamp).to.be.a('number');",
+							"});",
+							"",
+							"pm.test(\"Check end_timestamp property\", function() {",
+							"    pm.expect(jsonResponse).to.have.property('end_timestamp');",
+							"    pm.expect(jsonResponse.end_timestamp).to.be.a('number');",
+							"});",
+							"",
+							"pm.test(\"Check dentistId property\", function() {",
+							"    pm.expect(jsonResponse).to.have.property('dentistId');",
+							"    pm.expect(jsonResponse.dentistId).to.be.a('string');",
+							"});",
+							"",
+							"pm.test(\"Check patientId property\", function() {",
+							"    pm.expect(jsonResponse).to.have.property('patientId');",
+							"    pm.expect(jsonResponse.patientId).to.be.a('string');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"start_timestamp\": 21321312321,\n    \"end_timestamp\": 213213129871\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/appointments/:id",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"appointments",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{appointmentId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PATCH /api/appointments/:id 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response code shall be 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Get the response JSON",
+							"var jsonResponse = pm.response.json();",
+							"",
+							"// Check if the response is an object",
+							"pm.test(\"Response is an object\", function () {",
+							"    pm.expect(jsonResponse).to.be.an('object');",
+							"});",
+							"",
+							"// Check if the response has the required properties",
+							"pm.test(\"Check start_timestamp property\", function() {",
+							"    pm.expect(jsonResponse).to.have.property('start_timestamp');",
+							"    pm.expect(jsonResponse.start_timestamp).to.be.a('number');",
+							"});",
+							"",
+							"pm.test(\"Check end_timestamp property\", function() {",
+							"    pm.expect(jsonResponse).to.have.property('end_timestamp');",
+							"    pm.expect(jsonResponse.end_timestamp).to.be.a('number');",
+							"});",
+							"",
+							"pm.test(\"Check dentistId property\", function() {",
+							"    pm.expect(jsonResponse).to.have.property('dentistId');",
+							"    pm.expect(jsonResponse.dentistId).to.be.a('string');",
+							"});",
+							"",
+							"pm.test(\"Check patientId property\", function() {",
+							"    pm.expect(jsonResponse).to.have.property('patientId');",
+							"    pm.expect(jsonResponse.patientId).to.be.a('string');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"start_timestamp\": 21321312321\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/appointments/:id",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"appointments",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{appointmentId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PATCH /api/appointments/:id 3",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response code shall be 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Get the response JSON",
+							"var jsonResponse = pm.response.json();",
+							"",
+							"// Check if the response is an object",
+							"pm.test(\"Response is an object\", function () {",
+							"    pm.expect(jsonResponse).to.be.an('object');",
+							"});",
+							"",
+							"// Check if the response has the required properties",
+							"pm.test(\"Check start_timestamp property\", function() {",
+							"    pm.expect(jsonResponse).to.have.property('start_timestamp');",
+							"    pm.expect(jsonResponse.start_timestamp).to.be.a('number');",
+							"});",
+							"",
+							"pm.test(\"Check end_timestamp property\", function() {",
+							"    pm.expect(jsonResponse).to.have.property('end_timestamp');",
+							"    pm.expect(jsonResponse.end_timestamp).to.be.a('number');",
+							"});",
+							"",
+							"pm.test(\"Check dentistId property\", function() {",
+							"    pm.expect(jsonResponse).to.have.property('dentistId');",
+							"    pm.expect(jsonResponse.dentistId).to.be.a('string');",
+							"});",
+							"",
+							"pm.test(\"Check patientId property\", function() {",
+							"    pm.expect(jsonResponse).to.have.property('patientId');",
+							"    pm.expect(jsonResponse.patientId).to.be.a('string');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"start_timestamp\": 21321312393217,\n    \"foobar\": \"baz\" // should be ignored\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/appointments/:id",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"appointments",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{appointmentId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PATCH /api/appointments/:id (invalid)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response code shall be 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    // should be an error (bad usage)\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/appointments/:id",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"appointments",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{appointmentId}}"
+						}
 					]
 				}
 			},
