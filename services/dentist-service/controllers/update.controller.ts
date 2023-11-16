@@ -1,9 +1,15 @@
 import type { Request, Response } from 'express';
 import database from '../db/config';
+import { type Dentist } from './types';
 
 export const updateDentist = (req: Request, res: Response): void => {
   const email = req.params.email;
-  const updatedInfo = req.body;
+  const updatedInfo = req.body as Partial<Dentist>;
+
+  if (!isValidDentistUpdate(updatedInfo)) {
+    res.status(400).json({ message: 'Invalid update fields' });
+    return;
+  }
 
   if (database === undefined) {
     res.status(500).send('Database undefined');
@@ -39,4 +45,15 @@ export const updateDentist = (req: Request, res: Response): void => {
     console.error('Error updating dentist:', error);
     res.status(500).json({ message: 'Internal Server Error' });
   }
+};
+
+const isValidDentistUpdate = (updatedInfo: Partial<Dentist>): boolean => {
+  const isValidKeys = Object.keys(updatedInfo).every((key) => {
+    return (['fName', 'lName', 'clinic_country', 'clinic_city', 'clinic_street', 'clinic_house_number', 'clinic_zipcode', 'picture'] as Array<keyof Dentist>).includes(key as keyof Dentist);
+  });
+
+  if (!isValidKeys) {
+    return false;
+  }
+  return true;
 };
