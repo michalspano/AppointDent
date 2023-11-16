@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import database from '../db/config';
-import bcrypt from 'bcrypt';
+import { createHash } from 'crypto';
 
 // Interface representing a Dentist
 interface Dentist {
@@ -33,39 +33,33 @@ export const registerController = (req: Request<string, unknown, RegistrationReq
     const { email, pass, fName, lName, clinicCountry, clinicCity, clinicStreet, clinicHouseNumber, clinicZipCode, picture } = req.body;
 
     // Hash password before storing
-    bcrypt.hash(pass, 10, (hashError: Error | undefined, hashedPassword) => {
-      if (database === undefined) {
-        res.status(500).send('Database undefined');
-        return;
-      }
-      if (hashError !== undefined) {
-        console.error('Error hashing password:', hashError);
-        res.status(500).json({ message: 'Server Error' });
-        return;
-      }
+    const hashedPassword = createHash('sha256').update(pass).digest('hex');
+    if (database === undefined) {
+      res.status(500).send('Database undefined');
+      return;
+    }
 
-      const query = database.prepare(`
+    const query = database.prepare(`
         INSERT INTO dentists 
         (email, pass, fName, lName, clinic_country, clinic_city, clinic_street, clinic_house_number, clinic_zipcode, picture) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
 
-      query.run(email, hashedPassword, fName, lName, clinicCountry, clinicCity, clinicStreet, clinicHouseNumber, clinicZipCode, picture);
+    query.run(email, hashedPassword, fName, lName, clinicCountry, clinicCity, clinicStreet, clinicHouseNumber, clinicZipCode, picture);
 
-      const createdDentist = {
-        email,
-        fName,
-        lName,
-        clinicCountry,
-        clinicCity,
-        clinicStreet,
-        clinicHouseNumber,
-        clinicZipCode,
-        picture
-      };
+    const createdDentist = {
+      email,
+      fName,
+      lName,
+      clinicCountry,
+      clinicCity,
+      clinicStreet,
+      clinicHouseNumber,
+      clinicZipCode,
+      picture
+    };
 
-      res.status(201).json(createdDentist);
-    });
+    res.status(201).json(createdDentist);
   } catch (error) {
     console.error('Error registering dentist:', error);
     res.status(500).json({ message: 'Server Error' });
@@ -87,21 +81,15 @@ export const loginController = (req: Request, res: Response): void => {
       return;
     }
 
-    // Compare the hashed password using bcrypt.compare
-    bcrypt.compare(pass, dentist.pass, (compareError: Error | undefined, passwordMatch: boolean) => {
-      if (compareError !== undefined) {
-        console.error('Error comparing passwords:', compareError);
-        res.status(500).json({ message: 'Server Error' });
-        return;
-      }
+    const hashedPasswordInput = createHash('sha256').update(pass).digest('hex');
 
-      if (!passwordMatch) {
-        res.status(401).json({ message: 'Invalid email or password' });
-        return;
-      }
+    // Compare the hashed password
+    if (hashedPasswordInput !== dentist.pass) {
+      res.status(401).json({ message: 'Invalid email or password' });
+      return;
+    }
 
-      res.status(200).json({ message: 'Login successful' });
-    });
+    res.status(200).json({ message: 'Login successful' });
   } catch (error) {
     console.error('Error during login:', error);
     res.status(500).json({ message: 'Server Error' });
