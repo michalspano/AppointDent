@@ -1,11 +1,14 @@
 import { Router } from 'express';
-import * as controllers from '../controllers/controllers';
+import * as registerController from '../controllers/register.controller';
+import * as loginController from '../controllers/login.controller';
+import * as updateController from '../controllers/update.controller';
+import * as deleteController from '../controllers/delete.controller';
 
 const router = Router();
 
-router.post('/register', controllers.registerController);
-router.post('/login', controllers.loginController);
-router.patch('/:email', controllers.updateDentistController);
-router.delete('/:email', controllers.deleteDentistController);
+router.post('/register', registerController.register);
+router.post('/login', loginController.login);
+router.patch('/:email', updateController.updateDentist);
+router.delete('/:email', deleteController.deleteDentist);
 
 export default router;
