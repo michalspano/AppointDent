@@ -33,23 +33,23 @@ export const loginController = async (req: Request, res: Response): Promise<void
 
       sendSuccess(res, 'Login successful');
     } catch (compareError) {
-      console.error('Error during login:', compareError);
+      console.error('Error during logging in:', compareError);
       sendServerError(res);
     }
   } catch (error) {
-    console.error('Error during login:', error);
+    console.error('Error during logging in:', error);
     sendServerError(res);
   }
+
+  function sendServerError (res: Response): Response {
+    return res.status(500).json({ message: 'Server Error' });
+  }
+
+  function sendUnauthorized (res: Response, message: string): Response {
+    return res.status(401).json({ message });
+  }
+
+  function sendSuccess (res: Response, message: string): Response {
+    return res.status(200).json({ message });
+  }
 };
-
-function sendServerError (res: Response): Response {
-  return res.status(500).json({ message: 'Server Error' });
-}
-
-function sendUnauthorized (res: Response, message: string): Response {
-  return res.status(401).json({ message });
-}
-
-function sendSuccess (res: Response, message: string): Response {
-  return res.status(200).json({ message });
-}

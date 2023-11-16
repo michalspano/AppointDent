@@ -23,7 +23,6 @@ export const registerController = async (req: Request, res: Response): Promise<v
         sendServerError(res);
         return;
       }
-
       const query = database.prepare(`
         INSERT INTO patients 
         (email, pass, birthDate, fName, lName) VALUES (?, ?, ?, ?, ?)`);
@@ -36,7 +35,6 @@ export const registerController = async (req: Request, res: Response): Promise<v
         fName,
         lName
       };
-
       sendCreated(res, createdPatient);
     } catch (hashError) {
       console.error('Error hashing password:', hashError);
