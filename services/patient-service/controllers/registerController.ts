@@ -1,6 +1,6 @@
 import { type Request, type Response } from 'express';
 import database from '../db/config';
-import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 import type * as BetterSqlite3 from 'better-sqlite3';
 import { sendServerError, sendCreated } from './controllerUtils';
 
@@ -14,7 +14,7 @@ export const registerController = async (req: Request, res: Response): Promise<v
     }
 
     try {
-      const hashedPassword = await bcrypt.hash(pass, 10);
+      const hashedPassword = crypto.createHash('sha256').update(pass).digest('hex');
 
       function isDatabaseDefined (obj: any): obj is BetterSqlite3.Database {
         return obj !== undefined && obj !== null && obj.prepare !== undefined;

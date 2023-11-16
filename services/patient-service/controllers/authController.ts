@@ -1,6 +1,6 @@
 import { type Request, type Response } from 'express';
 import database from '../db/config';
-import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 
 interface Patient {
   email: string
@@ -24,7 +24,9 @@ export const loginController = async (req: Request, res: Response): Promise<void
     }
 
     try {
-      const passwordMatch: boolean = await bcrypt.compare(pass, patient.pass);
+      const hashedInputPass = crypto.createHash('sha256').update(pass).digest('hex');
+
+      const passwordMatch: boolean = hashedInputPass === patient.pass;
 
       if (!passwordMatch) {
         sendUnauthorized(res, 'Invalid email or password');
