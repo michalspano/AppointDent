@@ -26,10 +26,6 @@ export const deletePatientController = (req: Request, res: Response): Response<a
   }
 };
 
-function sendCreated (res: Response, data: Record<string, any>): Response {
-  return res.status(201).json(data);
-}
-
 function sendNotFound (res: Response, message: string): Response {
   return res.status(404).json({ message });
 }
