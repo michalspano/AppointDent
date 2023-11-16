@@ -55,7 +55,7 @@ export const createAppointment = (req: Request, res: Response): void => {
   /* A query can fail because of a bad request (e.g. invalid object),
    * or that something is wrong with the database (an internal server error).
    * TODO: add proper error handling, so that the latter case is appropriately
-   * handled with a 500 status code.*/
+   * handled with a 500 status code. */
   try {
     stmt.run(Object.values(appointment));
   } catch (err: Error | unknown) {
