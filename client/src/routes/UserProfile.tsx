@@ -1,11 +1,11 @@
-import axios, { AxiosError } from 'axios'
+// import axios, { AxiosError } from 'axios'
 import { type JSX } from 'solid-js/jsx-runtime'
 import { type Dentist, type Patient } from '../utils/types'
 import DentistProfile from '../components/MyProfile/DentistProfile/DentistProfile'
 // import LoginNav from '../components/LoginNav/LoginNav'
 // import LoginImage from '../components/LoginImage/LoginImage'
 
-async function getUser (): Promise<Patient | Dentist | undefined> {
+/* async function getUser (): Promise<Patient | Dentist | undefined> {
   try {
     let stringEmail = localStorage.getItem('userEmail')
     if (stringEmail !== null) {
@@ -37,17 +37,36 @@ async function getUser (): Promise<Patient | Dentist | undefined> {
       console.log(err)
     }
   }
-}
+} */
 
-export default async function DentistProfilePage (): Promise<JSX.Element> {
-  const user = await getUser()
+export default function DentistProfilePage (): JSX.Element {
+  // getUser()
+  //   .then(result => { user = result })
+  //   .catch(err => { console.log(err) })
+  const user: Patient | Dentist | undefined = {
+    userEmail: 'omidkhoda2002@gmail.com',
+    name: {
+      firstName: 'Omid',
+      lastName: 'Khodaparast'
+    },
+    address: {
+      street: 'Önskevädersgatan',
+      city: 'Göteborg',
+      zip: 23456,
+      houseNumber: '12A',
+      country: 'Sweden'
+    },
+    picture: 'Omid\'s picture'
+  }
   if (user !== null && user !== undefined) {
     if ('dateOfBirth' in user) {
       return <>
       </>
     } else {
       return <>
-        <DentistProfile dentistProp={user}/>
+        <div class='w-full h-full flex'>
+          <DentistProfile dentistProp={user}/>
+        </div>
       </>
     }
   } else {

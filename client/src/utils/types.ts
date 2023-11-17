@@ -4,7 +4,7 @@ optional (using the question mark). Moreover, password is needed in signUp,
 but not im MyProfile. Therefore, it is optional.
 */
 
-export interface Patient extends Record<string, unknown> {
+export interface Patient {
   userEmail: string
   password?: string
   name: {
@@ -18,7 +18,7 @@ export interface Patient extends Record<string, unknown> {
   }
 }
 
-export interface Dentist extends Record<string, unknown> {
+export interface Dentist {
   userEmail: string
   password?: string
   name: {
@@ -40,15 +40,15 @@ export interface Dentist extends Record<string, unknown> {
 }
 
 export interface Appointment {
-  startTimestamp: Date
-  endDate: Date
+  startTime: number
+  endTime: number
   dentist: string
   id: string
 }
 
 export interface Notification {
   message: string
-  time: Date
+  time: number
   email: string
   id?: string
 }
