@@ -13,3 +13,7 @@ build
 
 # Ignore all .log files
 *.log
+
+# Ignore IDE Clutter
+
+.idea
