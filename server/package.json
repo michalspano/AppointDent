@@ -4,7 +4,7 @@
   "description": "Server part of the AppointDent project.",
   "scripts": {
     "build": "npx tsc",
-    "start": "node dist/server/app.js",
+    "start": "node dist/app.js",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/app.js\"",
     "test": "npm run newman-server",
     "newman-server": "run-p --race start newman-wait",
