@@ -15,13 +15,13 @@ export async function insertUser (user: CreateUser): Promise<void> {
   await new Promise<void>((resolve, reject) => {
     try {
       // SQL query to enter user to database
-      const insertQuery = database?.prepare('INSERT INTO users (email, password_hash, session_hash) VALUES (?, ?, ?)');
+      const insertQuery = database?.prepare('INSERT INTO users (email, password_hash) VALUES (?, ?)');
       if (insertQuery === undefined) reject(new Error('Query is undefined.'));
 
       // Hash the user's password
       const hash: string = crypto.createHash('sha256').update(user.password).digest('hex');
       // Execute the query with user email, hashed password and session hash which will be empty.
-      const result: QueryResult = insertQuery?.run(user.email, hash, user.session_hash) as QueryResult;
+      const result: QueryResult = insertQuery?.run(user.email, hash) as QueryResult;
       if (result.changes === 0) reject(new Error('No changes made.'));
       console.log('User added successfully.');
       resolve();
