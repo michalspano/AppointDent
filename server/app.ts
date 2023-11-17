@@ -20,11 +20,11 @@ app.get('/', (req: Request, res: Response) => {
 async function setupServices (): Promise<void> {
   await parseServices(servicesPath, parsedServices);
   await spawnServices(servicesPath, parsedServices);
+  void mqttClient.setup(parsedServices, TOPICS);
 }
 
 app.listen(port, () => {
   console.log('Hello from AppointDent!');
   console.log(`Server is running at http://localhost:${port}`);
   void setupServices();
-  void mqttClient.setup(parsedServices, TOPICS);
 });
