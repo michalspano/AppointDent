@@ -8,7 +8,7 @@ The solution is based on a distributed system that combines various architectura
 
 ## Entity Relationship Diagram
 
-![ER Diagram](./docs/assets/ERdiagram.png)
+![ER Diagram](./docs/diagrams/ERdiagram.png)
 
 ## Deployment Diagram
 
