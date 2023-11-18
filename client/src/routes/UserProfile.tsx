@@ -1,11 +1,12 @@
-// import axios, { AxiosError } from 'axios'
+import axios, { AxiosError } from 'axios'
 import { type JSX } from 'solid-js/jsx-runtime'
 import { type Dentist, type Patient } from '../utils/types'
 import DentistProfile from '../components/MyProfile/DentistProfile/DentistProfile'
+import PatientProfile from '../components/MyProfile/PatientProfile/PatientProfile'
 // import LoginNav from '../components/LoginNav/LoginNav'
 // import LoginImage from '../components/LoginImage/LoginImage'
 
-/* async function getUser (): Promise<Patient | Dentist | undefined> {
+async function getUser (): Promise<Patient | Dentist | undefined> {
   try {
     let stringEmail = localStorage.getItem('userEmail')
     if (stringEmail !== null) {
@@ -37,30 +38,34 @@ import DentistProfile from '../components/MyProfile/DentistProfile/DentistProfil
       console.log(err)
     }
   }
-} */
+}
 
 export default function DentistProfilePage (): JSX.Element {
-  // getUser()
-  //   .then(result => { user = result })
-  //   .catch(err => { console.log(err) })
-  const user: Patient | Dentist | undefined = {
-    userEmail: 'omidkhoda2002@gmail.com',
-    name: {
-      firstName: 'Omid',
-      lastName: 'Khodaparast'
-    },
-    address: {
-      street: 'Önskevädersgatan',
-      city: 'Göteborg',
-      zip: 23456,
-      houseNumber: '12A',
-      country: 'Sweden'
-    },
-    picture: 'Omid\'s picture'
-  }
+  let user: Patient | Dentist | undefined
+  getUser()
+    .then(result => { user = result })
+    .catch(err => { console.log(err) })
+  // const user: Patient | Dentist | undefined = {
+  //   userEmail: 'omidkhoda2002@gmail.com',
+  //   name: {
+  //     firstName: 'Omid',
+  //     lastName: 'Khodaparast'
+  //   },
+  //   address: {
+  //     street: 'Önskevädersgatan',
+  //     city: 'Göteborg',
+  //     zip: 23456,
+  //     houseNumber: '12A',
+  //     country: 'Sweden'
+  //   },
+  //   picture: 'Omid\'s picture'
+  // }
   if (user !== null && user !== undefined) {
     if ('dateOfBirth' in user) {
       return <>
+        <div class='w-full h-full flex'>
+          <PatientProfile patientProp={user}/>
+        </div>
       </>
     } else {
       return <>
