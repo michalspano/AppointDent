@@ -7,56 +7,68 @@ import Navbar from '../../Navbar/Navbar'
 import axios from 'axios'
 import { type AxiosResponse } from 'axios'
 
+// Since props can only be objects, there was a need to create this interface
+// so that props can be passed to the element function
 interface DentistProfileProps {
   dentistProp: Dentist
 }
 
+// validity check for dentist before patching
 function isValidDentist (dentist: Dentist): boolean {
   if (dentist.address.zip <= 0) {
-    console.log(false)
     return false
   }
+
   // RegEx expression to check email validity
   // source: https://www.tutorialspoint.com/how-to-validate-email-address-using-regexp-in-javascript
   if (dentist.userEmail.match(/^[a-z0-9]+@[a-z]+\.[a-z]{2,3}$/) == null) {
-    console.log(false)
     return false
   }
+
   if (dentist.name.firstName === '' || dentist.name.lastName === '') {
-    console.log(false)
     return false
   }
+
   return true
 }
 
 export default function DentistProfile (dentistProp: DentistProfileProps): JSX.Element {
-  const [dentist, setDentist] = createStore<Dentist>(dentistProp.dentistProp)
+  // we need a copy, so that the original values do not change
+  // in case a wrong patch is executed, we set the values back to what
+  // they were
+  const dentistCopy = structuredClone(dentistProp.dentistProp)
+  const [dentist, setDentist] = createStore<Dentist>(dentistCopy)
   const [proImage, setProImage] = createSignal<string>(dentist.picture)
   const [getError, setError] = createSignal<Error | null>(null)
+
+  // using blob and FileReader to read an image and render it on the front-end
   const uploadProPic = function (target: HTMLInputElement): void {
     const files = target.files
-    console.log(files)
-    console.log(typeof files)
     if (files !== null && files !== undefined && files.length > 0) {
       console.log(files[0].type)
       const file = files[0]
       const reader = new FileReader()
       reader.onloadend = () => {
         const result = reader.result
-        console.log(result)
         if (result !== null) {
           if (typeof result === 'string') {
             setProImage(result)
-            console.log(proImage())
           }
         }
       }
       reader.readAsDataURL(file)
     }
   }
+
+  // The following method will be called upon saving changes
+  // You can change it however you see fit when you are integrating with the
+  // backend
   const patchDentist = function patchDentist (patchedDentist: Dentist): void {
     if (!isValidDentist(dentist)) {
       setError(new Error('Please provide valid credentials'))
+      setDentist(dentistProp.dentistProp)
+      setProImage(dentistProp.dentistProp.picture)
+      location.reload()
       return
     }
     const url = `/dentist/${patchedDentist.userEmail}`
@@ -65,20 +77,23 @@ export default function DentistProfile (dentistProp: DentistProfileProps): JSX.E
       .catch(err => {
         setDentist(dentistProp.dentistProp)
         setProImage(dentistProp.dentistProp.picture)
+        location.reload()
         console.log(err)
       })
   }
+
+  // note that you need to upload a picture to see how it looks like
   return <>
-    <div class="h-auto w-full bg-white flex lg:flex-row flex-col items-center justify-center">
+    <div class="h-full w-full bg-white flex lg:flex-row flex-col items-center justify-center">
       <div class='lg:h-full lg:w-1/2 w-full h-1/4 flex flex-col  bg-primary'>
         <div class='flex items-top justify-center'>
           <Navbar/>
         </div>
         <div class='flex items-center justify-center'>
-          <img class='lg:w-5/6 w-1/5 h-auto lg:rounded-sm rounded-full' src={proImage()} alt='profile image' />
+          <img class='lg:w-5/6 w-1/5 h-auto lg:rounded-md rounded-full mb-8' src={proImage()} alt='profile image' />
         </div>
       </div>
-      <div class="lg:w-1/2 w-5/6 h-screen flex flex-col text-black rounded-sm bg-gradient-to-b from-neutral ... lg:px-10 px-5 py-3 text-sm font-medium">
+      <div class="lg:w-1/2 w-5/6 h-auto lg:mx-8 my-8 justify-center flex flex-col text-black rounded-sm bg-gradient-to-b from-neutral ... lg:px-10 px-5 py-3 text-sm font-medium">
         <div class="flex flex-col items-center justify-center">
           <img class="w-40 " src={logo} alt="AppointDent" />
         </div>
@@ -138,7 +153,7 @@ export default function DentistProfile (dentistProp: DentistProfileProps): JSX.E
               class="input h-12 w-full px-3 py-2 mb-6  border rounded-xl"
               type="file"
               accept=".jpeg, .jpg, .png"
-              value="Upload a profile image"
+              placeholder="Upload a profile image"
               onChange={(event) => { uploadProPic(event.target) }}
           />
           {getError() !== null ? <p class="text-error">{(getError() as Error).message}</p> : <></>}

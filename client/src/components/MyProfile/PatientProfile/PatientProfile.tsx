@@ -1,4 +1,4 @@
-// import { type JSX } from 'solid-js/jsx-runtime'
+import LoginImage from '../../../assets/home.png'
 import logo from '../../../assets/logo.png'
 import { type Patient } from '../../../utils/types'
 import { createStore } from 'solid-js/store'
@@ -7,6 +7,8 @@ import Navbar from '../../Navbar/Navbar'
 import axios from 'axios'
 import { type AxiosResponse } from 'axios'
 
+// Since props can only be objects, there was a need to create this interface
+// so that props can be passed to the element function
 interface PatientProfileProps {
   patientProp: Patient
 }
@@ -15,22 +17,32 @@ function isValidDentist (patient: Patient): boolean {
   // RegEx expression to check email validity
   // source: https://www.tutorialspoint.com/how-to-validate-email-address-using-regexp-in-javascript
   if (patient.userEmail.match(/^[a-z0-9]+@[a-z]+\.[a-z]{2,3}$/) == null) {
-    console.log(false)
     return false
   }
+
   if (patient.name.firstName === '' || patient.name.lastName === '') {
-    console.log(false)
     return false
   }
+
   return true
 }
 
 export default function DentistProfile (patientProp: PatientProfileProps): JSX.Element {
-  const [patient, setPatient] = createStore<Patient>(patientProp.patientProp)
+  // we need a copy, so that the original values do not change
+  // in case a wrong patch is executed, we set the values back to what
+  // they were
+  const patientCopy = structuredClone(patientProp.patientProp)
+  const [patient, setPatient] = createStore<Patient>(patientCopy)
   const [getError, setError] = createSignal<Error | null>(null)
+
+  // The following method will be called upon saving changes
+  // You can change it however you see fit when you are integrating with the
+  // backend
   const patchPatient = function patchPatient (patchedPatient: Patient): void {
     if (!isValidDentist(patient)) {
       setError(new Error('Please provide valid credentials'))
+      setPatient(patientProp.patientProp)
+      return
     }
     const url = `/patient/${patchedPatient.userEmail}`
     axios.patch<Patient, AxiosResponse<Patient>, Patient>(url, patchedPatient)
@@ -40,17 +52,18 @@ export default function DentistProfile (patientProp: PatientProfileProps): JSX.E
         console.log(err)
       })
   }
+
   return <>
-    <div class="h-auto w-full bg-white flex lg:flex-row flex-col items-center justify-center">
-      <div class='lg:h-full lg:w-1/2 w-full h-1/4 flex flex-col  bg-primary'>
+    <div class="h-auto w-screen bg-white flex lg:flex-row flex-col items-center justify-center">
+      <div class='lg:h-full lg:w-1/2 w-full h-1/8 flex flex-col bg-primary'>
         <div class='flex items-top justify-center'>
           <Navbar/>
         </div>
-        <div class='flex items-center justify-center'>
-          <img class='lg:w-5/6 w-1/5 h-auto lg:rounded-sm rounded-full' src={logo} alt='profile image' />
+        <div class='lg:flex items-center justify-center hidden '>
+          <img class='lg:w-5/6 w-1/5 h-auto lg:rounded-sm rounded-full' src={LoginImage} alt='profile image' />
         </div>
       </div>
-      <div class="lg:w-1/2 w-5/6 h-screen flex flex-col text-black rounded-sm bg-gradient-to-b from-neutral ... lg:px-10 px-5 py-3 text-sm font-medium">
+      <div class="lg:w-1/2 w-5/6 h-screen m-8 flex flex-col text-black rounded-sm justify-center bg-gradient-to-b from-neutral ... lg:px-10 px-5 py-3 text-sm font-medium">
         <div class="flex flex-col items-center justify-center">
           <img class="w-40 " src={logo} alt="AppointDent" />
         </div>
@@ -74,6 +87,7 @@ export default function DentistProfile (patientProp: PatientProfileProps): JSX.E
               placeholder={patient.name.lastName}
               onChange={(event) => { setPatient('name', 'lastName', event.target.value) }}
             />
+          </div>
           <input
               class="input h-12 w-full px-3 py-2 mb-6 border rounded-xl"
               type="date"
@@ -85,7 +99,6 @@ export default function DentistProfile (patientProp: PatientProfileProps): JSX.E
           <button type="submit" class="log-in-btn h-12 mb-6 bg-secondary rounded-xl text-base" onClick={() => { patchPatient(patient) }}>
              Save changes
           </button>
-        </div>
       </div>
     </div>
   </>
