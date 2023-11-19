@@ -16,7 +16,7 @@ export const register = (req: Request<string, unknown, RegistrationRequestBody>,
     }
 
     const reqId = Math.floor(Math.random() * 1000); // Generates a random integer between 0 and 999
-    client.publish(TOPIC, `${reqId}/${email}/${pass}/*`); // REQID/USERID/SECRET*
+    client.publish(TOPIC, `${reqId}/${email}/${pass}/*`); // REQID/USERID/SECRET/*
     client.subscribe(RESPONSE_TOPIC);
 
     client.on('message', (topic: string, message: Buffer) => {
@@ -52,49 +52,56 @@ function handleMqttResponse (
   const result = message.toString();
   let status;
   if (result.length >= 3) {
-    status = result[1][0];
-    // TODO: Use 'status' and 'sessionKey' as needed
+    status = result.split('/')[1][0];
   } else {
     console.error('Invalid data format:', result);
   }
 
-  // Authorization successful
+  if (status === '0') {
+    if (!res.headersSent) {
+      res.status(500).json({ message: 'User can not be registered' });
+    }
+    return;
+  }
+
   if (status === '1') {
     // Check if the email is already registered
-    const checkEmailQuery = database.prepare(`
-      SELECT COUNT(*) as count
-      FROM dentists
-      WHERE email = ?
-    `);
-
-    const emailCheckResult = checkEmailQuery.get(email) as { count: number };
-
-    // Check if email is already registered before inserting
-    if (emailCheckResult !== null && emailCheckResult.count > 0) {
+    if (checkEmailRegistered(email)) {
       res.status(500).json({ message: 'Email is already registered' });
-    } else {
-      const query = database.prepare(`
+      return;
+    }
+
+    const query = database.prepare(`
         INSERT INTO dentists 
         (email, pass, fName, lName, clinic_country, clinic_city, clinic_street, clinic_house_number, clinic_zipcode, picture) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
-      query.run(email, pass, fName, lName, clinicCountry, clinicCity, clinicStreet, clinicHouseNumber, clinicZipCode, picture);
+    query.run(email, pass, fName, lName, clinicCountry, clinicCity, clinicStreet, clinicHouseNumber, clinicZipCode, picture);
 
-      const createdDentist = {
-        email,
-        fName,
-        lName,
-        clinicCountry,
-        clinicCity,
-        clinicStreet,
-        clinicHouseNumber,
-        clinicZipCode,
-        picture
-      };
-
-      res.status(201).json(createdDentist);
-    }
-  } else {
-    res.status(500).json({ message: 'Authorization failed' });
+    const createdDentist = {
+      email,
+      fName,
+      lName,
+      clinicCountry,
+      clinicCity,
+      clinicStreet,
+      clinicHouseNumber,
+      clinicZipCode,
+      picture
+    };
+    console.log('created and inserted');
+    res.status(201).json(createdDentist);
   }
+}
+
+function checkEmailRegistered (email: string): boolean {
+  // Check if the email is already registered
+  const checkEmailQuery = database?.prepare(`
+      SELECT COUNT(*) as count
+      FROM dentists
+      WHERE email = ?
+    `);
+  const emailCheckResult = checkEmailQuery?.get(email) as { count: number };
+
+  return emailCheckResult !== null && emailCheckResult.count > 0;
 }
