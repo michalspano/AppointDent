@@ -12,7 +12,14 @@ export default function DentistCalendar (): JSX.Element {
   }
 
   // Use createEffect to run code when the component mounts
-  const [events, setEvents] = createSignal<Appointment[]>([])
+  const slots: Appointment[] = [
+    {
+      id: '1',
+      title: 'testevent',
+      start: '2023-11-18T10:31',
+      end: '2023-11-18T12:31'
+    }
+  ]
   const [newAppointment, setNewAppointment] = createSignal<Appointment>({
     id: '',
     title: '',
@@ -21,12 +28,26 @@ export default function DentistCalendar (): JSX.Element {
   })
 
   function addAppointment (appointment: Appointment): void {
-    console.log(appointment)
+    slots.push(appointment)
+    calendarRef.current?.addEvent(appointment)
+    setNewAppointment({
+      id: '',
+      title: '',
+      start: '',
+      end: ''
+    })
   }
+  function deleteAppointment (eventId: string): void {
+    const index = slots.findIndex((event) => event.id === eventId)
+    if (index !== -1) {
+      slots.splice(index, 1)
+      calendarRef.current?.getEventById(eventId)?.remove()
+    }
+  }
+  const calendarRef: { current: any } = { current: null }
 
   createEffect(() => {
     const calendarEl: HTMLElement | null = document.getElementById('calendar')
-
     if (calendarEl != null) {
       // Create a FullCalendar instance
       const calendar: any = new Calendar(calendarEl, {
@@ -41,14 +62,26 @@ export default function DentistCalendar (): JSX.Element {
         firstDay: 1,
         views: {
           timeGrid: {
-            allDaySlot: false
+            axisFormat: 'H(:mm)',
+            timeFormat: {
+              agenda: 'H(:mm)'
+            },
+            allDaySlot: false,
+            slotMinTime: '06:00', // Minimum time to display (6:00 AM)
+            slotMaxTime: '20:00' // Maximum time to display (8:00 PM)
           }
         },
         nowIndicator: true,
-        events: events()
+        events: [...slots],
+        eventClick: ({ event }: { event: any }) => {
+          const confirmation = window.confirm('Do you want to delete this event?')
+          if (confirmation) {
+            deleteAppointment(event.id)
+          }
+        }
       })
 
-      // Render the calendar
+      calendarRef.current = calendar
       calendar.render()
 
       // Use onCleanup to destroy the calendar when the component unmounts
