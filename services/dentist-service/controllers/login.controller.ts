@@ -1,6 +1,5 @@
 import type { Request, Response } from 'express';
 import database from '../db/config';
-import type { Dentist } from './types';
 import { client } from '../mqtt/mqtt';
 
 const TOPIC = 'CREATESESSION';
@@ -12,13 +11,6 @@ export const login = (req: Request, res: Response): void => {
 
     if (database === undefined) {
       res.status(500).send('Database undefined');
-      return;
-    }
-
-    const dentist = database.prepare('SELECT * FROM dentists WHERE email = ?').get(email) as Dentist;
-
-    if (dentist === undefined) {
-      res.status(401).json({ message: 'Invalid email or password' });
       return;
     }
 
@@ -47,21 +39,17 @@ function handleMqttLoginResponse (res: Response, message: Buffer): void {
     }
 
     const result = message.toString();
-    let status;
     let sessionKey;
     if (result.length >= 3) {
-      status = result[1][0];
-      sessionKey = result[2][0];
+      sessionKey = result.split('/')[1];
     } else {
       console.error('Invalid data format:', result);
     }
-
-    if (status === '1') {
-      // Set the session key in an HTTP-only cookie (if needed)
+    if (sessionKey !== undefined && sessionKey.length === 1 && sessionKey === '0') { // REQID/0/* (fail)
+      res.status(500).json({ message: 'Email or password is incorrect' });
+    } else if (sessionKey !== undefined) { // REQID/SESSIONKEY/* (success)
       res.cookie('sessionKey', sessionKey, { httpOnly: true });
       res.status(200).json({ message: 'Login successful' });
-    } else {
-      res.status(500).json({ message: 'Login Error' });
     }
   } catch (error) {
     console.error('Error handling MQTT login response:', error);
