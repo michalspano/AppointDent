@@ -1,10 +1,34 @@
 import type { Request, Response } from 'express';
 import database from '../db/config';
 import { type Dentist } from './types';
+import { client } from '../mqtt/mqtt';
+
+const TOPIC = 'AUTHREQ';
+const RESPONSE_TOPIC = 'AUTHRES';
 
 export const updateDentist = (req: Request, res: Response): void => {
-  const email = req.params.email;
+  const { email } = req.params;
+  let { session } = req.headers;
   const updatedInfo = req.body as Partial<Dentist>;
+
+  if (client === undefined) {
+    res.status(201).json({ message: 'MQTT connection failed' });
+    return;
+  }
+
+  if (session === undefined) {
+    res.status(400).json({ message: 'Missing session cookie' });
+    return;
+  } else if (Array.isArray(session)) {
+    session = session.join(',');
+  }
+  const reqId = Math.floor(Math.random() * 1000);
+  client.publish(TOPIC, `${reqId}/${email}/${session}/*`); // reqId and session from body FE?
+  client.subscribe(RESPONSE_TOPIC);
+
+  client.on('message', (topic: string, message: Buffer) => {
+    handleMqttResponse(res, message);
+  });
 
   if (!isValidDentistUpdate(updatedInfo)) {
     res.status(400).json({ message: 'Invalid update fields' });
@@ -57,3 +81,16 @@ const isValidDentistUpdate = (updatedInfo: Partial<Dentist>): boolean => {
   }
   return true;
 };
+
+function handleMqttResponse (res: Response, message: Buffer): void {
+  const result = message.toString();
+  let status;
+  if (result.length >= 3) {
+    status = result.split('/')[1][0];
+  }
+  if (status === '0') {
+    res.status(201).json({ message: 'Unable to authorize' });
+    // eslint-disable-next-line no-useless-return
+    return;
+  }
+}
