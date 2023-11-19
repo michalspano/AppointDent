@@ -5,22 +5,19 @@ import { client } from '../mqtt/mqtt';
 const TOPIC = 'AUTHREQ';
 const RESPONSE_TOPIC = 'AUTHRES';
 
-export const deleteDentist = (req: Request, res: Response): void => {
+export const deleteDentist = (req: Request, res: Response): Response<any, Record<string, any>> => {
   const { email } = req.params;
   let { session } = req.headers;
   if (database === undefined) {
-    res.status(500).send('Database undefined');
-    return;
+    return res.status(500).send('Database undefined');
   }
 
   if (client === undefined) {
-    res.status(201).json({ message: 'MQTT connection failed' });
-    return;
+    return res.status(201).json({ message: 'MQTT connection failed' });
   }
 
   if (session === undefined) {
-    res.status(400).json({ message: 'Missing session cookie' });
-    return;
+    return res.status(400).json({ message: 'Missing session cookie' });
   } else if (Array.isArray(session)) {
     session = session.join(',');
   }
@@ -28,8 +25,12 @@ export const deleteDentist = (req: Request, res: Response): void => {
   client.publish(TOPIC, `${reqId}/${email}/${session}/*`); // reqId and session from body FE?
   client.subscribe(RESPONSE_TOPIC);
 
+  // Use a custom promise here. Ensure the event handler is killed before the request ends.
   client.on('message', (topic: string, message: Buffer) => {
-    handleMqttResponse(res, message);
+    const result = handleMqttResponse(message);
+    if (result === '0') {
+      return res.status(201).json({ message: 'Unable to authorize' });
+    }
   });
 
   const query = database.prepare('DELETE FROM dentists WHERE email = ?');
@@ -37,23 +38,16 @@ export const deleteDentist = (req: Request, res: Response): void => {
 
   if (result.changes === 0) {
     // If no rows were affected, then dentist with the given email was not found
-    res.status(404).json({ message: 'Dentist not found' });
-    return;
+    return res.status(404).json({ message: 'Dentist not found' });
   }
 
-  res.json({ message: 'Dentist deleted successfully' });
+  return res.json({ message: 'Dentist deleted successfully' });
 };
 
-function handleMqttResponse (res: Response, message: Buffer): void {
+function handleMqttResponse (message: Buffer): string { // Ensure to not give helper functions the power to return status. Only the controller function should do that. Otherwise things get messy.
   const result = message.toString();
-  let status;
-  if (result.length >= 3) {
-    status = result.split('/')[1][0];
+  if (result.length >= 3) { // Return actual status if defined
+    return result.split('/')[1][0];
   }
-  console.log(status);
-  if (status === '0') {
-    res.status(201).json({ message: 'Unable to authorize' });
-    // eslint-disable-next-line no-useless-return
-    return;
-  }
+  return '0';
 }
