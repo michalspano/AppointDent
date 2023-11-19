@@ -1,3 +1,6 @@
+# Ignore `sqlite3` database files and configuration
+# files (to enforce consistency and avoid data corruption).
+
 *.db
 *.db-shm
 *.db-wal
