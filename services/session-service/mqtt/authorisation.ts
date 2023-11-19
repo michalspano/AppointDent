@@ -94,10 +94,10 @@ export async function listenForAuthorise (client: mqtt.MqttClient): Promise<void
       parseRawRequest(message.toString()).then((result: AuthenticationRequest) => {
         authenticateRequest(result).then((authResult) => {
           // Publish the appropriate response (1: authorized, 0: unauthorized)
-          if (!authResult) return client.publish(RESPONSE_TOPIC, `${result.reqId}/0*`);
-          client.publish(RESPONSE_TOPIC, `${result.reqId}/1*`);
+          if (!authResult) return client.publish(RESPONSE_TOPIC, `${result.reqId}/0/*`);
+          client.publish(RESPONSE_TOPIC, `${result.reqId}/1/*`);
         }).catch((err) => {
-          client.publish(RESPONSE_TOPIC, `${result.reqId}/0*`);
+          client.publish(RESPONSE_TOPIC, `${result.reqId}/0/*`);
           console.error(err);
         });
       }).catch((err) => {
