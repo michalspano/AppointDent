@@ -4,8 +4,35 @@ import { client } from '../mqtt/mqtt';
 
 const TOPIC = 'AUTHREQ';
 const RESPONSE_TOPIC = 'AUTHRES';
+const TIMEOUT = 10000;
 
-export const deleteDentist = (req: Request, res: Response): Response<any, Record<string, any>> => {
+/**
+ * Wait for a response from MQTT before continuing processing of request
+ * @param reqId the id that you are waiting a response for
+ * @returns return a status.
+ */
+async function getServiceResponse (reqId: string): Promise<string> {
+  return await new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      client?.unsubscribe(RESPONSE_TOPIC);
+      reject(new Error('MQTT timeout'));
+    }, TIMEOUT);
+    const eventHandler = (topic: string, message: Buffer): void => {
+      if (topic === RESPONSE_TOPIC) {
+        if (message.toString().startsWith(`${reqId}/`)) {
+          clearTimeout(timeout);
+          client?.unsubscribe(topic);
+          client?.removeListener('message', eventHandler);
+          resolve(message.toString().split('/')[1][0]);
+        }
+      }
+    };
+    client?.subscribe(RESPONSE_TOPIC);
+    client?.on('message', eventHandler);
+  });
+}
+
+export const deleteDentist = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
   const { email } = req.params;
   let { session } = req.headers;
   if (database === undefined) {
@@ -25,13 +52,14 @@ export const deleteDentist = (req: Request, res: Response): Response<any, Record
   client.publish(TOPIC, `${reqId}/${email}/${session}/*`); // reqId and session from body FE?
   client.subscribe(RESPONSE_TOPIC);
 
-  // Use a custom promise here. Ensure the event handler is killed before the request ends.
-  client.on('message', (topic: string, message: Buffer) => {
-    const result = handleMqttResponse(message);
-    if (result === '0') {
+  try {
+    const mqttResult = await getServiceResponse(reqId.toString());
+    if (mqttResult === '0') {
       return res.status(201).json({ message: 'Unable to authorize' });
     }
-  });
+  } catch (error) {
+    return res.status(500).json({ message: 'Service Timeout' });
+  }
 
   const query = database.prepare('DELETE FROM dentists WHERE email = ?');
   const result = query.run(email);
@@ -43,11 +71,3 @@ export const deleteDentist = (req: Request, res: Response): Response<any, Record
 
   return res.json({ message: 'Dentist deleted successfully' });
 };
-
-function handleMqttResponse (message: Buffer): string { // Ensure to not give helper functions the power to return status. Only the controller function should do that. Otherwise things get messy.
-  const result = message.toString();
-  if (result.length >= 3) { // Return actual status if defined
-    return result.split('/')[1][0];
-  }
-  return '0';
-}
