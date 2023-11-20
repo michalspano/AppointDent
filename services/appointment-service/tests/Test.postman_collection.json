@@ -669,6 +669,93 @@
 			"response": []
 		},
 		{
+			"name": "PATCH /api/appointments/:id (book) 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response code shall be 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Get the response JSON",
+							"var jsonResponse = pm.response.json();",
+							"",
+							"// Check if the response is an object",
+							"pm.test(\"Response is an object\", function () {",
+							"    pm.expect(jsonResponse).to.be.an('object');",
+							"});",
+							"",
+							"// Check if the response has the required properties",
+							"pm.test(\"Check start_timestamp property\", function() {",
+							"    pm.expect(jsonResponse).to.have.property('start_timestamp');",
+							"    pm.expect(jsonResponse.start_timestamp).to.be.a('number');",
+							"});",
+							"",
+							"pm.test(\"Check end_timestamp property\", function() {",
+							"    pm.expect(jsonResponse).to.have.property('end_timestamp');",
+							"    pm.expect(jsonResponse.end_timestamp).to.be.a('number');",
+							"});",
+							"",
+							"pm.test(\"Check dentistId property\", function() {",
+							"    pm.expect(jsonResponse).to.have.property('dentistId');",
+							"    pm.expect(jsonResponse.dentistId).to.be.a('string');",
+							"});",
+							"",
+							"pm.test(\"patientId is NOT null\", function() {",
+							"    pm.expect(jsonResponse).to.have.property('patientId');",
+							"    pm.expect(jsonResponse.patientId).to.be.a('string');",
+							"});",
+							"",
+							"// Set the patientId for other tests",
+							"const patientId = jsonResponse.patientId;",
+							"pm.environment.set(\"patientId\", patientId);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"patientId\": \"123123211231\" // make the appointment booked\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/appointments/:id?toBook=true",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"appointments",
+						":id"
+					],
+					"query": [
+						{
+							"key": "toBook",
+							"value": "true"
+						}
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{appointmentId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "GET /api/appointments (all unbooked)",
 			"event": [
 				{
@@ -714,6 +801,63 @@
 					"path": [
 						"api",
 						"appointments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /api/appointments/patients/:patientId",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response code shall be 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Parse the response JSON",
+							"var jsonData = pm.response.json();",
+							"",
+							"// Check if the response is an array",
+							"pm.test(\"Response is an array\", function () {",
+							"    pm.expect(jsonData).to.be.an('array');",
+							"});",
+							"",
+							"// Check if each item in the array is an object",
+							"pm.test(\"Items in the array are objects\", function () {",
+							"    if (jsonData.length > 0) {",
+							"        jsonData.forEach(function (item) {",
+							"            pm.expect(item).to.be.an('object');",
+							"        });",
+							"    }",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/appointments/patients/:patientId",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"appointments",
+						"patients",
+						":patientId"
+					],
+					"variable": [
+						{
+							"key": "patientId",
+							"value": "{{patientId}}"
+						}
 					]
 				}
 			},

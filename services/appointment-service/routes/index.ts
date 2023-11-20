@@ -13,4 +13,7 @@ router.delete('/', deleteControllers.deleteAllAppointments);
 router.delete('/:id', deleteControllers.deleteAppointment);
 router.patch('/:id', editAppointment);
 
+// Relational endpoints.
+router.get('/patients/:patientId', getControllers.getAppointmentsByPatientId);
+
 export default router;
