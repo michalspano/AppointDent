@@ -159,7 +159,17 @@ export default function DentistCalendar (): JSX.Element {
             <button
                 class='bg-secondary rounded text-white p-2 mr-3'
                 type='button'
-                onClick={() => setShowForm(false)}
+                onClick={() => {
+                  // Reset the new appointment state to empty values
+                  setNewAppointment({
+                    id: '',
+                    title: '',
+                    start: '',
+                    end: ''
+                  })
+                  // Hide the form
+                  setShowForm(false)
+                }}
               >
                 Cancel
               </button>
