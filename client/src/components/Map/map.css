@@ -4,9 +4,14 @@
 }
 
 .dentistMarker{
-    width:300px
+    max-width:300px;
+    width:250px;
 }
 
 .details p {
     margin:0px !important;
+}
+
+.showSlots {
+    color:white;
 }
