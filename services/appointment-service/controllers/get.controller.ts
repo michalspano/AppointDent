@@ -1,5 +1,6 @@
 import database from '../db/config';
 import type { Request, Response } from 'express';
+import { parseBinaryQueryParam } from '../utils';
 
 // Get all appointments slots that are not assigned to a patient.
 export const getAllAppointments = (req: Request, res: Response): Response<any, Record<string, any>> => {
@@ -62,9 +63,10 @@ export const getAppointmentsByDentistId = (req: Request, res: Response): Respons
   }
 
   // TODO: ensure that a valid session is present.
-  // Furthermore, restrict access to this endpoint to dentists only.
-  // Enforce that dentists can only query their own appointments.
-  // This is called for the dentist to see what they 'agenda' is.
+  // Ideally, only the unbooked appointments should be made 'visible'
+  // publicly, however, that may be a choice of the dentist. For now,
+  // there's no restriction on the visibility of the appointments in
+  // this regard.
 
   const dentistEmail: string = req.params.email;
 
@@ -73,8 +75,22 @@ export const getAppointmentsByDentistId = (req: Request, res: Response): Respons
 
   let result: unknown[];
 
+  // Read the query parameter to filter only the available appointments.
+  // By default, all appointments are returned.
+  let toGetAvailable: boolean;
   try {
-    result = database.prepare('SELECT * FROM appointments WHERE dentistId = ?').all(dentistEmail);
+    toGetAvailable = parseBinaryQueryParam(req.query.available);
+  } catch (err: Error | unknown) {
+    return res.status(400).json({
+      message: 'Bad request: invalid query parameter.'
+    });
+  }
+
+  try {
+    result = database.prepare(`
+      SELECT * FROM appointments WHERE dentistId = ?
+      ${toGetAvailable ? 'AND patientId IS NULL' : ''}
+    `).all(dentistEmail);
   } catch (err: Error | unknown) {
     return res.status(500).json({
       message: 'Internal server error: fail performing selection.'

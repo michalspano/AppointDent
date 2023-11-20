@@ -923,6 +923,131 @@
 			"response": []
 		},
 		{
+			"name": "GET /api/appointments/dentists/:email (all)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response code shall be 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Parse the response JSON",
+							"var jsonData = pm.response.json();",
+							"",
+							"// Check if the response is an array",
+							"pm.test(\"Response is an array\", function () {",
+							"    pm.expect(jsonData).to.be.an('array');",
+							"});",
+							"",
+							"// Check if each item in the array is an object",
+							"pm.test(\"Items in the array are objects\", function () {",
+							"    if (jsonData.length > 0) {",
+							"        jsonData.forEach(function (item) {",
+							"            pm.expect(item).to.be.an('object');",
+							"        });",
+							"    }",
+							"});",
+							"",
+							"// There's at least one unbooked appointment",
+							"pm.test(\"Response is not of size 0\", function () {",
+							"    pm.expect(jsonData.length).not.to.equal(0);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/appointments/dentists/:email?available=false",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"appointments",
+						"dentists",
+						":email"
+					],
+					"query": [
+						{
+							"key": "available",
+							"value": "false"
+						}
+					],
+					"variable": [
+						{
+							"key": "email",
+							"value": "{{dentistId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /api/appointments/dentists/:email (booked)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response code shall be 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Parse the response JSON",
+							"var jsonData = pm.response.json();",
+							"",
+							"// Check if the response is an array",
+							"pm.test(\"Response is an array\", function () {",
+							"    pm.expect(jsonData).to.be.an('array');",
+							"});",
+							"",
+							"// Ensure that the response array is of size 0",
+							"pm.test(\"Response is of size 0\", function () {",
+							"    pm.expect(jsonData.length).to.equal(0);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/appointments/dentists/:email?available=true",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"appointments",
+						"dentists",
+						":email"
+					],
+					"query": [
+						{
+							"key": "available",
+							"value": "true"
+						}
+					],
+					"variable": [
+						{
+							"key": "email",
+							"value": "{{dentistId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "GET /api/appointments/:id",
 			"event": [
 				{

@@ -26,24 +26,30 @@ export const destructUnknownToAppointment = (obj: unknown): Appointment => {
 
 /**
  * @description a helper function to convert the raw query parameter into a
- * boolean value.
+ * boolean value. If the query parameter is not valid, an error is thrown.
+ * It it's simply not given, assign the default value `true`.
  *
- * @param toBookParam a raw string representing the query parameter toBook
+ * @param rawParam a raw string representing the 'raw' query parameter
  * obtained from path of the request. It is set to `any`, because the return
- * of a query parameter has various string-like types.
+ * of a query parameter has various string-like types (for the sake of simplicity,
+ * it is set to `any`).
+ * 
+ * @param fallbackValue a fallback value to be used if the query parameter is
+ * not given.
+ * @default fallbackValue false
  *
- * @returns a boolean value representing the query parameter toBook.
+ * @returns a boolean value representing the query parameter.
  * @throws an error if the query parameter is not valid.
  */
-export const parseToBookQuery = (toBookParam: any): boolean => {
-  switch (toBookParam) {
+export const parseBinaryQueryParam = (rawParam: any, fallbackValue: boolean = false): boolean => {
+  switch (rawParam) {
     case undefined:
-      return true; // Default value is set to `true`.
+      return fallbackValue;
     case 'true'.toLowerCase().trim():
       return true;
     case 'false'.toLowerCase().trim():
       return false;
     default:
-      throw new Error('Invalid query parameter: toBook must be true or false.');
+      throw new Error('Invalid query parameter: expected true, false of none.');
   }
 };

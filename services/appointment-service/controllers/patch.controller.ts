@@ -2,7 +2,7 @@ import database from '../db/config';
 import { type Appointment } from '../types/types';
 import type Database from 'better-sqlite3';
 import { type Statement } from 'better-sqlite3';
-import { destructUnknownToAppointment, parseToBookQuery } from '../utils';
+import { destructUnknownToAppointment, parseBinaryQueryParam } from '../utils';
 import type { Request, Response } from 'express';
 
 /*
@@ -72,7 +72,7 @@ const bookAppointment = (req: Request, res: Response): Response<any, Record<stri
   // then the default value (true) is used.
   let toBook: boolean;
   try {
-    toBook = parseToBookQuery(req.query.toBook);
+    toBook = parseBinaryQueryParam(req.query.toBook, true);
   } catch (err: Error | unknown) {
     return res.status(400).json({
       message: 'Bad request: invalid query parameter.'
