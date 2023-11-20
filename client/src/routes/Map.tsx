@@ -1,7 +1,6 @@
 import { type JSX, onMount } from 'solid-js'
 import * as leaflet from 'leaflet'
 import '../components/Map/map.css'
-
 import '../assets/leaflet.css'
 import { addDentistsToMap } from '../components/Map/dentists'
 
