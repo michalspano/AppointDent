@@ -12,7 +12,10 @@ export default function DentistCalendar (): JSX.Element {
     end: string
   }
 
-  // Use createEffect to run code when the component mounts
+  const [showForm, setShowForm] = createSignal<boolean>(false)
+  const calendarRef: { current: any } = { current: null }
+
+  // Temporary array of appointment, will be modified once integrated with backend.
   const slots: Appointment[] = [
     {
       id: '1',
@@ -28,17 +31,32 @@ export default function DentistCalendar (): JSX.Element {
     end: ''
   })
 
+  /**
+ * Adds a new appointment to the slots array and updates the calendar.
+ *
+ * @param {Appointment} appointment - The appointment to be added.
+ */
   function addAppointment (appointment: Appointment): void {
     slots.push(appointment)
+
+    // Update the FullCalendar instance with the new appointment
     calendarRef.current?.addEvent(appointment)
+    // Reset the new appointment state
     setNewAppointment({
       id: '',
       title: '',
       start: '',
       end: ''
     })
+    // Hide the "Add slot" form
     setShowForm(false)
   }
+
+  /**
+ * Deletes the selected appointment from array and updates calendar.
+ *
+ * @param eventId - The id of the appointment to be removed.
+ */
   function deleteAppointment (eventId: string): void {
     const index = slots.findIndex((event) => event.id === eventId)
     if (index !== -1) {
@@ -46,9 +64,8 @@ export default function DentistCalendar (): JSX.Element {
       calendarRef.current?.getEventById(eventId)?.remove()
     }
   }
-  const [showForm, setShowForm] = createSignal<boolean>(false)
-  const calendarRef: { current: any } = { current: null }
 
+  // Effect to initialize FullCalendar and manage its lifecycle
   createEffect(() => {
     const calendarEl: HTMLElement | null = document.getElementById('calendar')
     if (calendarEl != null) {
@@ -68,16 +85,16 @@ export default function DentistCalendar (): JSX.Element {
         headerToolbar: {
           left: 'prev,next',
           center: 'title',
-          right: 'timeGridWeek,timeGridDay addButton' // user can switch between the two
+          right: 'timeGridWeek,timeGridDay addButton'
         },
-        // Week starts with a Monday
-        firstDay: 1,
+        firstDay: 1, // Week starts with a Monday
         views: {
           timeGrid: {
             allDaySlot: false
           }
         },
         nowIndicator: true,
+        // Define the class for styling for unbooked and booked events.
         eventClassNames: function (arg: any) {
           return arg.event.title === '' ? 'unbooked-event' : 'booked-event'
         },
