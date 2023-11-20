@@ -1,21 +1,7 @@
 import axios from 'axios'
 import * as leaflet from 'leaflet'
-import { type Dentist } from '../../utils/types'
+import { type Place, type Dentist } from '../../utils/types'
 
-interface Place {
-  boundingBox: [string, string, string, string]
-  class: string
-  displayName: string
-  importance: number
-  lat: string
-  licence: string
-  lon: string
-  osmId: number
-  osmType: string
-  placeId: number
-  poweredBy: string
-  type: string
-}
 /**
  * Used to convert addresses into long and lat for the map.
  * @param address the address that needs to be geocoded

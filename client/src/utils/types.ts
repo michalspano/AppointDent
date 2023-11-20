@@ -1,8 +1,20 @@
-/*
-Some attributes that I was not sure if the response payload will contain are
-optional (using the question mark). Moreover, password is needed in signUp,
-but not im MyProfile. Therefore, it is optional.
-*/
+/**
+ * Response data type from geocoding API
+ */
+export interface Place {
+  boundingBox: [string, string, string, string]
+  class: string
+  displayName: string
+  importance: number
+  lat: string
+  licence: string
+  lon: string
+  osmId: number
+  osmType: string
+  placeId: number
+  poweredBy: string
+  type: string
+}
 
 export interface Patient {
   userEmail: string
@@ -42,8 +54,8 @@ export interface Dentist {
 export interface Appointment {
   startTime: number
   endTime: number
-  dentist: string
-  id: string
+  dentist: string // email
+  id: string // arbitrary id
 }
 
 export interface Notification {
