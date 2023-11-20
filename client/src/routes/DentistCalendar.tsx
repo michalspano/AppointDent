@@ -53,6 +53,7 @@ export default function DentistCalendar (): JSX.Element {
       const calendar: any = new Calendar(calendarEl, {
         plugins: [timeGridPlugin],
         initialView: 'timeGridWeek',
+        locale: 'en-GB',
         headerToolbar: {
           left: 'prev,next',
           center: 'title',
@@ -60,12 +61,10 @@ export default function DentistCalendar (): JSX.Element {
         },
         // Week starts with a Monday
         firstDay: 1,
+
         views: {
+
           timeGrid: {
-            axisFormat: 'H(:mm)',
-            timeFormat: {
-              agenda: 'H(:mm)'
-            },
             allDaySlot: false,
             slotMinTime: '06:00', // Minimum time to display (6:00 AM)
             slotMaxTime: '20:00' // Maximum time to display (8:00 PM)
