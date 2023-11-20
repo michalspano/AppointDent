@@ -1,7 +1,7 @@
 import database from '../db/config';
 import type { Request, Response } from 'express';
 
-// Get all appointments.
+// Get all appointments slots that are not assigned to a patient.
 export const getAllAppointments = (req: Request, res: Response): Response<any, Record<string, any>> => {
   if (database === undefined) {
     return res.status(500).json({
@@ -11,7 +11,7 @@ export const getAllAppointments = (req: Request, res: Response): Response<any, R
 
   let result: unknown[];
   try {
-    result = database.prepare('SELECT * FROM appointments').all();
+    result = database.prepare('SELECT * FROM appointments WHERE patientId IS NULL').all();
   } catch (err: Error | unknown) {
     return res.status(500).json({
       message: 'Internal server error: fail performing selection.'

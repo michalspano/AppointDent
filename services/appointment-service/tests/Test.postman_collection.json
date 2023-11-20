@@ -669,7 +669,7 @@
 			"response": []
 		},
 		{
-			"name": "GET /api/appointments",
+			"name": "GET /api/appointments (all unbooked)",
 			"event": [
 				{
 					"listen": "test",
@@ -688,10 +688,12 @@
 							"});",
 							"",
 							"// Check if each item in the array is an object",
-							"pm.test(\"Items in the array are objects\", function () {",
+							"// and ensure that each patientId is NULL",
+							"pm.test(\"Items in the array are objects and patienId is NULL\", function () {",
 							"    if (jsonData.length > 0) {",
 							"        jsonData.forEach(function (item) {",
 							"            pm.expect(item).to.be.an('object');",
+							"            pm.expect(item.patientId).to.be.null; // must be NULL",
 							"        });",
 							"    }",
 							"});",
