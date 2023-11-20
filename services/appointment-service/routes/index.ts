@@ -14,6 +14,7 @@ router.delete('/:id', deleteControllers.deleteAppointment);
 router.patch('/:id', editAppointment);
 
 // Relational endpoints.
-router.get('/patients/:patientId', getControllers.getAppointmentsByPatientId);
+router.get('/patients/:email', getControllers.getAppointmentsByPatientId);
+router.get('/dentists/:email', getControllers.getAppointmentsByDentistId);
 
 export default router;

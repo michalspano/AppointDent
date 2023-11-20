@@ -35,14 +35,46 @@ export const getAppointmentsByPatientId = (req: Request, res: Response): Respons
   // Ensure that the caller of the request is the patient that is being queried.
   // Don't allow a patient to query another patient's appointments.
 
-  const patientId: string = req.params.patientId;
+  const patientEmail: string = req.params.email;
 
   // TODO: make a call to patient-service to ensure that the patient exists.
   // If not, return 404. For now, it is assumed that the patient exists.
 
   let result: unknown[];
   try {
-    result = database.prepare('SELECT * FROM appointments WHERE patientId = ?').all(patientId);
+    result = database.prepare('SELECT * FROM appointments WHERE patientId = ?').all(patientEmail);
+  } catch (err: Error | unknown) {
+    return res.status(500).json({
+      message: 'Internal server error: fail performing selection.'
+    });
+  }
+
+  return res.status(200).json(result);
+};
+
+// Get all appointments slots that are assigned to a dentist (both booked
+// and non-booked).
+export const getAppointmentsByDentistId = (req: Request, res: Response): Response<any, Record<string, any>> => {
+  if (database === undefined) {
+    return res.status(500).json({
+      message: 'Internal server error: database connection failed.'
+    });
+  }
+
+  // TODO: ensure that a valid session is present.
+  // Furthermore, restrict access to this endpoint to dentists only.
+  // Enforce that dentists can only query their own appointments.
+  // This is called for the dentist to see what they 'agenda' is.
+
+  const dentistEmail: string = req.params.email;
+
+  // TODO: make a call to the patient-service to ensure that the dentist exists.
+  // If not, return 404. For now, it is assumed that the patient exists.
+
+  let result: unknown[];
+
+  try {
+    result = database.prepare('SELECT * FROM appointments WHERE dentistId = ?').all(dentistEmail);
   } catch (err: Error | unknown) {
     return res.status(500).json({
       message: 'Internal server error: fail performing selection.'

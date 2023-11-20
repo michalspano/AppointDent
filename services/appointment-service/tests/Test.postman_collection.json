@@ -93,7 +93,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"start_timestamp\": 123131312,\n    \"end_timestamp\": 123131987,\n    \"dentistId\": \"sdkashd123918\"\n}",
+					"raw": "{\n    \"start_timestamp\": 123131312,\n    \"end_timestamp\": 123131987,\n    \"dentistId\": \"generic.doctor@clinit_name.se\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -708,9 +708,11 @@
 							"    pm.expect(jsonResponse.patientId).to.be.a('string');",
 							"});",
 							"",
-							"// Set the patientId for other tests",
+							"// Set the patientId, dentist for other tests",
 							"const patientId = jsonResponse.patientId;",
+							"const dentistId = jsonResponse.dentistId;",
 							"pm.environment.set(\"patientId\", patientId);",
+							"pm.environment.set(\"dentistId\", dentistId);",
 							""
 						],
 						"type": "text/javascript"
@@ -722,7 +724,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"patientId\": \"123123211231\" // make the appointment booked\n}",
+					"raw": "{\n    \"patientId\": \"generic.patient@gmail.com\" // make the appointment booked\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -807,7 +809,7 @@
 			"response": []
 		},
 		{
-			"name": "GET /api/appointments/patients/:patientId",
+			"name": "GET /api/appointments/patients/:email",
 			"event": [
 				{
 					"listen": "test",
@@ -843,7 +845,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/api/appointments/patients/:patientId",
+					"raw": "{{host}}/api/appointments/patients/:email",
 					"host": [
 						"{{host}}"
 					],
@@ -851,12 +853,69 @@
 						"api",
 						"appointments",
 						"patients",
-						":patientId"
+						":email"
 					],
 					"variable": [
 						{
-							"key": "patientId",
+							"key": "email",
 							"value": "{{patientId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /api/appointments/dentists/:email",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response code shall be 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Parse the response JSON",
+							"var jsonData = pm.response.json();",
+							"",
+							"// Check if the response is an array",
+							"pm.test(\"Response is an array\", function () {",
+							"    pm.expect(jsonData).to.be.an('array');",
+							"});",
+							"",
+							"// Check if each item in the array is an object",
+							"pm.test(\"Items in the array are objects\", function () {",
+							"    if (jsonData.length > 0) {",
+							"        jsonData.forEach(function (item) {",
+							"            pm.expect(item).to.be.an('object');",
+							"        });",
+							"    }",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/appointments/dentists/:email",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"appointments",
+						"dentists",
+						":email"
+					],
+					"variable": [
+						{
+							"key": "email",
+							"value": "{{dentistId}}"
 						}
 					]
 				}
