@@ -10,5 +10,5 @@ export interface Appointment {
   start_timestamp: number
   end_timestamp: number
   dentistId: UUID
-  patientId: UUID
+  patientId: UUID | null
 };
