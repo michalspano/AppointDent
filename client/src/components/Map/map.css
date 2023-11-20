@@ -4,5 +4,9 @@
 }
 
 .dentistMarker{
-    width:200px
+    width:300px
+}
+
+.details p {
+    margin:0px !important;
 }

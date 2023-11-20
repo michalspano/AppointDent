@@ -13,7 +13,7 @@ export interface Patient {
   }
   dateOfBirth: Date
   session?: {
-    hash: string
+    token: string
     expiry?: Date
   }
 }
@@ -26,8 +26,8 @@ export interface Dentist {
     lastName: string
   }
   session?: {
-    hash: string
-    expiry?: Date
+    token: string
+    expiry?: number
   }
   address: {
     street: string
