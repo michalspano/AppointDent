@@ -880,6 +880,48 @@
 			"response": []
 		},
 		{
+			"name": "DELETE /api/appointments/:id (invalid)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response code shall be 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"Response is in JSON format\", function () {",
+							"    pm.response.to.be.json;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/api/appointments/:id",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"appointments",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{appointmentId}}21dasd1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "DELETE *appointments",
 			"event": [
 				{
