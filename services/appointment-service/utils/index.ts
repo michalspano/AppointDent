@@ -27,11 +27,11 @@ export const destructUnknownToAppointment = (obj: unknown): Appointment => {
 /**
  * @description a helper function to convert the raw query parameter into a
  * boolean value.
- * 
+ *
  * @param toBookParam a raw string representing the query parameter toBook
  * obtained from path of the request. It is set to `any`, because the return
  * of a query parameter has various string-like types.
- * 
+ *
  * @returns a boolean value representing the query parameter toBook.
  * @throws an error if the query parameter is not valid.
  */

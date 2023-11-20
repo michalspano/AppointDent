@@ -16,18 +16,18 @@ import type { Request, Response } from 'express';
  * - query the patient-service to determine if the user exists in the
  * patient database. If so, then the user is a patient.
  * Otherwise, the user is not authorized and an appropriate error should
- * be returned.*/
+ * be returned. */
 
 /**
  * @description the controller for the PATCH /appointments/:id route. In
  * terms of our system, this means 'booking, or un-booking an appointment'.
  * A query parameter, ?toBook=true|false, is used to determine whether the
  * appointment should be booked or unbooked. The default value is true.
- * 
+ *
  * An appointment is not booked by default, i.e., it is assigned to NO
  * patients, hence patientId is null. If the appointment is booked, then
  * patientId is not null.
- * 
+ *
  * @param req request object
  * @param res response object
  * @returns TODO: this is subject to change, hence edit this comment.
@@ -87,7 +87,7 @@ const bookAppointment = (req: Request, res: Response): Response<any, Record<stri
 
   // Update the appointment object with the patientId.
   appointmentObj.patientId = toBook ? req.body.patientId : null;
-  
+
   const stmt: Statement = database.prepare(`
     UPDATE appointments
     SET patientId = ?

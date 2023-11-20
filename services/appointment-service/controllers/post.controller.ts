@@ -5,12 +5,9 @@ import { type Appointment } from '../types/types';
 import type { Request, Response } from 'express';
 
 // Create a new appointment.
-const createAppointment = (req: Request, res: Response): void => {
+const createAppointment = (req: Request, res: Response): Response<any, Record<string, any>> => {
   if (database === undefined) {
-    res.status(500).json({
-      message: 'Internal server error: database connection failed.'
-    });
-    return;
+    return res.status(500).json({ message: 'Internal server error: database connection failed.' });
   }
 
   const appointment: Appointment = {
@@ -34,14 +31,11 @@ const createAppointment = (req: Request, res: Response): void => {
   try {
     stmt.run(Object.values(appointment));
   } catch (err: Error | unknown) {
-    res.status(400).json({
-      message: 'Bad request: invalid appointment object.'
-    });
-    return;
+    return res.status(400).json({ message: 'Bad request: invalid appointment object.' });
   }
 
   // Everything went well, return the created object.
-  res.status(201).json(appointment);
+  return res.status(201).json(appointment);
 };
 
 export default createAppointment;
