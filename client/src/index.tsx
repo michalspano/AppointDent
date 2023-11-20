@@ -7,6 +7,7 @@ import Signup from './routes/Signup.tsx'
 import DentistSignup from './routes/DentistSignup.tsx'
 import PatientSignup from './routes/PatientSignup.tsx'
 import DentistCalendar from './routes/DentistCalendar.tsx'
+import UserProfile from './routes/UserProfile.tsx'
 
 const root = document.getElementById('root')
 if (root === null) throw Error('Root undefined!')
@@ -18,6 +19,7 @@ render(() => <div>
         <Route path="/dentist-signup" component={DentistSignup} />
         <Route path="/patient-signup" component={PatientSignup} />
         <Route path="/calendar" component={DentistCalendar} />
+        <Route path="/user-profile" component={UserProfile} />
       </Routes>
     </Router>
 
