@@ -2,34 +2,31 @@ import database from '../db/config';
 import type { Request, Response } from 'express';
 
 // Get all appointments.
-export const getAllAppointments = (req: Request, res: Response): void => {
+export const getAllAppointments = (req: Request, res: Response): Response<any, Record<string, any>> => {
   if (database === undefined) {
-    res.status(500).json({
+    return res.status(500).json({
       message: 'Internal server error: database connection failed.'
     });
-    return;
   }
 
   let result: unknown[];
   try {
     result = database.prepare('SELECT * FROM appointments').all();
   } catch (err: Error | unknown) {
-    res.status(500).json({
+    return res.status(500).json({
       message: 'Internal server error: fail performing selection.'
     });
-    return;
   }
 
-  res.status(200).json(result);
+  return res.status(200).json(result);
 };
 
 // Get an appointment by id.
-export const getAppointment = (req: Request, res: Response): void => {
+export const getAppointment = (req: Request, res: Response): Response<any, Record<string, any>> => {
   if (database === undefined) {
-    res.status(500).json({
+    return res.status(500).json({
       message: 'Internal server error: database connection failed.'
     });
-    return;
   }
 
   const id: string = req.params.id;
@@ -39,18 +36,16 @@ export const getAppointment = (req: Request, res: Response): void => {
       .prepare('SELECT * FROM appointments WHERE id = ?')
       .get(id);
   } catch (err: Error | unknown) {
-    res.status(500).json({
+    return res.status(500).json({
       message: 'Internal server error: query failed.'
     });
-    return;
   }
 
   if (appointment === undefined) {
-    res.status(404).json({
+    return res.status(404).json({
       message: `Appointment with id ${id} not found.`
     });
-    return;
   }
 
-  res.status(200).json(appointment);
+  return res.status(200).json(appointment);
 };
