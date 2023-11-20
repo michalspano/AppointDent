@@ -23,22 +23,18 @@ async function getUser (): Promise<Patient | Dentist | undefined> {
     const { data } = await axios.get<Dentist>(url)
     return data
   } catch (err: any) {
-    if (err instanceof AxiosError) {
-      if (err.response?.status === 404) {
-        try {
-          let stringEmail = localStorage.getItem('userEmail')
-          if (stringEmail !== null) {
-            const dentistEmail = JSON.parse(stringEmail)
-            stringEmail = dentistEmail.email
-          }
-          const url = `/patient/${stringEmail}`
-          const { data } = await axios.get<Patient>(url)
-          return data
-        } catch (error: any) {
-          console.log(error)
+    if (err instanceof AxiosError && err.response?.status === 404) {
+      try {
+        let stringEmail = localStorage.getItem('userEmail')
+        if (stringEmail !== null) {
+          const dentistEmail = JSON.parse(stringEmail)
+          stringEmail = dentistEmail.email
         }
-      } else {
-        console.log(err)
+        const url = `/patient/${stringEmail}`
+        const { data } = await axios.get<Patient>(url)
+        return data
+      } catch (error: any) {
+        console.log(error)
       }
     } else {
       console.log(err)

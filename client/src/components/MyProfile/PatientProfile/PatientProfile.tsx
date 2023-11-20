@@ -6,26 +6,9 @@ import { createSignal, type JSX } from 'solid-js'
 import Navbar from '../../Navbar/Navbar'
 import axios from 'axios'
 import { type AxiosResponse } from 'axios'
-
-// Since props can only be objects, there was a need to create this interface
-// so that props can be passed to the element function
-interface PatientProfileProps {
-  patientProp: Patient
-}
-
-function isValidDentist (patient: Patient): boolean {
-  // RegEx expression to check email validity
-  // source: https://www.tutorialspoint.com/how-to-validate-email-address-using-regexp-in-javascript
-  if (patient.userEmail.match(/^[a-z0-9]+@[a-z]+\.[a-z]{2,3}$/) == null) {
-    return false
-  }
-
-  if (patient.name.firstName === '' || patient.name.lastName === '') {
-    return false
-  }
-
-  return true
-}
+import { type PatientProfileProps } from '../MyProfileTypes'
+import { isValidPatient } from '../utils'
+import CustomInput from '../CustomInput'
 
 export default function DentistProfile (patientProp: PatientProfileProps): JSX.Element {
   // we need a copy, so that the original values do not change
@@ -39,9 +22,10 @@ export default function DentistProfile (patientProp: PatientProfileProps): JSX.E
   // You can change it however you see fit when you are integrating with the
   // backend
   const patchPatient = function patchPatient (patchedPatient: Patient): void {
-    if (!isValidDentist(patient)) {
-      setError(new Error('Please provide valid credentials'))
-      setPatient(patientProp.patientProp)
+    const validPatient = isValidPatient(patient)
+    if (validPatient !== undefined) {
+      setError(new Error(validPatient))
+      setTimeout(() => setError(null), 2000)
       return
     }
     const url = `/patient/${patchedPatient.userEmail}`
@@ -49,6 +33,12 @@ export default function DentistProfile (patientProp: PatientProfileProps): JSX.E
       .then(result => { setPatient(result.data) })
       .catch(err => {
         setPatient(patientProp.patientProp)
+        setError(new Error('Please try again.'))
+        setTimeout(() => {
+          setError(null)
+          setPatient(patientProp.patientProp)
+          location.reload()
+        }, 3000)
         console.log(err)
       })
   }
@@ -68,33 +58,12 @@ export default function DentistProfile (patientProp: PatientProfileProps): JSX.E
           <img class="w-40 " src={logo} alt="AppointDent" />
         </div>
           <h1 class="mb-2 mt-4 text-lg">{patient.name.firstName}'s Profile</h1>
-          <input
-          class="input h-12 px-3 py-2 mb-3 border rounded-xl"
-          type="text"
-          placeholder={patient.userEmail}
-          onChange={(event) => { setPatient('userEmail', event.target.value) }}
-          />
+          <CustomInput value={patient.userEmail} inputType='text' onChange={(event) => { setPatient('userEmail', event.target.value) }}/>
           <div class="flex flex-row">
-            <input
-              class="input h-12 w-full px-3 py-2 mb-3 md:mb-0 mr-2 border rounded-xl"
-              type="text"
-              placeholder={patient.name.firstName}
-              onChange={(event) => { setPatient('name', 'firstName', event.target.value) }}
-            />
-            <input
-              class="input h-12 w-full px-3 py-2 mb-3 border rounded-xl"
-              type="text"
-              placeholder={patient.name.lastName}
-              onChange={(event) => { setPatient('name', 'lastName', event.target.value) }}
-            />
+            <CustomInput class='mr-2' value={patient.name.firstName} inputType='text' onChange={(event) => { setPatient('name', 'firstName', event.target.value) }}/>
+            <CustomInput value={patient.name.lastName} inputType='text' onChange={(event) => { setPatient('name', 'lastName', event.target.value) }}/>
           </div>
-          <input
-              class="input h-12 w-full px-3 py-2 mb-6 border rounded-xl"
-              type="date"
-              max={new Date().toISOString().split('T')[0]}
-              placeholder="Date of birth"
-              onChange={(event) => { setPatient('dateOfBirth', new Date(event.target.value)) }}
-            />
+          <CustomInput max={new Date().toISOString().split('T')[0]} value={patient.dateOfBirth.toISOString().split('T')[0]} inputType='date' onChange={(event) => { setPatient('dateOfBirth', new Date(event.target.value)) }}/>
           {getError() !== null ? <p class="text-error">{(getError() as Error).message}</p> : <></>}
           <button type="submit" class="log-in-btn h-12 mb-6 bg-secondary rounded-xl text-base" onClick={() => { patchPatient(patient) }}>
              Save changes
