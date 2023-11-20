@@ -18,7 +18,7 @@ const createAppointment = (req: Request, res: Response): void => {
     start_timestamp: req.body.start_timestamp,
     end_timestamp: req.body.end_timestamp,
     dentistId: req.body.dentistId,
-    patientId: req.body.patientId
+    patientId: null // Initially, the appointment is not booked (hence NULL).
   };
 
   const stmt: Statement = database.prepare(`
@@ -41,7 +41,7 @@ const createAppointment = (req: Request, res: Response): void => {
   }
 
   // Everything went well, return the created object.
-  res.status(201).json({ ...appointment });
+  res.status(201).json(appointment);
 };
 
 export default createAppointment;
