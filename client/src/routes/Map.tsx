@@ -20,6 +20,6 @@ export default function Map (): JSX.Element {
     void addDentistsToMap(map)
   })
   return <>
-  <div id="map" style={{ height: '100vh', width: '100%' }} />
+  <div id="map"></div>
   </>
 }
