@@ -77,9 +77,9 @@ export const getAppointmentsByDentistId = (req: Request, res: Response): Respons
 
   // Read the query parameter to filter only the available appointments.
   // By default, all appointments are returned.
-  let toGetAvailable: boolean;
+  let getOnlyAvailable: boolean;
   try {
-    toGetAvailable = parseBinaryQueryParam(req.query.available);
+    getOnlyAvailable = parseBinaryQueryParam(req.query.onlyAvailable);
   } catch (err: Error | unknown) {
     return res.status(400).json({
       message: 'Bad request: invalid query parameter.'
@@ -89,7 +89,7 @@ export const getAppointmentsByDentistId = (req: Request, res: Response): Respons
   try {
     result = database.prepare(`
       SELECT * FROM appointments WHERE dentistId = ?
-      ${toGetAvailable ? 'AND patientId IS NULL' : ''}
+      ${getOnlyAvailable ? 'AND patientId IS NULL' : ''}
     `).all(dentistEmail);
   } catch (err: Error | unknown) {
     return res.status(500).json({

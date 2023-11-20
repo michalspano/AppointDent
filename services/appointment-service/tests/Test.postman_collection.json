@@ -963,7 +963,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/api/appointments/dentists/:email?available=false",
+					"raw": "{{host}}/api/appointments/dentists/:email?onlyAvailable=false",
 					"host": [
 						"{{host}}"
 					],
@@ -975,7 +975,7 @@
 					],
 					"query": [
 						{
-							"key": "available",
+							"key": "onlyAvailable",
 							"value": "false"
 						}
 					],
@@ -1021,7 +1021,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/api/appointments/dentists/:email?available=true",
+					"raw": "{{host}}/api/appointments/dentists/:email?onlyAvailable=true",
 					"host": [
 						"{{host}}"
 					],
@@ -1033,7 +1033,7 @@
 					],
 					"query": [
 						{
-							"key": "available",
+							"key": "onlyAvailable",
 							"value": "true"
 						}
 					],

@@ -33,7 +33,7 @@ export const destructUnknownToAppointment = (obj: unknown): Appointment => {
  * obtained from path of the request. It is set to `any`, because the return
  * of a query parameter has various string-like types (for the sake of simplicity,
  * it is set to `any`).
- * 
+ *
  * @param fallbackValue a fallback value to be used if the query parameter is
  * not given.
  * @default fallbackValue false
