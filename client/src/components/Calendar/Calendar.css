@@ -1,0 +1,58 @@
+.unbooked-event {
+    background-color:#1BD0DA;
+    border: none;
+    opacity: 0.7;
+  }
+  
+  .booked-event {
+    background-color:#275E61;
+    border: none;
+    opacity: 0.9;
+  }
+  .fc .fc-button{
+    background-color: #12878D; /* Set the background color to black */
+    color: white; /* Set the text color to white or any other suitable color */
+    border: none; /* Remove the border */
+    padding: 10px 20px; /* Adjust padding as needed */
+    cursor: pointer;
+  }
+  
+  .fc .fc-button-primary:not(:disabled).fc-button-active {
+    background-color: #275E61;
+    border: 1px solid white;
+  }
+
+  .fc .fc-button-primary:hover{
+    background-color: #275E61;
+    border: 1px solid white;
+  }
+
+  .fc .fc-button-primary{
+    background-color: #12878D;
+    border: 1px solid white;
+  }
+
+
+  label {
+    color: white;
+  }
+
+  button {
+    color: white;
+  }
+
+  .fc-col-header-cell-cushion{
+    color: black;
+  }
+
+  @media (max-width: 768px){
+    .fc .fc-button-primary{
+        font-size: 10px;
+      }
+      .fc {
+        font-size: 10px;
+      }
+      .fc .fc-button{
+        padding: 5px 9px;
+      } 
+}
