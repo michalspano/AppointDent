@@ -45,3 +45,7 @@ export const deleteDentist = async (req: Request, res: Response): Promise<Respon
 
   return res.json({ message: 'Dentist deleted successfully' });
 };
+
+export const deleteDentistWrapper = (req: Request, res: Response): void => {
+  void deleteDentist(req, res);
+};

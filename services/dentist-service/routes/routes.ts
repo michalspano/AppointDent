@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
 import { Router } from 'express';
 import * as registerController from '../controllers/register.controller';
 import * as loginController from '../controllers/login.controller';
@@ -10,6 +9,6 @@ const router = Router();
 router.post('/register', registerController.register);
 router.post('/login', loginController.login);
 router.patch('/:email', updateController.updateDentist);
-router.delete('/:email', deleteController.deleteDentist);
+router.delete('/:email', deleteController.deleteDentistWrapper);
 
 export default router;
