@@ -5,7 +5,6 @@ CREATE TABLE IF NOT EXISTS dentists (
     pass VARCHAR(255) NOT NULL,
     fName VARCHAR(64) NOT NULL,
     lName VARCHAR(64) NOT NULL,
-    birthDate DATE NOT NULL,
     clinic_country VARCHAR NOT NULL,
     clinic_city VARCHAR NOT NULL,
     clinic_street VARCHAR NOT NULL,

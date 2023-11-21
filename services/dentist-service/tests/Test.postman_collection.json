@@ -1,21 +1,114 @@
 {
 	"info": {
-		"_postman_id": "af75aaca-474b-48f1-abac-01c3ac3743d0",
+		"_postman_id": "79a74c23-bdf6-432f-b336-8b460e3cb928",
 		"name": "dentist-service",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "29461036",
-		"_collection_link": "https://lively-robot-331309.postman.co/workspace/DIT356---Group-2~5bf71687-ed30-4209-b09f-e41d5824efd9/collection/29461036-af75aaca-474b-48f1-abac-01c3ac3743d0?action=share&source=collection_link&creator=29461036"
+		"_exporter_id": "31133267",
+		"_collection_link": "https://appointdent.postman.co/workspace/AppointDent~3d7b8d88-ecc1-4d83-a513-eb9122453c58/collection/31133349-79a74c23-bdf6-432f-b336-8b460e3cb928?action=share&source=collection_link&creator=31133267"
 	},
 	"item": [
 		{
-			"name": "GET /",
+			"name": "POST /api/dentists/register",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Response code shall be 200\", function () {",
-							"    pm.response.to.have.status(200);",
+							"pm.test(\"Response code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"pm.test(\"Response is in JSON format\", function () {",
+							"    pm.response.to.be.json;",
+							"});",
+							"const responseJson = pm.response.json();",
+							"const dentistEmail = responseJson.email;",
+							"pm.environment.set(\"dentistEmail\", dentistEmail);",
+							"pm.environment.set('sessionCookie', pm.cookies.get('sessionKey'));",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"john.doe1@example.com\",\n  \"pass\": \"secretpassword\",\n  \"fName\": \"John\",\n  \"lName\": \"Doe\",\n  \"clinicCountry\": \"Country\",\n  \"clinicCity\": \"City\",\n  \"clinicStreet\": \"Street\",\n  \"clinicHouseNumber\": 123,\n  \"clinicZipCode\": 12345,\n  \"picture\": \"base64encodedimage\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/dentists/register",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"dentists",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST /api/dentists/login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response is in JSON format\", function () {",
+							"    pm.response.to.be.json;",
+							"});",
+							"",
+							"pm.environment.set('sessionCookie', pm.cookies.get('sessionKey'));",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"kate2@example.com\",\n  \"pass\": \"secretpassword\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/dentists/login",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"dentists",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PATCH /api/dentists/:id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -23,15 +116,73 @@
 				}
 			],
 			"request": {
-				"method": "GET",
-				"header": [],
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "session",
+						"value": "{{sessionCookie}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"fName\": \"Kate\" }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": "{{host}}/",
+					"raw": "{{host}}/api/dentists/{{dentistEmail}}",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
-						""
+						"api",
+						"dentists",
+						"{{dentistEmail}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE /api/dentists/:id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response time is less than 2000ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+							"});",
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "session",
+						"value": "{{sessionCookie}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/api/dentists/{{dentistEmail}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"dentists",
+						"{{dentistEmail}}"
 					]
 				}
 			},
