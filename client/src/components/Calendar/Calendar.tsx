@@ -5,9 +5,12 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import './Calendar.css'
 import { type Appointment } from '../../utils/types'
 import { type EventContentArg, type EventClickArg } from '@fullcalendar/core'
+import ConfirmationPopup from './DeleteConfirmation'
 
 export default function DentistCalendar (): JSX.Element {
   const [showForm, setShowForm] = createSignal<boolean>(false)
+  const [showConfirmation, setShowConfirmation] = createSignal<boolean>(false)
+  const [selectedEventId, setSelectedEventId] = createSignal<string | null>(null)
   const calendarRef: { current: Calendar | null } = { current: null }
 
   // Temporary array of appointment, will be modified once integrated with backend.
@@ -95,10 +98,8 @@ export default function DentistCalendar (): JSX.Element {
         },
         events: [...slots],
         eventClick: ({ event }: EventClickArg) => {
-          const confirmation = window.confirm('Do you want to delete this event?')
-          if (confirmation) {
-            deleteAppointment(event.id)
-          }
+          setSelectedEventId(event.id) // Store the selected event ID
+          setShowConfirmation(true)
         }
       })
 
@@ -176,6 +177,21 @@ export default function DentistCalendar (): JSX.Element {
           </form>
         )}
       </div>
+
+      {showConfirmation() && (
+          <ConfirmationPopup
+            onConfirm={() => {
+              const eventId = selectedEventId()
+              if (eventId !== null) {
+                deleteAppointment(eventId)
+                setShowConfirmation(false)
+              }
+            }}
+              onCancel={() => {
+                setShowConfirmation(false)
+              }}
+          />
+      )}
     </>
   )
 }

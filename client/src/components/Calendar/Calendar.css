@@ -55,4 +55,19 @@
       .fc .fc-button{
         padding: 5px 9px;
       } 
+
+}
+
+@media (max-width: 500px){
+
+    .fc .fc-button{
+      padding: 3px 3px;
+    } 
+
+    .fc-toolbar-title {
+      font-size: 1.1em !important;
+    }
+}
+.delete-text {
+  color:  white;
 }
