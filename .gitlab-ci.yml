@@ -261,7 +261,7 @@ test-integration:
     - npm ci --cache .npm --prefer-offline --prefix $NOTIFICATION_SERVICE_PATH
     - npm ci --cache .npm --prefer-offline --prefix $PATIENT_SERVICE_PATH
     - npm ci --cache .npm --prefer-offline --prefix $SERVER_PATH
-    cd $SERVER_PATH
+    - cd $SERVER_PATH
   script:
     - echo "Running tests on the server..."
     - npm run ci-test
