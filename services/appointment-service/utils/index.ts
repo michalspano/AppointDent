@@ -94,10 +94,10 @@ export const verifySession = async (reqId: string, RESPONSE_TOPIC: string): Prom
 
 /**
  * @description helper function to generate the ReqId value.
- *  
+ *
  * @param n the number of bytes to generate
  * @default n 64
- * 
+ *
  * @returns string of random bytes (hex)
  */
 export const genReqId = (n: number = 64): string => {
