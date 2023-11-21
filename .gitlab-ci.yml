@@ -253,7 +253,7 @@ test-integration:
   stage: test
   tags:
     - docker
-  needs: ["build-server"]
+  needs: ["build-server","build-service1","build-service2","build-service3","build-service4","build-service5"]
   before_script:
     - cd $SERVER_PATH
     - npm ci --cache .npm --prefer-offline

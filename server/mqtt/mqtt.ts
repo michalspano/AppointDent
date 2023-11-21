@@ -5,8 +5,7 @@ let client = undefined as mqtt.MqttClient | undefined;
 
 export const mqttClient = {
   setup: async (services: string[], topics: string[]) => {
-    const broker: string | undefined = process.env.BROKER;
-    if (broker === undefined) throw Error('Broker details undefined');
+    const broker: string = process.env.BROKER ?? 'mqtt://localhost:1883';
     client = mqtt.connect(broker);
     client.on('connect', () => {
       if (client != null) void listenForHeartbeat(services, client, 10);
