@@ -34,3 +34,7 @@ export const login = async (req: Request, res: Response): Promise<Response<any, 
     return res.status(200).json({ message: 'Login successful' });
   }
 };
+
+export const loginDentistWrapper = (req: Request, res: Response): void => {
+  void login(req, res);
+};

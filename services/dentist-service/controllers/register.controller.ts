@@ -65,3 +65,7 @@ function checkEmailRegistered (email: string): boolean {
 
   return emailCheckResult !== null && emailCheckResult.count > 0;
 }
+
+export const registerDentistWrapper = (req: Request, res: Response): void => {
+  void register(req, res);
+};

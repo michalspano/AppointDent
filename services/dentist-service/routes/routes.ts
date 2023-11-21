@@ -6,9 +6,9 @@ import * as deleteController from '../controllers/delete.controller';
 
 const router = Router();
 
-router.post('/register', registerController.register);
-router.post('/login', loginController.login);
-router.patch('/:email', updateController.updateDentist);
+router.post('/register', registerController.registerDentistWrapper);
+router.post('/login', loginController.loginDentistWrapper);
+router.patch('/:email', updateController.updateDentistWrapper);
 router.delete('/:email', deleteController.deleteDentistWrapper);
 
 export default router;

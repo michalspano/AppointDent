@@ -79,3 +79,7 @@ const isValidDentistUpdate = (updatedInfo: Partial<Dentist>): boolean => {
   }
   return true;
 };
+
+export const updateDentistWrapper = (req: Request, res: Response): void => {
+  void updateDentist(req, res);
+};
