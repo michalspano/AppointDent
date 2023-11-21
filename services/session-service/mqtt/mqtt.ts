@@ -8,8 +8,9 @@ import { listenForSessionCreation } from './create-session';
 let client = undefined as mqtt.MqttClient | undefined;
 export const mqttClient = {
   setup: async (serviceName: string): Promise<void> => {
-    // Connect to the MQTT broker
-    client = mqtt.connect('mqtt://broker.hivemq.com');
+    const broker: string | undefined = process.env.BROKER;
+    if (broker === undefined) throw Error('Broker details undefined');
+    client = mqtt.connect(broker);
     // Listening for the "connect" event
     client.on('connect', () => {
       if (client != null) {
