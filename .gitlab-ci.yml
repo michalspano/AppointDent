@@ -254,7 +254,7 @@ test-integration:
     - docker
   needs: ["build-server","build-service1","build-service2","build-service3","build-service4","build-service5"]
   before_script:
-    # It should include all necessary services.
+    # Include dependencies for all services
     - npm ci --cache .npm --prefer-offline --prefix $SESSION_SERVICE_PATH
     - npm ci --cache .npm --prefer-offline --prefix $APPOINTMENT_SERVICE_PATH
     - npm ci --cache .npm --prefer-offline --prefix $DENTIST_SERVICE_PATH
@@ -263,7 +263,7 @@ test-integration:
     - npm ci --cache .npm --prefer-offline --prefix $SERVER_PATH
   script:
     - echo "Running tests on the server..."
-    - npm run test # Ensure this command runs correctly for your setup.
+    - npm run test
   image: "nikolaik/python-nodejs:python3.10-nodejs18" 
 
 # TODO: discuss the feasibility of the deploy stage
