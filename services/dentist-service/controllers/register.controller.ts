@@ -1,31 +1,10 @@
 import type { Request, Response } from 'express';
 import database from '../db/config';
 import { client } from '../mqtt/mqtt';
+import { getServiceResponse } from './helper';
 
 const TOPIC = 'INSERTUSER';
 const RESPONSE_TOPIC = 'INSERTUSERRES';
-const TIMEOUT = 10000;
-
-async function getServiceResponse (reqId: string): Promise<string> {
-  return await new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => {
-      client?.unsubscribe(RESPONSE_TOPIC);
-      reject(new Error('MQTT timeout'));
-    }, TIMEOUT);
-    const eventHandler = (topic: string, message: Buffer): void => {
-      if (topic === RESPONSE_TOPIC) {
-        if (message.toString().startsWith(`${reqId}/`)) {
-          clearTimeout(timeout);
-          client?.unsubscribe(topic);
-          client?.removeListener('message', eventHandler);
-          resolve(message.toString().split('/')[1][0]);
-        }
-      }
-    };
-    client?.subscribe(RESPONSE_TOPIC);
-    client?.on('message', eventHandler);
-  });
-}
 
 export const register = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
   const { email, pass, fName, lName, clinicCountry, clinicCity, clinicStreet, clinicHouseNumber, clinicZipCode, picture } = req.body;
@@ -40,7 +19,7 @@ export const register = async (req: Request, res: Response): Promise<Response<an
   client.publish(TOPIC, `${reqId}/${email}/${pass}/*`); // REQID/USERID/SECRET/*
   client.subscribe(RESPONSE_TOPIC);
   try {
-    const mqttResult = await getServiceResponse(reqId.toString());
+    const mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
     if (mqttResult === '0') {
       return res.status(201).json({ message: 'Unable to authorize' });
     }

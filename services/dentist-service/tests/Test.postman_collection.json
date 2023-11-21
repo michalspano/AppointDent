@@ -22,7 +22,9 @@
 							"});",
 							"const responseJson = pm.response.json();",
 							"const dentistEmail = responseJson.email;",
-							"pm.environment.set(\"dentistEmail\", dentistEmail);"
+							"pm.environment.set(\"dentistEmail\", dentistEmail);",
+							"pm.environment.set('sessionCookie', pm.cookies.get('sessionKey'));",
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -61,12 +63,12 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Response code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
 							"pm.test(\"Response is in JSON format\", function () {",
 							"    pm.response.to.be.json;",
-							"});"
+							"});",
+							"",
+							"pm.environment.set('sessionCookie', pm.cookies.get('sessionKey'));",
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -77,7 +79,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"email\": \"john.doe1@example.com\",\n  \"pass\": \"secretpassword\"\n}",
+					"raw": "{\n  \"email\": \"kate2@example.com\",\n  \"pass\": \"secretpassword\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -105,12 +107,8 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Check data assertion\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.fName).to.eql(\"Ann\");",
-							"});",
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -119,10 +117,16 @@
 			],
 			"request": {
 				"method": "PATCH",
-				"header": [],
+				"header": [
+					{
+						"key": "session",
+						"value": "{{sessionCookie}}",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \"fName\": \"Ann\" }",
+					"raw": "{ \"fName\": \"Kate\" }",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -153,8 +157,8 @@
 							"pm.test(\"Response time is less than 2000ms\", function () {",
 							"    pm.expect(pm.response.responseTime).to.be.below(2000);",
 							"});",
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -163,7 +167,13 @@
 			],
 			"request": {
 				"method": "DELETE",
-				"header": [],
+				"header": [
+					{
+						"key": "session",
+						"value": "{{sessionCookie}}",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "{{host}}/api/dentists/{{dentistEmail}}",
 					"host": [

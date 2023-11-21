@@ -2,31 +2,10 @@ import type { Request, Response } from 'express';
 import database from '../db/config';
 import { type Dentist } from './types';
 import { client } from '../mqtt/mqtt';
+import { getServiceResponse } from './helper';
 
 const TOPIC = 'AUTHREQ';
 const RESPONSE_TOPIC = 'AUTHRES';
-const TIMEOUT = 10000;
-
-async function getServiceResponse (reqId: string): Promise<string> {
-  return await new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => {
-      client?.unsubscribe(RESPONSE_TOPIC);
-      reject(new Error('MQTT timeout'));
-    }, TIMEOUT);
-    const eventHandler = (topic: string, message: Buffer): void => {
-      if (topic === RESPONSE_TOPIC) {
-        if (message.toString().startsWith(`${reqId}/`)) {
-          clearTimeout(timeout);
-          client?.unsubscribe(topic);
-          client?.removeListener('message', eventHandler);
-          resolve(message.toString().split('/')[1][0]);
-        }
-      }
-    };
-    client?.subscribe(RESPONSE_TOPIC);
-    client?.on('message', eventHandler);
-  });
-}
 
 export const updateDentist = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
   const { email } = req.params;
@@ -49,7 +28,7 @@ export const updateDentist = async (req: Request, res: Response): Promise<Respon
   client.subscribe(RESPONSE_TOPIC);
 
   try {
-    const mqttResult = await getServiceResponse(reqId.toString());
+    const mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
     if (mqttResult === '0') {
       return res.status(201).json({ message: 'Unable to authorize' });
     }

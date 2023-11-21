@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import { Router } from 'express';
 import * as registerController from '../controllers/register.controller';
 import * as loginController from '../controllers/login.controller';
