@@ -31,7 +31,14 @@ export default function MyBookings (): JSX.Element {
    */
   const handleCancelBooking = (id: string): void => {
     setAppointments((prevAppointments: Appointment[]) => {
-      const newAppointments = prevAppointments.filter(appointment => appointment.id !== id)
+      const foundIndex = prevAppointments.findIndex(appointment => appointment.id === id)
+      if (foundIndex === -1) {
+        // Handle the case where the ID is not found
+        console.error(`Appointment with ID ${id} not found.`)
+        return prevAppointments
+      }
+      const newAppointments = [...prevAppointments]
+      newAppointments.splice(foundIndex, 1)
       return newAppointments
     })
   }
