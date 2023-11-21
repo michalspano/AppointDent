@@ -5,8 +5,11 @@
   "scripts": {
     "build": "npx tsc",
     "start": "node dist/app.js",
-    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/app.js\"",
-    "test": "npm run newman-server",
+    "dev": "concurrently --kill-others-on-failure \"npx tsc --watch\" \"nodemon -q dist/app.js\"",
+    "test": "npm run execute-dropdb-on-services && npm run prepare-for-test & wait-on http://localhost:3002 http://localhost:3003 http://localhost:3004 http://localhost:3005 && npm run execute-newman-on-services && fkill :3002 :3003 :3004 :3005",
+    "prepare-for-test": "concurrently  \"npm run start --prefix ../services/session-service\" \"npm run start --prefix  ../services/appointment-service\" \"npm run start --prefix ../services/dentist-service\" \"npm run start --prefix ../services/notification-service\" \"npm run start --prefix ../services/patient-service\"",
+    "execute-newman-on-services": "npm run newman --prefix ../services/appointment-service && npm run newman  --prefix ../services/dentist-service && npm run newman  --prefix ../services/notification-service && npm run newman  --prefix ../services/patient-service",
+    "execute-dropdb-on-services": "npm run dropdb  --prefix ../services/session-service && npm run dropdb --prefix ../services/appointment-service && npm run dropdb  --prefix ../services/dentist-service && npm run dropdb  --prefix ../services/notification-service && npm run dropdb  --prefix ../services/patient-service",
     "newman-server": "run-p --race start newman-wait",
     "newman-wait": "wait-on http://127.0.0.1:3000/ && npm run newman",
     "newman": "newman run tests/Test.postman_collection.json -e tests/Test.postman_environment.json",
@@ -34,6 +37,7 @@
     "eslint-plugin-import": "^2.29.0",
     "eslint-plugin-n": "^16.2.0",
     "eslint-plugin-promise": "^6.1.1",
+    "fkill-cli": "^8.0.0",
     "nodemon": "^3.0.1",
     "typescript": "^5.2.2"
   }
