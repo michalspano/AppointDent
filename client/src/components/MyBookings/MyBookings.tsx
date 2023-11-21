@@ -2,11 +2,8 @@ import { For, createSignal, onCleanup, type JSX } from 'solid-js'
 import Booking from './Booking'
 import { type Appointment } from './types'
 
-interface MyBookingsProps {
-  appointments: Appointment[]
-}
-
-export default function MyBookings (props: MyBookingsProps): JSX.Element {
+export default function MyBookings (): JSX.Element {
+// Note: This array will not be hardcoded in the future.
   const [appointments, setAppointments] = createSignal([
     {
       id: '1',
