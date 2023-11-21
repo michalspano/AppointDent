@@ -15,7 +15,7 @@
     "newman": "newman run tests/Test.postman_collection.json -e tests/Test.postman_environment.json",
     "lint": "eslint **/*.ts",
     "lint:fix": "eslint **/*.ts --fix",
-    "broker":"node dist/broker.js"
+    "broker": "node dist/broker.js"
   },
   "keywords": [],
   "author": "",
@@ -32,6 +32,7 @@
     "@types/express": "^4.17.20",
     "@types/node": "^20.8.10",
     "@typescript-eslint/eslint-plugin": "^6.9.1",
+    "aedes": "^0.50.0",
     "concurrently": "^8.2.2",
     "dotenv-cli": "^7.3.0",
     "eslint": "^8.52.0",
