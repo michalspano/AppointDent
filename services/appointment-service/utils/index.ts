@@ -3,6 +3,13 @@
  */
 
 import { type Appointment } from '../types/types';
+import { client } from '../mqtt/mqtt';
+import { randomBytes } from 'crypto';
+
+/**
+ * @description the default timeout for the MQTT client to wait for a response.
+ */
+const TIMEOUT: number = 10000;
 
 /**
  * @description a helper function to convert an unknown object to an
@@ -52,4 +59,47 @@ export const parseBinaryQueryParam = (rawParam: any, fallbackValue: boolean = fa
     default:
       throw new Error('Invalid query parameter: expected true, false of none.');
   }
+};
+
+/**
+ * @description helper function that verifies the session of a user based
+ * on the session-service.
+ *
+ * @param reqId the request Id; @see genReqId
+ * @param RESPONSE_TOPIC the response topic to subscribe to
+ * @returns a promise that resolves to the response of the session-service
+ * based on the request Id.
+ */
+export const verifySession = async (reqId: string, RESPONSE_TOPIC: string): Promise<string> => {
+  return await new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      client?.unsubscribe(RESPONSE_TOPIC);
+      reject(new Error('MQTT timeout'));
+    }, TIMEOUT);
+
+    const eventHandler = (topic: string, message: Buffer): void => {
+      if (topic === RESPONSE_TOPIC) {
+        if (message.toString().startsWith(`${reqId}/`)) {
+          clearTimeout(timeout);
+          client?.unsubscribe(topic);
+          client?.removeListener('message', eventHandler);
+          resolve(message.toString().split('/')[1][0]);
+        }
+      }
+    };
+    client?.subscribe(RESPONSE_TOPIC);
+    client?.on('message', eventHandler);
+  });
+};
+
+/**
+ * @description helper function to generate the ReqId value.
+ *  
+ * @param n the number of bytes to generate
+ * @default n 64
+ * 
+ * @returns string of random bytes (hex)
+ */
+export const genReqId = (n: number = 64): string => {
+  return randomBytes(n).toString('hex');
 };
