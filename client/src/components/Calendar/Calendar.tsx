@@ -3,17 +3,12 @@ import { onCleanup, createEffect, createSignal } from 'solid-js'
 import { Calendar } from '@fullcalendar/core'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import './Calendar.css'
+import { type Appointment } from '../../utils/types'
+import { type EventContentArg, type EventClickArg } from '@fullcalendar/core'
 
 export default function DentistCalendar (): JSX.Element {
-  interface Appointment {
-    id: string
-    title: string
-    start: string
-    end: string
-  }
-
   const [showForm, setShowForm] = createSignal<boolean>(false)
-  const calendarRef: { current: any } = { current: null }
+  const calendarRef: { current: Calendar | null } = { current: null }
 
   // Temporary array of appointment, will be modified once integrated with backend.
   const slots: Appointment[] = [
@@ -55,13 +50,13 @@ export default function DentistCalendar (): JSX.Element {
   /**
  * Deletes the selected appointment from array and updates calendar.
  *
- * @param eventId - The id of the appointment to be removed.
+ * @param appointmentId - The id of the appointment to be removed.
  */
-  function deleteAppointment (eventId: string): void {
-    const index = slots.findIndex((event) => event.id === eventId)
+  function deleteAppointment (appointmentId: string): void {
+    const index = slots.findIndex((appointment) => appointment.id === appointmentId)
     if (index !== -1) {
       slots.splice(index, 1)
-      calendarRef.current?.getEventById(eventId)?.remove()
+      calendarRef.current?.getEventById(appointmentId)?.remove()
     }
   }
 
@@ -70,7 +65,7 @@ export default function DentistCalendar (): JSX.Element {
     const calendarEl: HTMLElement | null = document.getElementById('calendar')
     if (calendarEl != null) {
       // Create a FullCalendar instance
-      const calendar: any = new Calendar(calendarEl, {
+      const calendar: Calendar = new Calendar(calendarEl, {
         plugins: [timeGridPlugin],
         initialView: 'timeGridWeek',
         locale: 'en-GB',
@@ -95,11 +90,11 @@ export default function DentistCalendar (): JSX.Element {
         },
         nowIndicator: true,
         // Define the class for styling for unbooked and booked events.
-        eventClassNames: function (arg: any) {
+        eventClassNames: function (arg: EventContentArg) {
           return arg.event.title === '' ? 'unbooked-event' : 'booked-event'
         },
         events: [...slots],
-        eventClick: ({ event }: { event: any }) => {
+        eventClick: ({ event }: EventClickArg) => {
           const confirmation = window.confirm('Do you want to delete this event?')
           if (confirmation) {
             deleteAppointment(event.id)

@@ -40,10 +40,10 @@ export interface Dentist {
 }
 
 export interface Appointment {
-  startTime: number
-  endTime: number
-  dentist: string
   id: string
+  title: string // The patient name (to work with fullcalendar, it has to be named title)
+  start: string // The start time (to work with fullcalendar, it has to be named start)
+  end: string// The end time (to work with fullcalendar, it has to be named end)
 }
 
 export interface Notification {
