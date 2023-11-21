@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
 import { Router } from 'express';
 import * as authController from '../controllers/authController';
 import * as registerController from '../controllers/registerController';
@@ -8,6 +7,7 @@ import * as updatePatientController from '../controllers/updatePatientController
 const router = Router();
 
 router.post('/login', authController.loginController);
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
 router.post('/register', registerController.registerController);
 router.patch('/:email', updatePatientController.updatePatientController);
 router.delete('/:email', deletePatientController.deletePatientController);

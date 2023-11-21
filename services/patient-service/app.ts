@@ -4,11 +4,14 @@ import database from './db/config';
 import { app, port } from './config/config';
 import { mqttClient } from './mqtt/mqtt';
 import { basename, dirname } from 'path';
+import patientRoute from './routes/patientRoute';
 
 const SERVICES_PATH: string = basename(dirname(__dirname));
 void mqttClient.setup(SERVICES_PATH);
 
 config();
+
+app.use('api/patients', patientRoute);
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello from: AppointDent - Patients Service');
