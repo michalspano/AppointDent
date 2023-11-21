@@ -9,6 +9,7 @@ import PatientSignup from './routes/PatientSignup.tsx'
 import UserProfile from './routes/UserProfile.tsx'
 import Map from './routes/Map.tsx'
 import Navbar from './components/Navbar/Navbar.tsx'
+import MyBookingsPage from './routes/MyBookings.tsx'
 
 const root = document.getElementById('root')
 if (root === null) throw Error('Root undefined!')
@@ -22,6 +23,7 @@ render(() => <div>
         <Route path="/patient-signup" component={PatientSignup} />
         <Route path="/user-profile" component={UserProfile} />
         <Route path="/map" component={Map} />
+        <Route path="/my-bookings" component={MyBookingsPage} />
       </Routes>
     </Router>
 

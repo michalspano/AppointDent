@@ -7,7 +7,7 @@ export const routes = [
 
   {
     name: 'My Bookings',
-    href: '/'
+    href: '/my-bookings'
   }
 
 ]
