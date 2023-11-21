@@ -2,14 +2,16 @@ import { type Request, type Response } from 'express';
 import database from '../db/config';
 import { sendServerError, sendNotFound } from './controllerUtils';
 
-export const updatePatientController = (req: Request, res: Response): Response<any, Record<string, any>> => {
+export const updatePatientController = (req: Request, res: Response): void => {
   try {
     const email = req.params.email;
     const updatedInfo = req.body;
 
+    // console.log('Email: ', email);
+
     if (database === undefined) {
       sendServerError(res);
-      return res.sendStatus(500);
+      return;
     }
 
     const fieldsToUpdate: string[] = [];
@@ -30,15 +32,14 @@ export const updatePatientController = (req: Request, res: Response): Response<a
 
     if (result.changes === undefined || result.changes === 0) {
       sendNotFound(res, 'Patient not found');
-      return res.sendStatus(500);
+      return;
     }
 
     const updatedPatient = { email, ...updatedInfo };
 
-    return res.json(updatedPatient);
+    res.json(updatedPatient);
   } catch (error) {
     console.error('Error updating patient:', error);
     sendServerError(res);
-    return res.sendStatus(500);
   }
 };

@@ -3,7 +3,7 @@ import database from '../db/config';
 import type * as BetterSqlite3 from 'better-sqlite3';
 import { sendServerError, sendCreated } from './controllerUtils';
 
-export const registerController = async (req: Request, res: Response): Promise<void> => {
+export const registerController = (req: Request, res: Response): void => {
   // console.log('HERE!!');
   try {
     const { email, pass, birthDate, fName, lName } = req.body;

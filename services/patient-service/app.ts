@@ -11,7 +11,7 @@ void mqttClient.setup(SERVICES_PATH);
 
 config();
 
-app.use('api/patients', patientRoute);
+app.use('/api/patients', patientRoute);
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello from: AppointDent - Patients Service');

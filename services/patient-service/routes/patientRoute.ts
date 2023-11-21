@@ -7,7 +7,6 @@ import * as updatePatientController from '../controllers/updatePatientController
 const router = Router();
 
 router.post('/login', authController.loginController);
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
 router.post('/register', registerController.registerController);
 router.patch('/:email', updatePatientController.updatePatientController);
 router.delete('/:email', deletePatientController.deletePatientController);

@@ -1,6 +1,5 @@
 import { type Request, type Response } from 'express';
 import database from '../db/config';
-import bcrypt from 'bcrypt';
 import { sendUnauthorized, sendServerError, sendSuccess } from './controllerUtils';
 
 interface Patient {
@@ -14,16 +13,23 @@ export const loginController = (req: Request, res: Response): void => {
     const { email, pass } = req.body;
 
     if (database === undefined) {
-      sendServerError(res); return;
+      sendServerError(res);
+      return;
     }
 
     const patient = database.prepare('SELECT * FROM patients WHERE email = ?').get(email) as Patient;
 
     if (patient === undefined) {
-      sendUnauthorized(res, 'Invalid email or password'); return;
+      sendUnauthorized(res, 'Invalid email or password');
+      return;
     }
 
-    bcrypt.compare(pass, patient.pass, (compareError: Error | undefined, passwordMatch: boolean) => {
+    if (patient.pass !== pass) {
+      sendUnauthorized(res, 'Invalid email or password');
+      return;
+    }
+
+    /* bcrypt.compare(pass, patient.pass, (compareError: Error | undefined, passwordMatch: boolean) => {
       if (compareError != null) {
         sendServerError(res); return;
       }
@@ -31,9 +37,9 @@ export const loginController = (req: Request, res: Response): void => {
       if (!passwordMatch) {
         sendUnauthorized(res, 'Invalid email or password'); return;
       }
+      */
 
-      sendSuccess(res, 'Login successful');
-    });
+    sendSuccess(res, 'Login successful');
   } catch (error) {
     console.error('Error during login:', error);
     sendServerError(res);
