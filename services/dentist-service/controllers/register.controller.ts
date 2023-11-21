@@ -1,98 +1,79 @@
 import type { Request, Response } from 'express';
 import database from '../db/config';
-import type { RegistrationRequestBody } from './types';
 import { client } from '../mqtt/mqtt';
 
 const TOPIC = 'INSERTUSER';
 const RESPONSE_TOPIC = 'INSERTUSERRES';
+const TIMEOUT = 10000;
 
-export const register = (req: Request<string, unknown, RegistrationRequestBody>, res: Response): void => {
-  try {
-    const { email, pass, fName, lName, clinicCountry, clinicCity, clinicStreet, clinicHouseNumber, clinicZipCode, picture } = req.body;
-
-    if (client === undefined) {
-      res.status(201).json({ message: 'MQTT connection failed' });
-      return;
-    }
-
-    const reqId = Math.floor(Math.random() * 1000); // Generates a random integer between 0 and 999
-    client.publish(TOPIC, `${reqId}/${email}/${pass}/*`); // REQID/USERID/SECRET/*
-    client.subscribe(RESPONSE_TOPIC);
-
-    client.on('message', (topic: string, message: Buffer) => {
+async function getServiceResponse (reqId: string): Promise<string> {
+  return await new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      client?.unsubscribe(RESPONSE_TOPIC);
+      reject(new Error('MQTT timeout'));
+    }, TIMEOUT);
+    const eventHandler = (topic: string, message: Buffer): void => {
       if (topic === RESPONSE_TOPIC) {
-        handleMqttResponse(res, message, email, pass, fName, lName, clinicCountry, clinicCity, clinicStreet, clinicHouseNumber, clinicZipCode, picture);
+        if (message.toString().startsWith(`${reqId}/`)) {
+          clearTimeout(timeout);
+          client?.unsubscribe(topic);
+          client?.removeListener('message', eventHandler);
+          resolve(message.toString().split('/')[1][0]);
+        }
       }
-    });
-  } catch (error) {
-    console.error('Error registering dentist:', error);
-    res.status(500).json({ message: 'Server Error' });
-  }
-};
+    };
+    client?.subscribe(RESPONSE_TOPIC);
+    client?.on('message', eventHandler);
+  });
+}
 
-function handleMqttResponse (
-  res: Response,
-  message: Buffer,
-  email: string,
-  pass: string,
-  fName: string,
-  lName: string,
-  clinicCountry: string,
-  clinicCity: string,
-  clinicStreet: string,
-  clinicHouseNumber: string,
-  clinicZipCode: string,
-  picture: string
-): void {
+export const register = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
+  const { email, pass, fName, lName, clinicCountry, clinicCity, clinicStreet, clinicHouseNumber, clinicZipCode, picture } = req.body;
   if (database === undefined) {
-    res.status(500).json({ message: 'Database undefined' });
-    return;
+    return res.status(500).json({ message: 'Database undefined' });
+  }
+  if (client === undefined) {
+    return res.status(201).json({ message: 'MQTT connection failed' });
   }
 
-  const result = message.toString();
-  let status;
-  if (result.length >= 3) {
-    status = result.split('/')[1][0];
-  } else {
-    console.error('Invalid data format:', result);
-  }
-
-  if (status === '0') {
-    if (!res.headersSent) {
-      res.status(500).json({ message: 'User can not be registered' });
+  const reqId = Math.floor(Math.random() * 1000); // Generates a random integer between 0 and 999
+  client.publish(TOPIC, `${reqId}/${email}/${pass}/*`); // REQID/USERID/SECRET/*
+  client.subscribe(RESPONSE_TOPIC);
+  try {
+    const mqttResult = await getServiceResponse(reqId.toString());
+    if (mqttResult === '0') {
+      return res.status(201).json({ message: 'Unable to authorize' });
     }
-    return;
+  } catch (error) {
+    return res.status(500).json({ message: 'Service Timeout' });
   }
 
-  if (status === '1') {
-    // Check if the email is already registered
-    if (checkEmailRegistered(email)) {
-      res.status(500).json({ message: 'Email is already registered' });
-      return;
-    }
+  // All checks passed, so inserting the user
+  // Check if the email is already registered
+  if (checkEmailRegistered(email)) {
+    return res.status(500).json({ message: 'Email is already registered' });
+  }
 
-    const query = database.prepare(`
+  const query = database.prepare(`
         INSERT INTO dentists 
         (email, pass, fName, lName, clinic_country, clinic_city, clinic_street, clinic_house_number, clinic_zipcode, picture) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
-    query.run(email, pass, fName, lName, clinicCountry, clinicCity, clinicStreet, clinicHouseNumber, clinicZipCode, picture);
+  query.run(email, pass, fName, lName, clinicCountry, clinicCity, clinicStreet, clinicHouseNumber, clinicZipCode, picture);
 
-    const createdDentist = {
-      email,
-      fName,
-      lName,
-      clinicCountry,
-      clinicCity,
-      clinicStreet,
-      clinicHouseNumber,
-      clinicZipCode,
-      picture
-    };
-    console.log('created and inserted');
-    res.status(201).json(createdDentist);
-  }
-}
+  const createdDentist = {
+    email,
+    fName,
+    lName,
+    clinicCountry,
+    clinicCity,
+    clinicStreet,
+    clinicHouseNumber,
+    clinicZipCode,
+    picture
+  };
+  return res.status(201).json(createdDentist);
+};
 
 function checkEmailRegistered (email: string): boolean {
   // Check if the email is already registered

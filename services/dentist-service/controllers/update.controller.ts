@@ -5,20 +5,42 @@ import { client } from '../mqtt/mqtt';
 
 const TOPIC = 'AUTHREQ';
 const RESPONSE_TOPIC = 'AUTHRES';
+const TIMEOUT = 10000;
 
-export const updateDentist = (req: Request, res: Response): void => {
+async function getServiceResponse (reqId: string): Promise<string> {
+  return await new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      client?.unsubscribe(RESPONSE_TOPIC);
+      reject(new Error('MQTT timeout'));
+    }, TIMEOUT);
+    const eventHandler = (topic: string, message: Buffer): void => {
+      if (topic === RESPONSE_TOPIC) {
+        if (message.toString().startsWith(`${reqId}/`)) {
+          clearTimeout(timeout);
+          client?.unsubscribe(topic);
+          client?.removeListener('message', eventHandler);
+          resolve(message.toString().split('/')[1][0]);
+        }
+      }
+    };
+    client?.subscribe(RESPONSE_TOPIC);
+    client?.on('message', eventHandler);
+  });
+}
+
+export const updateDentist = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
   const { email } = req.params;
   let { session } = req.headers;
   const updatedInfo = req.body as Partial<Dentist>;
-
+  if (database === undefined) {
+    return res.status(500).send('Database undefined');
+  }
   if (client === undefined) {
-    res.status(201).json({ message: 'MQTT connection failed' });
-    return;
+    return res.status(500).json({ message: 'MQTT connection failed' });
   }
 
   if (session === undefined) {
-    res.status(400).json({ message: 'Missing session cookie' });
-    return;
+    return res.status(400).json({ message: 'Missing session cookie' });
   } else if (Array.isArray(session)) {
     session = session.join(',');
   }
@@ -26,18 +48,17 @@ export const updateDentist = (req: Request, res: Response): void => {
   client.publish(TOPIC, `${reqId}/${email}/${session}/*`); // reqId and session from body FE?
   client.subscribe(RESPONSE_TOPIC);
 
-  client.on('message', (topic: string, message: Buffer) => {
-    handleMqttResponse(res, message);
-  });
-
-  if (!isValidDentistUpdate(updatedInfo)) {
-    res.status(400).json({ message: 'Invalid update fields' });
-    return;
+  try {
+    const mqttResult = await getServiceResponse(reqId.toString());
+    if (mqttResult === '0') {
+      return res.status(201).json({ message: 'Unable to authorize' });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: 'Service Timeout' });
   }
 
-  if (database === undefined) {
-    res.status(500).send('Database undefined');
-    return;
+  if (!isValidDentistUpdate(updatedInfo)) {
+    return res.status(400).json({ message: 'Invalid update fields' });
   }
 
   const fieldsToUpdate: string[] = [];
@@ -59,15 +80,13 @@ export const updateDentist = (req: Request, res: Response): void => {
     const result = query.run(...values, email);
 
     if (result.changes === undefined || result.changes === 0) {
-      res.status(404).json({ message: 'Dentist not found' });
-      return;
+      return res.status(404).json({ message: 'Dentist not found' });
     }
 
     const updatedDentist = { email, ...updatedInfo };
-    res.json(updatedDentist);
+    return res.status(200).json(updatedDentist);
   } catch (error) {
-    console.error('Error updating dentist:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    return res.status(500).json({ message: 'Error updating dentist' });
   }
 };
 
@@ -81,16 +100,3 @@ const isValidDentistUpdate = (updatedInfo: Partial<Dentist>): boolean => {
   }
   return true;
 };
-
-function handleMqttResponse (res: Response, message: Buffer): void {
-  const result = message.toString();
-  let status;
-  if (result.length >= 3) {
-    status = result.split('/')[1][0];
-  }
-  if (status === '0') {
-    res.status(201).json({ message: 'Unable to authorize' });
-    // eslint-disable-next-line no-useless-return
-    return;
-  }
-}

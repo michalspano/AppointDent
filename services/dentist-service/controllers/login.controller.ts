@@ -4,55 +4,54 @@ import { client } from '../mqtt/mqtt';
 
 const TOPIC = 'CREATESESSION';
 const RESPONSE_TOPIC = 'SESSION';
+const TIMEOUT = 10000;
 
-export const login = (req: Request, res: Response): void => {
+async function getServiceResponse (reqId: string): Promise<string> {
+  return await new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      client?.unsubscribe(RESPONSE_TOPIC);
+      reject(new Error('MQTT timeout'));
+    }, TIMEOUT);
+    const eventHandler = (topic: string, message: Buffer): void => {
+      if (topic === RESPONSE_TOPIC) {
+        if (message.toString().startsWith(`${reqId}/`)) {
+          clearTimeout(timeout);
+          client?.unsubscribe(topic);
+          client?.removeListener('message', eventHandler);
+          resolve(message.toString().split('/')[1]);
+        }
+      }
+    };
+    client?.subscribe(RESPONSE_TOPIC);
+    client?.on('message', eventHandler);
+  });
+}
+
+export const login = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
+  const { email, pass } = req.body;
+  if (database === undefined) {
+    return res.status(500).send('Database undefined');
+  }
+  if (client === undefined) {
+    return res.status(201).json({ message: 'MQTT connection failed' });
+  }
+
+  const reqId = Math.floor(Math.random() * 1000);
+  client.publish(TOPIC, `${reqId}/${email}/${pass}/*`);
+  client.subscribe(RESPONSE_TOPIC);
+  let mqttResult;
   try {
-    const { email, pass } = req.body;
-
-    if (database === undefined) {
-      res.status(500).send('Database undefined');
-      return;
+    mqttResult = await getServiceResponse(reqId.toString());
+    if (mqttResult === '0') {
+      return res.status(201).json({ message: 'Unable to authorize' });
     }
-
-    if (client === undefined) {
-      res.status(201).json({ message: 'MQTT connection failed' });
-      return;
-    }
-
-    const reqId = Math.floor(Math.random() * 1000);
-    client.publish(TOPIC, `${reqId}/${email}/${pass}/*`);
-    client.subscribe(RESPONSE_TOPIC);
-
-    client.on('message', (topic: string, message: Buffer) => {
-      handleMqttLoginResponse(res, message);
-    });
   } catch (error) {
-    console.error('Error during login:', error);
-    res.status(500).json({ message: 'Server Error' });
+    return res.status(500).json({ message: 'Service Timeout' });
+  }
+  if (mqttResult !== undefined && mqttResult.length === 1 && mqttResult === '0') { // REQID/0/* (fail)
+    return res.status(500).json({ message: 'Email or password is incorrect' });
+  } else { // REQID/SESSIONKEY/* (success)
+    res.cookie('sessionKey', mqttResult, { httpOnly: true });
+    return res.status(200).json({ message: 'Login successful' });
   }
 };
-
-function handleMqttLoginResponse (res: Response, message: Buffer): void {
-  try {
-    if (database === undefined) {
-      res.status(500).send('Database undefined');
-    }
-
-    const result = message.toString();
-    let sessionKey;
-    if (result.length >= 3) {
-      sessionKey = result.split('/')[1];
-    } else {
-      console.error('Invalid data format:', result);
-    }
-    if (sessionKey !== undefined && sessionKey.length === 1 && sessionKey === '0') { // REQID/0/* (fail)
-      res.status(500).json({ message: 'Email or password is incorrect' });
-    } else if (sessionKey !== undefined) { // REQID/SESSIONKEY/* (success)
-      res.cookie('sessionKey', sessionKey, { httpOnly: true });
-      res.status(200).json({ message: 'Login successful' });
-    }
-  } catch (error) {
-    console.error('Error handling MQTT login response:', error);
-    res.status(500).json({ message: 'Server Error' });
-  }
-}
