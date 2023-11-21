@@ -248,17 +248,22 @@ build-service5:
   artifacts:
     paths:
       - $SESSION_SERVICE_PATH/dist
-
 test-integration:
   stage: test
   tags:
     - docker
   needs: ["build-server","build-service1","build-service2","build-service3","build-service4","build-service5"]
   before_script:
-    - cd $SERVER_PATH
-    - npm ci --cache .npm --prefer-offline
+    # It should include all necessary services.
+    - npm ci --cache .npm --prefer-offline --prefix $SESSION_SERVICE_PATH
+    - npm ci --cache .npm --prefer-offline --prefix $APPOINTMENT_SERVICE_PATH
+    - npm ci --cache .npm --prefer-offline --prefix $DENTIST_SERVICE_PATH
+    - npm ci --cache .npm --prefer-offline --prefix $NOTIFICATION_SERVICE_PATH
+    - npm ci --cache .npm --prefer-offline --prefix $PATIENT_SERVICE_PATH
+    - npm ci --cache .npm --prefer-offline --prefix $SERVER_PATH
   script:
     - echo "Running tests on the server..."
-    - npm run test # test and ci-test are the same (no db used in server)
+    - npm run test # Ensure this command runs correctly for your setup.
+  image: "nikolaik/python-nodejs:python3.10-nodejs18" 
 
 # TODO: discuss the feasibility of the deploy stage
