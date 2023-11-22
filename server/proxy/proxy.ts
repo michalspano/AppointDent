@@ -22,7 +22,6 @@ export function routeProxy (req: Request, res: Response, next: NextFunction): vo
   if (target !== undefined) {
     // Remove the service name.
     const newPath = pathParts.slice(2).join('/');
-    console.log('New path ' + newPath);
     req.url = newPath;
     req.originalUrl = newPath;
     target.web(req, res, {}, (err: Error) => {

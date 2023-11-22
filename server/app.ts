@@ -15,6 +15,10 @@ app.options('*', cors());
 app.use(cors());
 app.use('/api/v1', routeProxy);
 
+app.get('/', (req, res) => {
+  res.sendStatus(200);
+});
+
 const port: string = process.env.PORT ?? '3000';
 const servicesPath: string = process.env.SERVICES_PATH ?? '../services';
 
@@ -27,5 +31,5 @@ async function setupServices (): Promise<void> {
 app.listen(port, () => {
   console.log('Hello from AppointDent!');
   console.log(`Server is running at http://localhost:${port}`);
-  void setupServices();
+  if (!process.argv.includes('--no-spawn')) void setupServices();
 });

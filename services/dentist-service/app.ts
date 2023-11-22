@@ -11,7 +11,9 @@ void mqttClient.setup(SERVICES_PATH);
 config();
 
 app.use('/', routes);
-
+app.get('/', (req, res) => {
+  res.sendStatus(200);
+});
 app.listen(port, () => {
   console.log('AppointDent - Dentists Service');
   console.log(`Server is running at http://localhost:${port}`);
