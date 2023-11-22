@@ -14,7 +14,7 @@ export const deleteDentist = async (req: Request, res: Response): Promise<Respon
   }
 
   if (client === undefined) {
-    return res.status(201).json({ message: 'MQTT connection failed' });
+    return res.status(503).json({ message: 'MQTT connection failed' });
   }
 
   if (session === undefined) {
@@ -29,10 +29,10 @@ export const deleteDentist = async (req: Request, res: Response): Promise<Respon
   try {
     const mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
     if (mqttResult === '0') {
-      return res.status(201).json({ message: 'Unable to authorize' });
+      return res.status(401).json({ message: 'Unable to authorize' });
     }
   } catch (error) {
-    return res.status(500).json({ message: 'Service Timeout' });
+    return res.status(504).json({ message: 'Service Timeout' });
   }
 
   const query = database.prepare('DELETE FROM dentists WHERE email = ?');
@@ -43,7 +43,7 @@ export const deleteDentist = async (req: Request, res: Response): Promise<Respon
     return res.status(404).json({ message: 'Dentist not found' });
   }
 
-  return res.json({ message: 'Dentist deleted successfully' });
+  return res.status(200).json({ message: 'Dentist deleted successfully' });
 };
 
 export const deleteDentistWrapper = (req: Request, res: Response): void => {

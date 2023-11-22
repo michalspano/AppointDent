@@ -15,7 +15,7 @@ export const updateDentist = async (req: Request, res: Response): Promise<Respon
     return res.status(500).send('Database undefined');
   }
   if (client === undefined) {
-    return res.status(500).json({ message: 'MQTT connection failed' });
+    return res.status(503).json({ message: 'MQTT connection failed' });
   }
 
   if (session === undefined) {
@@ -30,10 +30,10 @@ export const updateDentist = async (req: Request, res: Response): Promise<Respon
   try {
     const mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
     if (mqttResult === '0') {
-      return res.status(201).json({ message: 'Unable to authorize' });
+      return res.status(401).json({ message: 'Unable to authorize' });
     }
   } catch (error) {
-    return res.status(500).json({ message: 'Service Timeout' });
+    return res.status(401).json({ message: 'Service Timeout' });
   }
 
   if (!isValidDentistUpdate(updatedInfo)) {

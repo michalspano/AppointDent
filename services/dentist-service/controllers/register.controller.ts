@@ -12,7 +12,7 @@ export const register = async (req: Request, res: Response): Promise<Response<an
     return res.status(500).json({ message: 'Database undefined' });
   }
   if (client === undefined) {
-    return res.status(201).json({ message: 'MQTT connection failed' });
+    return res.status(503).json({ message: 'MQTT connection failed' });
   }
 
   const reqId = Math.floor(Math.random() * 1000); // Generates a random integer between 0 and 999
@@ -21,16 +21,16 @@ export const register = async (req: Request, res: Response): Promise<Response<an
   try {
     const mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
     if (mqttResult === '0') {
-      return res.status(201).json({ message: 'Unable to authorize' });
+      return res.status(401).json({ message: 'Unable to authorize' });
     }
   } catch (error) {
-    return res.status(500).json({ message: 'Service Timeout' });
+    return res.status(504).json({ message: 'Service Timeout' });
   }
 
   // All checks passed, so inserting the user
   // Check if the email is already registered
   if (checkEmailRegistered(email)) {
-    return res.status(500).json({ message: 'Email is already registered' });
+    return res.status(409).json({ message: 'Email is already registered' });
   }
 
   const query = database.prepare(`
