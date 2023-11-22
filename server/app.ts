@@ -1,27 +1,28 @@
 import { config } from 'dotenv';
-import express from 'express';
-import spawnServices from './scripts/spawn_services';
 import { mqttClient } from './mqtt/mqtt';
 import { parseServices } from './scripts/parse_services';
 import { routeProxy } from './proxy/proxy';
-import cors from 'cors';
+import app from './config/config';
+import spawnServices from './scripts/spawn_services';
+
 config(); // init dotenv environment
 
-const TOPICS = ['HEARTBEAT'];
-const parsedServices: string[] = [];
-const app = express();
-// Enable cross-origin resource sharing for frontend must be registered before api
-app.options('*', cors());
-app.use(cors());
-app.use('/api/v1', routeProxy);
-
-app.get('/', (req, res) => {
-  res.sendStatus(200);
-});
-
 const port: string = process.env.PORT ?? '3000';
+
+const TOPICS: string[] = ['HEARTBEAT'];
+const parsedServices: string[] = [];
+
+/* Middleware */
+app.use('/api/v1', routeProxy);
+app.get('/', (req, res) => res.sendStatus(200));
+
 const servicesPath: string = process.env.SERVICES_PATH ?? '../services';
 
+/**
+ * @description a helper function to setup services, parse and spawn them,
+ * and setups up the mqtt client.
+ * @returns {Promise<void>}
+ */
 async function setupServices (): Promise<void> {
   await parseServices(servicesPath, parsedServices);
   await spawnServices(servicesPath, parsedServices);
