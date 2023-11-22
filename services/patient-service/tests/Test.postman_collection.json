@@ -14,12 +14,12 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Register Patient and Set Environment Variable\", function () {",
-							"    pm.response.to.have.status(201);",
+							"pm.test(\"Set Environment Variable\", function () {",
 							"    const responseJson = pm.response.json();",
 							"    const patientEmail = responseJson.email;",
-							"    console.log(\"Set Environment Variable: \", patientEmail);",
+							"    console.log(\"Email (Register):\", patientEmail);",
 							"    pm.environment.set(\"patientEmail\", patientEmail);",
+							"    console.log(\"Email set in environment: \", patientEmail);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -31,7 +31,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"email\": \"may.appleseed@email2.com\",\n    \"pass\": \"complicatedpassword\",\n    \"birthDate\": \"2023\",\n    \"lName\": \"Appleseeed\",\n    \"fName\": \"May\"\n}",
+					"raw": "{\n    \"email\": \"sophia2043.appleseed@email.com\",\n    \"pass\": \"complicatedpassword\",\n    \"birthDate\": \"2023\",\n    \"lName\": \"Appleseeed\",\n    \"fName\": \"Sophia\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -64,7 +64,17 @@
 							"});",
 							"pm.test(\"Response is in JSON format\", function () {",
 							"    pm.response.to.be.json;",
-							"});"
+							"});",
+							"const existingPatientEmail = pm.environment.get(\"patientEmail\");",
+							"",
+							"if (!existingPatientEmail) {",
+							"    const responseJson = pm.response.json();",
+							"    const patientEmail = responseJson.email;",
+							"    pm.environment.set(\"patientEmail\", patientEmail);",
+							"    console.log(\"Email (Login):\", patientEmail);",
+							"} else {",
+							"    console.log(\"Patient email already set (Login):\", existingPatientEmail);",
+							"}"
 						],
 						"type": "text/javascript"
 					}
@@ -75,7 +85,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"email\": \"may.appleseed@email2.com\",\n    \"pass\": \"complicatedpassword\"\n}",
+					"raw": "{\n    \"email\": \"sophia2043.appleseed@email.com\",\n    \"pass\": \"complicatedpassword\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -97,48 +107,6 @@
 			"response": []
 		},
 		{
-			"name": "DELETE/api/patients/:id",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Response time is less than 2000ms\", function () {",
-							"    pm.expect(pm.response.responseTime).to.be.below(2000);",
-							"});",
-							"",
-							"pm.test(\"Response code is 201\", function(){",
-							"    pm.repsonse.to.have.status(201);",
-							"})",
-							"",
-							"pm.test(\"Set Environment Variable\", function () {",
-							"    const responseJson = pm.response.json();",
-							"    const patientEmail = responseJson.email;",
-							"    pm.environment.set(\"patientEmail\", patientEmail);",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "{{host}}/api/patients/{{patientEmail}}",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"api",
-						"patients",
-						"{{patientEmail}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "PATCH/api/patients/:id",
 			"event": [
 				{
@@ -148,6 +116,9 @@
 							"pm.test(\"Response code is 201\", function(){",
 							"    pm.response.to.have.status(201);",
 							"})",
+							"",
+							"const patientEmail = pm.environment.get(\"patientEmail\");",
+							"console.log(\"Patient email: \", patientEmail);",
 							"",
 							"pm.test(\"Set Environment Variable\", function () {",
 							"    const responseJson = pm.response.json();console.log(\"Response Body:\", responseJson); ",
@@ -165,13 +136,54 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"fName\": \"Jane\"\n}",
+					"raw": "{\n    \"fName\": \"Wilma\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
 						}
 					}
 				},
+				"url": {
+					"raw": "{{host}}/api/patients/{{patientEmail}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"patients",
+						"{{patientEmail}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE/api/patients/:id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response time is less than 2000ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+							"});",
+							"pm.test(\"Response code is 201\", function(){",
+							"    pm.response.to.have.status(201);",
+							"})",
+							"",
+							"pm.test(\"Set Environment Variable\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    const patientEmail = responseJson.email;",
+							"    pm.environment.set(\"patientEmail\", patientEmail);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
 				"url": {
 					"raw": "{{host}}/api/patients/{{patientEmail}}",
 					"host": [

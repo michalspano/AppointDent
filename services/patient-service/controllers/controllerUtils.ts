@@ -19,3 +19,7 @@ export function sendUnauthorized (res: Response, message: string): Response {
 export function sendSuccess (res: Response, message: string): Response {
   return res.status(200).json({ message });
 }
+
+export function sendBadRequest (res: Response, message: string): Response {
+  return res.status(400).json({ message });
+}

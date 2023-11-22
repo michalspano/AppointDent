@@ -1,7 +1,7 @@
 import { type Request, type Response } from 'express';
 import database from '../db/config';
 import type * as BetterSqlite3 from 'better-sqlite3';
-import { sendServerError, sendCreated } from './controllerUtils';
+import { sendServerError, sendCreated, sendBadRequest } from './controllerUtils';
 
 export const registerController = (req: Request, res: Response): void => {
   // console.log('HERE!!');
@@ -20,6 +20,16 @@ export const registerController = (req: Request, res: Response): void => {
 
       if (!isDatabaseDefined(database)) {
         sendServerError(res);
+        return;
+      }
+
+      // Check if the email already exists in the database
+      const checkEmailQuery = database.prepare('SELECT COUNT(*) as count FROM patients WHERE email = ?');
+      const emailExists = (checkEmailQuery.get(email) as { count: number }).count > 0;
+
+      if (emailExists) {
+        // Email already exists, send a 400 Bad Request response
+        sendBadRequest(res, 'Email already exists');
         return;
       }
 
