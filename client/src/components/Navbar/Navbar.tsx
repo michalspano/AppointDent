@@ -6,7 +6,7 @@ import { patientRoutes } from './routes'
 import { fadeIn, fadeOut, hamburger, notify, slideIn, slideOut, toggleHamburger, toggleNotification } from './animation'
 import location from '../../assets/location.png'
 
-const isUserDentist = !false // should be extended with getting current user entity when we have it on BE
+const isUserDentist = false // should be extended with getting current user entity when we have it on BE
 const routes = isUserDentist ? null : patientRoutes
 const logoLink = isUserDentist ? '/calendar' : '/map'
 
