@@ -1,12 +1,20 @@
-import fs from 'fs';
+import { readFileSync } from 'fs';
 import Database from 'better-sqlite3';
 import type { Database as DatabaseType } from 'better-sqlite3';
 
 /**
  * @description the options for the database connection.
+ * The fileMustExit properly is set to default, which means,
+ * that if the database file does not exist, it will be created.
+ * We don't need to use a script to create the database file.
+ *
+ * We're using the verbose option to log all SQL queries to the console.
+ * This is useful for debugging purposes.
+ *
+ * @see https://github.com/WiseLibs/better-sqlite3/blob/master/docs/api.md#new-databasepath-options
  */
 const options: object = Object.freeze({
-  fileMustExist: true
+  verbose: console.log
   // TODO: add more options
 });
 
@@ -23,11 +31,6 @@ const DB_FILE: string = process.env.CUSTOM_DB_PATH ?? './db/appointments.db';
  */
 const schemaFilePath: string = './db/schema.sql';
 
-/* Verify that DB_FILE exists. If not, create it (just an empty file).
- * This eliminates the error that occurs when the database file does not exist
- * on the local machine. */
-if (!fs.existsSync(DB_FILE)) fs.writeFileSync(DB_FILE, '');
-
 /**
  * @description the database instance with the options and the local
  * .db file.
@@ -42,7 +45,7 @@ const database: DatabaseType | undefined = (() => {
     const db = new Database(DB_FILE, options);
     db.pragma('journal_mode = WAL');
     // Load the schema file to the database.
-    db.exec(fs.readFileSync(schemaFilePath, 'utf8'));
+    db.exec(readFileSync(schemaFilePath, 'utf8'));
 
     return db;
   } catch (error: Error | unknown) {

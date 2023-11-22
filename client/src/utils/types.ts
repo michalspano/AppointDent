@@ -1,8 +1,20 @@
-/*
-Some attributes that I was not sure if the response payload will contain are
-optional (using the question mark). Moreover, password is needed in signUp,
-but not im MyProfile. Therefore, it is optional.
-*/
+/**
+ * Response data type from geocoding API
+ */
+export interface Place {
+  boundingBox: [string, string, string, string]
+  class: string
+  displayName: string
+  importance: number
+  lat: string
+  licence: string
+  lon: string
+  osmId: number
+  osmType: string
+  placeId: number
+  poweredBy: string
+  type: string
+}
 
 export interface Patient {
   userEmail: string
@@ -13,13 +25,22 @@ export interface Patient {
   }
   dateOfBirth: Date
   session?: {
-    hash: string
+    token: string
     expiry?: Date
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-interface HiddenDentist extends Patient {
+export interface Dentist {
+  userEmail: string
+  password?: string
+  name: {
+    firstName: string
+    lastName: string
+  }
+  session?: {
+    token: string
+    expiry?: number
+  }
   address: {
     street: string
     city: string
@@ -30,26 +51,16 @@ interface HiddenDentist extends Patient {
   picture: string
 }
 
-type RemoveDateOfBirth<Type> = {
-  [Property in keyof Type as Exclude<Property, 'dateOfBirth'>]: Type[Property]
-}
-
-export type Dentist = RemoveDateOfBirth<HiddenDentist>
-/*
-The start and end dates are timestamps in the backend. In my opinion,
-the backend should convert them to date and then send them to the front-end
-*/
-
 export interface Appointment {
-  startTimestamp: Date
-  endDate: Date
-  dentist: string
   id: string
+  title: string // The patient name (to work with fullcalendar, it has to be named title)
+  start: string // The start time (to work with fullcalendar, it has to be named start)
+  end: string// The end time (to work with fullcalendar, it has to be named end)
 }
 
 export interface Notification {
   message: string
-  time: Date
+  time: number
   email: string
   id?: string
 }
