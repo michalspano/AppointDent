@@ -18,7 +18,7 @@
     "newman-wait": "wait-on http://127.0.0.1:3000/ && npm run newman",
     "newman": "newman run tests/Test.postman_collection.json -e tests/Test.postman_environment.json",
     "start-broker": "dotenv -- npm run broker",
-    "broker": "node dist/broker.js",
+    "broker": "node dist/mqtt/broker.js",
     "lint": "eslint **/*.ts",
     "lint:fix": "eslint **/*.ts --fix"
   },
