@@ -6,6 +6,7 @@ import type { Request, Response } from 'express';
 
 // Create a new appointment.
 const createAppointment = (req: Request, res: Response): Response<any, Record<string, any>> => {
+  console.log('creating appointment');
   if (database === undefined) {
     return res.status(500).json({ message: 'Internal server error: database connection failed.' });
   }

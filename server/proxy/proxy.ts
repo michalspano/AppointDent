@@ -1,3 +1,4 @@
+import { type NextFunction, type Request, type Response } from 'express';
 import httpProxy from 'http-proxy';
 
 const proxyTargets: Record<string, string> = {
@@ -6,34 +7,28 @@ const proxyTargets: Record<string, string> = {
   notifications: 'http://localhost:3004',
   dentists: 'http://localhost:3005'
 };
-
-export function setupProxies (): Record<string, httpProxy> {
-  const proxies: Record<string, httpProxy> = {};
-  for (const key in proxyTargets) {
-    proxies[key] = httpProxy.createProxyServer({ target: proxyTargets[key], ws: false });
-  }
-  return proxies;
+const proxies: Record<string, httpProxy> = {};
+for (const key in proxyTargets) {
+  console.log(key);
+  proxies[key] = httpProxy.createProxyServer({ target: proxyTargets[key], ws: false });
 }
 
-export async function routeThroughProxy (req, res, next): void {
-  const targetKey = req.originalUrl.substring(req.baseUrl.length + 1).split('/');
-  console.log(targetKey);
-}
-/*
-const handleProxy = (req, res, next) => {
-  // req.baseUrl will contain the matched prefix '/api/v1', we can use that to determine target.
+export function routeProxy (req: Request, res: Response, next: NextFunction): void {
+  const pathParts = req.url.split('/'); // Use req.url to include query string if necessary.
 
-  const proxy = proxies[targetKey];
-  if (proxy) {
-    // Modify the req.url to strip out the targetKey segment, since it's already matched.
-    req.url = req.url.substring(targetKey.length + 1);
-    proxy.web(req, res, (err) => {
-      if (err) {
-        console.error(err);
-        res.status(500).send('Proxy error');
-      }
+  const service = pathParts[1];
+  const target: httpProxy | undefined = proxies[service];
+
+  if (target !== undefined) {
+    // Remove the service name.
+    const newPath = pathParts.slice(2).join('/');
+    console.log('New path ' + newPath);
+    req.url = newPath;
+    req.originalUrl = newPath;
+    target.web(req, res, {}, (err: Error) => {
+      throw new Error(err.message);
     });
   } else {
-    next(); // No matching targetKey, continue with other middleware/route handlers
+    next();
   }
-}; */
+}

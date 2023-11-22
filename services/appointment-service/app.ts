@@ -11,22 +11,11 @@ void mqttClient.setup(SERVICES_PATH);
 
 config();
 
-/**
- * Default home route. Used to check if the service is running.
- * This route can be replaced by something more useful. For now,
- * it is used in the `npm run test` script to check if the service
- * is running (see the `wait-on` command in package.json).
- * @file package.json
- */
-app.get('/', (req: Request, res: Response) => {
-  res.send('AppointDent - Appointments Service');
-});
-
 // Use the routes defined in routes/index.ts.
-app.use('/api/appointments', router);
+app.use('/', router);
 
 // Handle undefined routes
-app.use('/api/*', (req: Request, res: Response) => {
+app.use('*', (req: Request, res: Response) => {
   res.status(404).send('Not found.');
 });
 
