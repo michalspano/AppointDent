@@ -4,9 +4,14 @@ import type { Database as DatabaseType } from 'better-sqlite3';
 
 /**
  * @description the options for the database connection.
+ *
+ * We're using the verbose option to log all SQL queries to the console.
+ * This is useful for debugging purposes.
+ *
+ * @see https://github.com/WiseLibs/better-sqlite3/blob/master/docs/api.md#new-databasepath-options
  */
 const options: object = Object.freeze({
-  fileMustExist: true
+  verbose: console.log
   // TODO: add more options
 });
 

@@ -8,7 +8,8 @@
     "start": "node dist/app.js",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/app.js\"",
     "lint": "eslint **/*.ts",
-    "lint:fix": "eslint **/*.ts --fix"
+    "lint:fix": "eslint **/*.ts --fix",
+    "dropdb": "node dist/scripts/dropdb.js"
   },
   "keywords": [],
   "author": "",
