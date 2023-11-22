@@ -25,7 +25,6 @@ const proxies: ProxyMap = constructProxies(proxyTargets);
 function constructProxies (targets: ProxyTargets): ProxyMap {
   const newProxies: ProxyMap = {};
   for (const key in proxyTargets) {
-    console.log(key);
     newProxies[key] = httpProxy.createProxyServer({ target: proxyTargets[key], ws: false });
   }
   return newProxies;

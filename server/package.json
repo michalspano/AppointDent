@@ -12,7 +12,7 @@
     "dropdb:services": "npm run dropdb --prefix ../services/session-service && npm run dropdb --prefix ../services/appointment-service && npm run dropdb --prefix ../services/dentist-service && npm run dropdb --prefix ../services/notification-service && npm run dropdb --prefix ../services/patient-service",
     "start-broker": "dotenv -- npm run broker",
     "broker": "node dist/mqtt/broker.js",
-    "newman-server": "run-p --race start newman-wait",
+    "newman-server": "run-p --race start-broker start newman-wait",
     "newman-wait": "wait-on http://localhost:3000/ http://localhost:3002 http://localhost:3003 http://localhost:3004 http://localhost:3005 && npm run newman",
     "newman": "newman run tests/Test.postman_collection.json -e tests/Test.postman_environment.json",
     "lint": "eslint **/*.ts",
