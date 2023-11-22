@@ -13,6 +13,7 @@
     "prepare-for-test": "dotenv -- concurrently \"npm run start --prefix ../services/session-service\" \"npm run start --prefix ../services/appointment-service\" \"npm run start --prefix ../services/dentist-service\" \"npm run start --prefix ../services/notification-service\" \"npm run start --prefix ../services/patient-service\"",
     "newman:services": "npm run newman --prefix ../services/appointment-service && npm run newman --prefix ../services/dentist-service && npm run newman --prefix ../services/notification-service && npm run newman --prefix ../services/patient-service",
     "dropdb:services": "npm run dropdb --prefix ../services/session-service && npm run dropdb --prefix ../services/appointment-service && npm run dropdb --prefix ../services/dentist-service && npm run dropdb --prefix ../services/notification-service && npm run dropdb --prefix ../services/patient-service",
+    "test:server": "npm run newman-server",
     "newman-server": "run-p --race start newman-wait",
     "newman-wait": "wait-on http://127.0.0.1:3000/ && npm run newman",
     "newman": "newman run tests/Test.postman_collection.json -e tests/Test.postman_environment.json",
