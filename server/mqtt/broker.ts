@@ -3,7 +3,7 @@ import type { Server } from 'net';
 import { createServer } from 'net';
 
 const rawPort: string | undefined = process.env.LOCAL_BROKER_PORT;
-const port: number = rawPort ? parseInt(rawPort) : 1883;
+const port: number = rawPort === undefined ? 1883 : parseInt(rawPort);
 const aedes: Aedes = new Aedes();
 const server: Server = createServer(aedes.handle);
 
