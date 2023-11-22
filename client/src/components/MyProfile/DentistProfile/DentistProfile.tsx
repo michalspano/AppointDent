@@ -3,7 +3,6 @@ import logo from '../../../assets/logo.png'
 import { type Dentist } from '../../../utils/types'
 import { createStore } from 'solid-js/store'
 import { createSignal, type JSX } from 'solid-js'
-import Navbar from '../../Navbar/Navbar'
 import axios from 'axios'
 import { type AxiosResponse } from 'axios'
 import { type DentistProfileProps } from '../MyProfileTypes'
@@ -68,7 +67,6 @@ export default function DentistProfile (dentistProp: DentistProfileProps): JSX.E
     <div class="h-full w-full bg-white flex lg:flex-row flex-col items-center justify-center">
       <div class='lg:h-full lg:w-1/2 w-full h-1/4 flex flex-col  bg-primary'>
         <div class='flex items-top justify-center'>
-          <Navbar/>
         </div>
         <div class='flex items-center justify-center'>
           <img class='lg:w-5/6 w-1/5 h-auto lg:rounded-md rounded-full mb-8' src={proImage()} alt='profile image' />

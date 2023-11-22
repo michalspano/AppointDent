@@ -4,7 +4,7 @@ module.exports = {
       "ecmaVersion": "latest",
       "sourceType": "module"
   },
-  "ignorePatterns": ["*.js","*.json","*.md"],
+  "ignorePatterns": ["*.js","*.json","*.md","*.d.ts"],
   "env": {
     "es2021": true,
     "node": true
