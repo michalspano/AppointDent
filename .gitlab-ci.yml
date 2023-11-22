@@ -273,7 +273,7 @@ test-integration:
     - cd $SERVER_PATH
   script:
     - echo "Running integration tests via the server..."
-    - npm run ci-test
+    - npm run test:integration # the same for local/ci
   image: "nikolaik/python-nodejs:python3.10-nodejs18" 
 
 # TODO: discuss the feasibility of the deploy stage
