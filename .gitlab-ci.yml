@@ -257,7 +257,7 @@ test-integration:
   # A set of integration tests requires all parts of the system
   # to be built correctly (apart from the client, in our case).
   needs: ["build-server",
-          "build-service1"
+          "build-service1",
           "build-service2",
           "build-service3",
           "build-service4",
