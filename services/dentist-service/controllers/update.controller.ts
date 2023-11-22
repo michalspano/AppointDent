@@ -9,7 +9,7 @@ const RESPONSE_TOPIC = 'AUTHRES';
 
 export const updateDentist = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
   const { email } = req.params;
-  let { session } = req.headers;
+  const { sessionKey } = req.cookies;
   const updatedInfo = req.body as Partial<Dentist>;
   if (database === undefined) {
     return res.status(500).send('Database undefined');
@@ -18,13 +18,11 @@ export const updateDentist = async (req: Request, res: Response): Promise<Respon
     return res.status(503).json({ message: 'MQTT connection failed' });
   }
 
-  if (session === undefined) {
+  if (sessionKey === undefined) {
     return res.status(400).json({ message: 'Missing session cookie' });
-  } else if (Array.isArray(session)) {
-    session = session.join(',');
   }
   const reqId = Math.floor(Math.random() * 1000);
-  client.publish(TOPIC, `${reqId}/${email}/${session}/*`); // reqId and session from body FE?
+  client.publish(TOPIC, `${reqId}/${email}/${sessionKey}/*`); // reqId and session from body FE?
   client.subscribe(RESPONSE_TOPIC);
 
   try {

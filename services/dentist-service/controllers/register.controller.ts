@@ -15,6 +15,11 @@ export const register = async (req: Request, res: Response): Promise<Response<an
     return res.status(503).json({ message: 'MQTT connection failed' });
   }
 
+  // Check if the email is already registered
+  if (checkEmailRegistered(email)) {
+    return res.status(409).json({ message: 'Email is already registered' });
+  }
+
   const reqId = Math.floor(Math.random() * 1000); // Generates a random integer between 0 and 999
   client.publish(TOPIC, `${reqId}/${email}/${pass}/*`); // REQID/USERID/SECRET/*
   client.subscribe(RESPONSE_TOPIC);
@@ -28,11 +33,6 @@ export const register = async (req: Request, res: Response): Promise<Response<an
   }
 
   // All checks passed, so inserting the user
-  // Check if the email is already registered
-  if (checkEmailRegistered(email)) {
-    return res.status(409).json({ message: 'Email is already registered' });
-  }
-
   const query = database.prepare(`
         INSERT INTO dentists 
         (email, pass, fName, lName, clinic_country, clinic_city, clinic_street, clinic_house_number, clinic_zipcode, picture) 
