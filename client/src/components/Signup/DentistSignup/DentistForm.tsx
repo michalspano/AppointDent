@@ -43,10 +43,9 @@ export default function DentistForm (): JSX.Element {
       })
 
       .catch((error: any) => {
+        setError('Something went wrong, try again.')
         console.error('Error during sign up', error)
       })
-
-    setError(null)
   }
 
   const login = async (): Promise<void> => {
