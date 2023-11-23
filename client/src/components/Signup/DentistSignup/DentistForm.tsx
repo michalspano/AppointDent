@@ -2,46 +2,64 @@ import { type JSX } from 'solid-js/jsx-runtime'
 import logo from '../../../assets/logo.png'
 import { A } from '@solidjs/router'
 import { createSignal } from 'solid-js'
+import { Api } from '../../../utils/api'
+import type { Registration } from '../../../utils/types'
 
 export default function DentistForm (): JSX.Element {
-  const [userEmail, setUserEmail] = createSignal('')
-  const [userPassword, setUserPassword] = createSignal('')
-  const [userFirstName, setUserFirstName] = createSignal('')
-  const [userLastName, setUserLastName] = createSignal('')
+  const [email, setEmail] = createSignal('')
+  const [password, setPassword] = createSignal('')
+  const [firstName, setFirstName] = createSignal('')
+  const [lastName, setLastName] = createSignal('')
   const [clinicCity, setClinicCity] = createSignal('')
+  const [clinicCountry, setClinicCountry] = createSignal('')
   const [clinicStreet, setClinicStreet] = createSignal('')
   const [clinicHouseNumber, setClinicHouseNumber] = createSignal('')
-  const [clinicZipcode, setClinicZipcode] = createSignal('')
-  const [userPicture, setUserPicture] = createSignal('')
+  const [clinicZipCode, setClinicZipcode] = createSignal('')
+  const [picture, setPicture] = createSignal('')
   const [error, setError] = createSignal<string | null>(null)
 
-  const fields = [
-    userEmail,
-    userPassword,
-    userFirstName,
-    userLastName,
-    clinicCity,
-    clinicStreet,
-    clinicHouseNumber,
-    clinicZipcode,
-    userPicture
-  ]
-  const signup = (): void => {
-    if (fields.some((field) => field() === '')) {
+  const signUp = (): void => {
+    const registrationData: Registration = {
+      email: email(),
+      password: password(),
+      firstName: firstName(),
+      lastName: lastName(),
+      clinicCountry: clinicCountry(),
+      clinicCity: clinicCity(),
+      clinicStreet: clinicStreet(),
+      clinicHouseNumber: clinicHouseNumber(),
+      clinicZipCode: clinicZipCode(),
+      picture: picture()
+    }
+    if (Object.values(registrationData).some((field) => field === '')) {
       setError('Please fill in all fields.')
       return
     }
-    console.log(userEmail())
-    console.log(userPassword())
-    console.log(userFirstName())
-    console.log(userLastName())
-    console.log(clinicCity())
-    console.log(clinicStreet())
-    console.log(clinicHouseNumber())
-    console.log(clinicZipcode())
-    console.log(userPicture())
+    Api
+      .post('/dentists/register', registrationData)
+      .then(async () => {
+        // enable automatic login when user registers
+        await login()
+      })
 
-    setError(null)
+      .catch((error: any) => {
+        setError('Something went wrong, try again.')
+        console.error('Error during sign up', error)
+      })
+  }
+
+  const login = async (): Promise<void> => {
+    try {
+      await Api.post('/dentists/login', { email: email(), password: password() })
+      // navigate to logged in view
+        .then(() => {
+        // navigate to logged in view
+          window.location.href = '/calendar' // calendar is a home page for the dentist
+        })
+    } catch (error) {
+      setError('Something went wrong, try again.')
+      console.error('Error during login:', error)
+    }
   }
 
   return <>
@@ -56,31 +74,37 @@ export default function DentistForm (): JSX.Element {
           class="input h-12 px-3 py-2 mb-3 border rounded-xl"
           type="text"
           placeholder="Email"
-          onChange={(event) => setUserEmail(event.target.value)}
+          onChange={(event) => setEmail(event.target.value)}
         />
         <input
           class="input h-12 px-3 py-2 mb-3 border rounded-xl"
           type="password"
           placeholder="Password"
-          onChange={(event) => setUserPassword(event.target.value)}
+          onChange={(event) => setPassword(event.target.value)}
         />
           <div class="flex flex-row">
             <input
               class="input h-12 w-full px-3 py-2 mb-3 md:mb-0 mr-2 border rounded-xl"
               type="text"
               placeholder="First name"
-              onChange={(event) => setUserFirstName(event.target.value)}
+              onChange={(event) => setFirstName(event.target.value)}
             />
             <input
               class="input h-12 w-full px-3 py-2 mb-3 border rounded-xl"
               type="text"
               placeholder="Last name"
-              onChange={(event) => setUserLastName(event.target.value)}
+              onChange={(event) => setLastName(event.target.value)}
             />
           </div>
           <label class="block pl-2 text-xs font-extralight pb-1">
                 Address of the clinic
           </label>
+           <input
+              class="input h-12 w-full px-3 py-2 mb-3  mr-2  border rounded-xl"
+              type="text"
+              placeholder="Country"
+              onChange={(event) => setClinicCountry(event.target.value)}
+            />
           <div class="flex flex-row">
             <input
               class="input h-12 w-full px-3 py-2 mb-3  mr-2  border rounded-xl"
@@ -117,11 +141,11 @@ export default function DentistForm (): JSX.Element {
               type="file"
               accept=".jpeg, .jpg, .png"
               placeholder="Upload a profile image"
-              onChange={(event) => setUserPicture(event.target.value)}
+              onChange={(event) => setPicture(event.target.value)}
             />
 
         {error() !== null && <p class="text-error">{error()}</p>}
-        <button type="submit" class="log-in-btn h-12 mb-6 bg-secondary rounded-xl text-base" onclick={signup} >
+        <button type="submit" class="log-in-btn h-12 mb-6 bg-secondary rounded-xl text-base" onclick={signUp} >
             Create account
             </button>
         <p class="font-extralight">Already have an account?
