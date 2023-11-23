@@ -1,5 +1,4 @@
 import { config } from 'dotenv';
-import { type Request, type Response } from 'express';
 import database from './db/config';
 import { app, port } from './config/config';
 import { mqttClient } from './mqtt/mqtt';

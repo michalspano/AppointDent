@@ -1,6 +1,13 @@
 import { type ChildProcess, spawn } from 'child_process';
 
 /**
+ * @description the platform that the server runs on.
+ * This is important to make sure that the commands run correctly
+ * on Windows.
+ */
+const PLATFORM: string = process.platform;
+
+/**
  * Spawn an individual service using ChildProcess
  * @param serviceName
  * @param servicesPath
@@ -10,7 +17,10 @@ import { type ChildProcess, spawn } from 'child_process';
 async function spawnService (serviceName: string, servicesPath: string, retryOnBuildFault: boolean): Promise<ChildProcess> {
   const servicePath = servicesPath + '/' + serviceName;
   return await new Promise((resolve, reject) => {
-    const buildProcess: ChildProcess = spawn('npm', ['run', 'build'], { cwd: servicePath });
+    const buildProcess: ChildProcess = spawn(
+      `${PLATFORM === 'win32' ? 'npm.cmd' : 'npm'}`, ['run', 'build'], {
+        cwd: servicePath
+      });
 
     buildProcess.on('close', (code: number | null) => {
       if (code === 0) {
@@ -18,10 +28,11 @@ async function spawnService (serviceName: string, servicesPath: string, retryOnB
         const childEnv: NodeJS.ProcessEnv = process.env;
         delete childEnv.PORT;
 
-        const child: ChildProcess = spawn('npm', ['run', 'start'], {
-          cwd: servicePath,
-          env: childEnv
-        });
+        const child: ChildProcess = spawn(
+          `${PLATFORM === 'win32' ? 'npm.cmd' : 'npm'}`, ['run', 'start'], {
+            cwd: servicePath,
+            env: childEnv
+          });
 
         child.stdout?.on('data', (data) => {
           console.log(`${serviceName}: ${data}`);
@@ -48,9 +59,10 @@ async function spawnService (serviceName: string, servicesPath: string, retryOnB
          * bypasses package.json and uses package-lock.json to install the exact dependency.
          */
         console.log('Initial attempt failed. Attempting to reinstall node_modules through clean install.');
-        const purgeChild: ChildProcess = spawn('npm', ['ci'], {
-          cwd: servicePath
-        });
+        const purgeChild: ChildProcess = spawn(
+          `${PLATFORM === 'win32' ? 'npm.cmd' : 'npm'}`, ['ci'], {
+            cwd: servicePath
+          });
         purgeChild.on('close', (code: number | null) => {
           if (code === 0) {
             resolve(spawnService(serviceName, servicesPath, false));
