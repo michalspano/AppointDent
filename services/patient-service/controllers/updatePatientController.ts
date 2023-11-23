@@ -45,17 +45,16 @@ export const updatePatientController = async (req: Request, res: Response): Prom
 
     const fieldsToUpdate: string[] = [];
     const values: any[] = [];
-
     for (const [key, value] of Object.entries(updatedInfo)) {
       fieldsToUpdate.push(`${key} = ?`);
       values.push(value);
     }
 
     const query = database.prepare(`
-        UPDATE patients
-        SET ${fieldsToUpdate.join(', ')}
-        WHERE email = ?
-      `);
+      UPDATE patients
+      SET ${fieldsToUpdate.join(', ')}
+      WHERE email = ?
+    `);
 
     try {
       const result = query.run(...values, email);
@@ -66,7 +65,6 @@ export const updatePatientController = async (req: Request, res: Response): Prom
       }
 
       const updatedPatient = { email, ...updatedInfo };
-
       res.status(200).json(updatedPatient);
     } catch (error) {
       sendServerError(res);
@@ -75,4 +73,8 @@ export const updatePatientController = async (req: Request, res: Response): Prom
     console.error('Error updating patient:', error);
     sendServerError(res);
   }
+};
+
+export const updatePatientWrapper = (req: Request, res: Response): void => {
+  void updatePatientController(req, res);
 };

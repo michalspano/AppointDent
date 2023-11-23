@@ -8,7 +8,7 @@ const router = Router();
 
 router.post('/login', authController.loginPatientWrapper);
 router.post('/register', registerController.registerPatientWrapper);
-router.patch('/:email', updatePatientController.updatePatientController);
-router.delete('/:email', deletePatientController.deletePatientController);
+router.patch('/:email', updatePatientController.updatePatientWrapper);
+router.delete('/:email', deletePatientController.deletePatientWrapper);
 
 export default router;
