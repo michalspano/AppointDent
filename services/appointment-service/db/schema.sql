@@ -5,5 +5,5 @@ CREATE TABLE IF NOT EXISTS appointments (
     start_timestamp INT NOT NULL, 
     end_timestamp INT NOT NULL, 
     dentistId VARCHAR(64) NOT NULL,
-    patientId VARCHAR(64) NOT NULL
+    patientId VARCHAR(64) -- can be null: means that the appointment is not booked
 );

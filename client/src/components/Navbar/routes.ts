@@ -1,13 +1,10 @@
-export const routes = [
-
+export const patientRoutes = [
   {
-    name: 'Home',
-    href: '/'
+    name: 'Explore',
+    href: '/map'
   },
-
   {
     name: 'My Bookings',
-    href: '/'
+    href: '/my-bookings'
   }
-
 ]
