@@ -23,6 +23,7 @@ export const updateDentist = async (req: Request, res: Response): Promise<Respon
   } else if (Array.isArray(session)) {
     session = session.join(',');
   }
+
   const reqId = Math.floor(Math.random() * 1000);
   client.publish(TOPIC, `${reqId}/${email}/${session}/*`); // reqId and session from body FE?
   client.subscribe(RESPONSE_TOPIC);

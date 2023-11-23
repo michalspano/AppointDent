@@ -14,8 +14,16 @@ import MyBookingsPage from './routes/MyBookings.tsx'
 
 const root = document.getElementById('root')
 if (root === null) throw Error('Root undefined!')
+
+const unLoggedInRoutes = ['/', '/signup', '/dentist-signup', '/patient-signup']
+
+const shouldShowNavbar = (): boolean => {
+  const currentPath = window.location.pathname
+  return !unLoggedInRoutes.includes(currentPath)
+}
+
 render(() => <div>
-  <Navbar/>
+  {shouldShowNavbar() && <Navbar/>}
     <Router>
       <Routes>
         <Route path="/" component={Login} />
