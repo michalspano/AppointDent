@@ -3,43 +3,29 @@ import './LoginForm.css'
 import logo from '../../assets/logo.png'
 import { A } from '@solidjs/router'
 import { createSignal } from 'solid-js'
+import { Api } from '../../utils/api'
 
 export default function LoginForm (): JSX.Element {
-  const [userEmail, setUserEmail] = createSignal('')
-  const [userPassword, setUserPassword] = createSignal('')
+  const [email, setEmail] = createSignal('')
+  const [password, setPassword] = createSignal('')
   const [error, setError] = createSignal<string | null>(null)
 
-  const login = async (): Promise<void> => {
-    if (userEmail() === '' || userPassword() === '') {
+  const login = (): void => {
+    if (email() === '' || password() === '') {
       setError('Please fill in all fields.')
       return
     }
-    // console.log(userEmail())
-    // console.log(userPassword())
-    // setError(null)
-    try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email: userEmail(),
-          password: userPassword()
-        })
+    Api
+      .post('/dentists/login', { email: email(), password: password() })
+      .then(() => {
+        const isUserDentist = false // replace when we have the object of current user
+        const navLink = isUserDentist ? '/calendar' : '/map'
+        window.location.href = navLink
       })
-      if (response.ok) {
-        const data = await response.json()
-        console.log('Login successful:', data)
-        setError(null)
-      } else {
-        const errorData = await response.json()
-        setError(errorData.message)
-      }
-    } catch (error) {
-      console.error('Error during login:', error)
-      setError('An unexpected error occurred.')
-    }
+      .catch((error: any) => {
+        console.error('Error during login', error)
+      })
+    setError(null)
   }
 
   return <>
@@ -54,13 +40,13 @@ export default function LoginForm (): JSX.Element {
           class="input h-12 px-3 py-2 mb-5 border rounded-xl"
           type="text"
           placeholder="Email"
-          onChange={(event) => setUserEmail(event.target.value)}
+          onChange={(event) => setEmail(event.target.value)}
           />
         <input
           class="input h-12 px-3 py-2 mb-8 border rounded-xl"
           type="password"
           placeholder="Password"
-          onChange={(event) => setUserPassword(event.target.value)}
+          onChange={(event) => setPassword(event.target.value)}
         />
         {error() !== null && <p class="text-error">{error()}</p>}
         <button type="submit" class="log-in-btn h-12 mb-10 bg-secondary rounded-xl text-base"
