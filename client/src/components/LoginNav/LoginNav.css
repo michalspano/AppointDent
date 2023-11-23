@@ -1,3 +1,7 @@
 .currentpage {
     color: #12878D;
 }
+
+.not-currentpage {
+    color: black;
+}

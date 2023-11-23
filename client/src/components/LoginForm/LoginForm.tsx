@@ -45,7 +45,7 @@ export default function LoginForm (): JSX.Element {
             </button>
         <p class="font-extralight">Not registered yet?
         <span class="font-medium">
-        <A href="/signup"> Create an account.</A>
+        <A class='text-black' href="/signup"> Create an account.</A>
             </span>
           </p>
         </div>
