@@ -64,3 +64,16 @@ export interface Notification {
   email: string
   id?: string
 }
+
+export interface RegistrationData {
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  clinicCountry: string
+  clinicCity: string
+  clinicStreet: string
+  clinicHouseNumber: string
+  clinicZipCode: string
+  picture: string
+}
