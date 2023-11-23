@@ -79,7 +79,7 @@ export default function PatientForm (): JSX.Element {
             </button>
         <p class="font-extralight">Already have an account?
         <span class="font-medium">
-        <A href="/"> Log in.</A>
+        <A class='text-black' href="/"> Log in.</A>
             </span>
           </p>
         </div>
