@@ -2,20 +2,12 @@ import { type Request, type Response } from 'express';
 import database from '../db/config';
 import { client } from '../mqtt/mqtt';
 import { getServiceResponse } from './helper';
-import {
-  sendServerError,
-  sendNotFound,
-  sendUnauthorized,
-  sendSuccess
-} from './controllerUtils';
+import { sendServerError, sendNotFound, sendUnauthorized, sendSuccess } from './controllerUtils';
 
 const TOPIC = 'AUTHREQ';
 const RESPONSE_TOPIC = 'AUTHRES';
 
-export const deletePatientController = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const deletePatientController = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email } = req.params;
     const { sessionKey } = req.cookies;

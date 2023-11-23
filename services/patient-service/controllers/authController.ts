@@ -21,7 +21,7 @@ async function getServiceResponse (reqId: string, RESPONSE_TOPIC: string, isLogi
           client?.removeListener('message', eventHandler);
           isLoginFlow
             ? resolve(message.toString().split('/')[1])
-            : resolve(message.toString().split('/')[1][0]);
+            : resolve(message.toString().split('/')[1]);
         }
       }
     };

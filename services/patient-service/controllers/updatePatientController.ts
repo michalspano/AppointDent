@@ -7,40 +7,38 @@ import { sendServerError, sendNotFound, sendUnauthorized } from './controllerUti
 const TOPIC = 'AUTHREQ';
 const RESPONSE_TOPIC = 'AUTHRES';
 
-export const updatePatientController = async (req: Request, res: Response): Promise<void> => {
+export const updatePatientController = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
   try {
     const email = req.params.email;
     const { sessionKey } = req.cookies;
     const updatedInfo = req.body;
 
+    console.log('Received update request for email:', email);
+
     if (database === undefined) {
-      sendServerError(res);
-      return;
+      return sendServerError(res);
     }
 
     if (client === undefined) {
-      sendUnauthorized(res, 'MQTT connection failed');
-      return;
+      return sendUnauthorized(res, 'MQTT connection failed');
     }
 
     if (sessionKey === undefined) {
-      res.status(400).json({ message: 'Missing session cookie' });
-      return;
+      return res.status(400).json({ message: 'Missing session cookie' });
     }
 
     const reqId = Math.floor(Math.random() * 1000);
     client.publish(TOPIC, `${reqId}/${email}/${sessionKey}/*`);
+    console.log(`${reqId}/${email}/${sessionKey}/*`);
     client.subscribe(RESPONSE_TOPIC);
 
     try {
       const mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
       if (mqttResult === '0') {
-        res.status(401).json({ message: 'Unable to authorize' });
-        return;
+        return res.status(401).json({ message: 'Unable to authorize' });
       }
     } catch (error) {
-      res.status(504).json({ message: 'Service Timeout' });
-      return;
+      return res.status(504).json({ message: 'Service Timeout' });
     }
 
     const fieldsToUpdate: string[] = [];
@@ -60,18 +58,20 @@ export const updatePatientController = async (req: Request, res: Response): Prom
       const result = query.run(...values, email);
 
       if (result.changes === undefined || result.changes === 0) {
-        sendNotFound(res, 'Patient not found');
-        return;
+        return sendNotFound(res, 'Patient not found');
       }
 
       const updatedPatient = { email, ...updatedInfo };
-      res.status(200).json(updatedPatient);
+      return res.status(200).json(updatedPatient);
     } catch (error) {
-      sendServerError(res);
+      console.error('Error updating patient:', error);
+
+      return sendServerError(res);
     }
   } catch (error) {
     console.error('Error updating patient:', error);
-    sendServerError(res);
+
+    return sendServerError(res);
   }
 };
 

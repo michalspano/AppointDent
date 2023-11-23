@@ -4,6 +4,7 @@ import database from './db/config';
 import { app, port } from './config/config';
 import { mqttClient } from './mqtt/mqtt';
 import { basename, dirname } from 'path';
+import cookieParser from 'cookie-parser';
 import patientRoute from './routes/patientRoute';
 
 const SERVICES_PATH: string = basename(dirname(__dirname));
@@ -13,6 +14,7 @@ config();
 
 // app.use('/', patientRoute);
 
+app.use(cookieParser());
 app.use('/api/v1/patients', patientRoute);
 
 app.get('/', (req: Request, res: Response) => {
