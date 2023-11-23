@@ -1,5 +1,5 @@
 import { type JSX } from 'solid-js/jsx-runtime'
-import { onCleanup, createEffect, createSignal } from 'solid-js'
+import { createEffect, createSignal } from 'solid-js'
 import { Calendar } from '@fullcalendar/core'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import './Calendar.css'
@@ -14,9 +14,6 @@ export default function DentistCalendar (): JSX.Element {
   const [selectedEventId, setSelectedEventId] = createSignal<string | null>(null)
   const [slots, setSlots] = createSignal<Appointment[]>([]) // Use state to hold appointments
   const calendarRef: { current: Calendar | null } = { current: null }
-
-  // Temporary array of appointment, will be modified once integrated with backend.
-
   const [newAppointment, setNewAppointment] = createSignal<Appointment>({
     id: '',
     title: '',
@@ -29,11 +26,15 @@ export default function DentistCalendar (): JSX.Element {
     try {
       await addAppointment(newAppointment())
     } catch (error) {
-      console.error('Error adding appointment:', error)
-      // Handle the error, show a message to the user, etc.
+      throw new Error('Error adding appointment.')
     }
   }
 
+  /**
+ * Parse a date in the format of integer into a string.
+ * @param dateString - A date in string format.
+ * @returns A date in number format.
+ */
   function parseDateStringToInteger (dateString: string): number {
     // Parse the date string into a Date object
     const date = new Date(dateString)
@@ -45,35 +46,40 @@ export default function DentistCalendar (): JSX.Element {
     return timestampInSeconds
   }
 
+  /**
+ * Fetch all of the appointments from a dentist to the calendar.
+ */
   async function fetchAppointments (): Promise<void> {
     try {
       const response = await Api.get('/appointments/dentists/dentist@gmail.com/') // NB! replace with actual email
-      const appointments = response.data // Assuming your API response contains the appointments
+      const appointments = response.data
       const formattedAppointments = appointments.map((appointment: any) => ({
         id: appointment.id,
-        title: appointment.patientId !== null ? appointment.patientId : '', // Make sure to replace 'title' with the actual property name
+        // Make sure that the patient email is the title. If appointment is unbooked, then there is no title.
+        title: appointment.patientId !== null ? appointment.patientId : '',
+        // Parse the start and end times from integer to string.
         start: new Date(appointment.start_timestamp * 1000).toISOString().slice(0, 16),
         end: new Date(appointment.end_timestamp * 1000).toISOString().slice(0, 16)
       }))
 
       setSlots(formattedAppointments)
     } catch (error) {
-      console.error('Error fetching appointments:', error)
+      throw new Error('Error fetching appointments')
     }
   }
   /**
  * Adds a new appointment to the database and updates the calendar.
- *
  * @param {Appointment} appointment - The appointment to be added.
  */
   async function addAppointment (appointment: Appointment): Promise<void> {
     try {
+      // Parse start and end times to integer
       const startTimestamp = parseDateStringToInteger(newAppointment().start)
       const endTimestamp = parseDateStringToInteger(newAppointment().end)
       const formattedAppointment = {
         start_timestamp: startTimestamp,
         end_timestamp: endTimestamp,
-        dentistId: 'dentist@gmail.com' // Replace with actual dentist email from local storage
+        dentistId: 'dentist@gmail.com' // Will be replaced with actual dentist email from local storage
       }
       await Api.post('/appointments', formattedAppointment)
         .then(() => {
@@ -94,20 +100,16 @@ export default function DentistCalendar (): JSX.Element {
   }
 
   /**
- * Deletes the selected appointment from array and updates calendar.
- *
+ * Deletes the selected appointment and updates calendar.
  * @param appointmentId - The id of the appointment to be removed.
  */
   async function deleteAppointment (appointmentId: string): Promise<void> {
     try {
       await Api.delete(`/appointments/${appointmentId}`).then(() => {
         calendarRef.current?.getEventById(appointmentId)?.remove()
-        // Add any additional actions you want to perform after successful deletion
         console.log('Appointment deleted successfully')
       })
     } catch (error) {
-      console.error('Error deleting appointment:', error)
-      // Handle the error, show a message to the user, etc.
       throw new Error('Error deleting appointment')
     }
   }
@@ -246,7 +248,6 @@ export default function DentistCalendar (): JSX.Element {
                 setShowConfirmation(false)
               }).catch((error) => {
                 console.error('Error deleting appointment:', error)
-                // Handle the error, show a message to the user, etc.
               })
             }
           }}
