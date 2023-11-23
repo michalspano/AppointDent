@@ -4,20 +4,16 @@
   "description": "Server part of the AppointDent project.",
   "scripts": {
     "build": "npx tsc",
+    "start-no-spawn": "node dist/app.js --no-spawn",
     "start": "node dist/app.js",
     "dev": "concurrently --kill-others-on-failure \"npx tsc --watch\" \"nodemon -q dist/app.js\"",
     "test": "echo \"This type of test is not yet defined\"; exit 0",
-    "test:server": "npm run newman-server",
-    "test:integration": "npm run dropdb:services && npm run test-setup",
-    "test-setup": "run-p --race start-broker prepare-for-test wait-on:services",
-    "wait-on:services": "wait-on http://localhost:3002 http://localhost:3003 http://localhost:3004 http://localhost:3005 && npm run newman:services",
-    "prepare-for-test": "dotenv -- concurrently \"npm run start --prefix ../services/session-service\" \"npm run start --prefix ../services/appointment-service\" \"npm run start --prefix ../services/dentist-service\" \"npm run start --prefix ../services/notification-service\" \"npm run start --prefix ../services/patient-service\"",
-    "newman:services": "npm run newman --prefix ../services/appointment-service && npm run newman --prefix ../services/dentist-service && npm run newman --prefix ../services/notification-service && npm run newman --prefix ../services/patient-service",
+    "test:integration": "npm run dropdb:services && npm run newman-server",
     "dropdb:services": "npm run dropdb --prefix ../services/session-service && npm run dropdb --prefix ../services/appointment-service && npm run dropdb --prefix ../services/dentist-service && npm run dropdb --prefix ../services/notification-service && npm run dropdb --prefix ../services/patient-service",
     "start-broker": "dotenv -- npm run broker",
     "broker": "node dist/mqtt/broker.js",
-    "newman-server": "run-p --race start newman-wait",
-    "newman-wait": "wait-on http://127.0.0.1:3000/ && npm run newman",
+    "newman-server": "run-p --race start-broker start newman-wait",
+    "newman-wait": "wait-on http://localhost:3000/ http://localhost:3002 http://localhost:3003 http://localhost:3004 http://localhost:3005 && npm run newman",
     "newman": "newman run tests/Test.postman_collection.json -e tests/Test.postman_environment.json",
     "lint": "eslint **/*.ts",
     "lint:fix": "eslint **/*.ts --fix"
@@ -26,17 +22,26 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+<<<<<<< HEAD
     "bcrypt": "^5.1.1",
+=======
+    "cors": "^2.8.5",
+>>>>>>> main
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "http-proxy": "^1.18.1",
+    "morgan": "^1.10.0",
     "mqtt": "^5.2.0",
     "newman": "^6.0.0",
     "npm-run-all": "^4.1.5",
     "wait-on": "^7.1.0"
   },
   "devDependencies": {
-    "@types/express": "^4.17.20",
-    "@types/node": "^20.8.10",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/http-proxy": "^1.17.14",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^20.9.3",
     "@typescript-eslint/eslint-plugin": "^6.9.1",
     "aedes": "^0.50.0",
     "concurrently": "^8.2.2",
@@ -47,6 +52,6 @@
     "eslint-plugin-n": "^16.2.0",
     "eslint-plugin-promise": "^6.1.1",
     "nodemon": "^3.0.1",
-    "typescript": "^5.2.2"
+    "typescript": "^5.3.2"
   }
 }
