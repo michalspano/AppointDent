@@ -50,15 +50,16 @@ export default function DentistForm (): JSX.Element {
   }
 
   const login = async (): Promise<void> => {
-    await Api
-      .post('/dentists/login', { email: email(), password: password() })
-      .then(() => {
+    try {
+      await Api.post('/dentists/login', { email: email(), password: password() })
+      // navigate to logged in view
+        .then(() => {
         // navigate to logged in view
-        window.location.href = '/calendar' // calendar is a home page for dentist
-      })
-      .catch((error: any) => {
-        console.error('Error during login:', error)
-      })
+          window.location.href = '/calendar' // calendar is a home page for the dentist
+        })
+    } catch (error) {
+      console.error('Error during login:', error)
+    }
   }
 
   return <>
