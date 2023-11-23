@@ -13,6 +13,7 @@ const TOPIC = 'INSERTUSER';
 const RESPONSE_TOPIC = 'INSERTUSERRES';
 
 export const registerController = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
+  console.log('Inside registerController');
   const {
     email,
     pass,
@@ -39,12 +40,14 @@ export const registerController = async (req: Request, res: Response): Promise<R
   try {
     // To wait for MQTT response
     const mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
+    console.log('MQTT result: ', mqttResult);
 
     // To handle unsuccessful authorization
     if (mqttResult === '0') {
       return sendUnauthorized(res, 'Unable to authorize');
     }
   } catch (error) {
+    console.error('Error in registerController:', error);
     return sendServerError(res, 'Service Timeout');
   }
 
