@@ -11,6 +11,7 @@ export default function DentistForm (): JSX.Element {
   const [firstName, setFirstName] = createSignal('')
   const [lastName, setLastName] = createSignal('')
   const [clinicCity, setClinicCity] = createSignal('')
+  const [clinicCountry, setClinicCountry] = createSignal('')
   const [clinicStreet, setClinicStreet] = createSignal('')
   const [clinicHouseNumber, setClinicHouseNumber] = createSignal('')
   const [clinicZipCode, setClinicZipcode] = createSignal('')
@@ -23,7 +24,7 @@ export default function DentistForm (): JSX.Element {
       password: password(),
       firstName: firstName(),
       lastName: lastName(),
-      clinicCountry: 'clinicCountry()',
+      clinicCountry: clinicCountry(),
       clinicCity: clinicCity(),
       clinicStreet: clinicStreet(),
       clinicHouseNumber: clinicHouseNumber(),
@@ -36,11 +37,28 @@ export default function DentistForm (): JSX.Element {
     }
     Api
       .post('/dentists/register', registrationData)
+      .then(async () => {
+        // enable automatic login when user registers
+        await login()
+      })
+
       .catch((error: any) => {
         console.error('Error during sign up', error)
       })
 
     setError(null)
+  }
+
+  const login = async (): Promise<void> => {
+    await Api
+      .post('/dentists/login', { email: email(), password: password() })
+      .then(() => {
+        // navigate to logged in view
+        window.location.href = '/calendar' // calendar is a home page for dentist
+      })
+      .catch((error: any) => {
+        console.error('Error during login:', error)
+      })
   }
 
   return <>
@@ -80,6 +98,12 @@ export default function DentistForm (): JSX.Element {
           <label class="block pl-2 text-xs font-extralight pb-1">
                 Address of the clinic
           </label>
+           <input
+              class="input h-12 w-full px-3 py-2 mb-3  mr-2  border rounded-xl"
+              type="text"
+              placeholder="Country"
+              onChange={(event) => setClinicCountry(event.target.value)}
+            />
           <div class="flex flex-row">
             <input
               class="input h-12 w-full px-3 py-2 mb-3  mr-2  border rounded-xl"
