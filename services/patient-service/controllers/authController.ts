@@ -8,7 +8,7 @@ interface Patient {
 }
 
 export const loginController = (req: Request, res: Response): void => {
-  console.log('Here!!!');
+  // console.log('Here!!!');
   try {
     const { email, pass } = req.body;
 

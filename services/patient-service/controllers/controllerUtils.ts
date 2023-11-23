@@ -8,8 +8,9 @@ export function sendNotFound (res: Response, message: string): Response {
   return res.status(404).json({ message });
 }
 
-export function sendServerError (res: Response): Response {
-  return res.status(500).json({ message: 'Server Error' });
+export function sendServerError (res: Response, customMessage?: string): Response {
+  const errorMessage = customMessage ?? 'Server Error';
+  return res.status(500).json({ message: errorMessage });
 }
 
 export function sendUnauthorized (res: Response, message: string): Response {
