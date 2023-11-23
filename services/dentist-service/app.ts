@@ -5,6 +5,7 @@ import { mqttClient } from './mqtt/mqtt';
 import { basename, dirname } from 'path';
 import routes from './routes/routes';
 import cookieParser from 'cookie-parser';
+import type { Request, Response } from 'express';
 
 const SERVICES_PATH: string = basename(dirname(__dirname));
 void mqttClient.setup(SERVICES_PATH);
@@ -12,9 +13,9 @@ void mqttClient.setup(SERVICES_PATH);
 config();
 
 app.use(cookieParser());
-app.use('/api/v1/dentists', routes);
+app.use('/', routes);
 
-app.get('/', (req: Request, res: Response) => {
+app.get('/', (_req: Request, res: Response) => {
   res.send('Hello from: AppointDent - Dentists Service');
 });
 app.listen(port, () => {
