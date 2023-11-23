@@ -6,6 +6,12 @@ import { getServiceResponse } from './helper';
 const TOPIC = 'AUTHREQ';
 const RESPONSE_TOPIC = 'AUTHRES';
 
+/**
+ * Used to delete a dentist from the database.
+ * @param req request
+ * @param res response
+ * @returns response object
+ */
 export const deleteDentist = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
   const { email } = req.params;
   const { sessionKey } = req.cookies;
@@ -43,7 +49,11 @@ export const deleteDentist = async (req: Request, res: Response): Promise<Respon
 
   return res.status(200).json({ message: 'Dentist deleted successfully' });
 };
-
+/**
+ * Used to wrap the async function in the sync function to satisfy TS constraints
+ * @param req request
+ * @param res response
+ */
 export const deleteDentistWrapper = (req: Request, res: Response): void => {
   void deleteDentist(req, res);
 };

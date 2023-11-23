@@ -5,9 +5,18 @@ import { getServiceResponse } from './helper';
 
 const TOPIC = 'CREATESESSION';
 const RESPONSE_TOPIC = 'SESSION';
-
+interface LoginRequest {
+  email: string
+  password: string
+}
+/**
+ * Used to login a dentist into the system.
+ * @param req request
+ * @param res response
+ * @returns response object
+ */
 export const login = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
-  const { email, pass } = req.body;
+  const request: LoginRequest = req.body;
   if (database === undefined) {
     return res.status(500).json({ message: 'Database undefined' });
   }
@@ -16,11 +25,11 @@ export const login = async (req: Request, res: Response): Promise<Response<any, 
   }
 
   const reqId = Math.floor(Math.random() * 1000);
-  client.publish(TOPIC, `${reqId}/${email}/${pass}/*`);
-  client.subscribe(RESPONSE_TOPIC);
+  client.subscribe(RESPONSE_TOPIC); // Subscribe first to ensure we dont miss anything
+  client.publish(TOPIC, `${reqId}/${request.email}/${request.password}/*`);
   let mqttResult;
   try {
-    mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC, true);
+    mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
     if (mqttResult === '0') {
       return res.status(401).json({ message: 'Unable to authorize' });
     }
@@ -34,7 +43,11 @@ export const login = async (req: Request, res: Response): Promise<Response<any, 
     return res.status(200).json({ message: 'Login successful' });
   }
 };
-
+/**
+ * Wrap the login handler in a sync function for the route handler
+ * @param req request
+ * @param res response
+ */
 export const loginDentistWrapper = (req: Request, res: Response): void => {
   void login(req, res);
 };
