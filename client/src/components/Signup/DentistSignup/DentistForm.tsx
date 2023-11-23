@@ -3,7 +3,7 @@ import logo from '../../../assets/logo.png'
 import { A } from '@solidjs/router'
 import { createSignal } from 'solid-js'
 import { Api } from '../../../utils/api'
-import type { RegistrationData } from '../../../utils/types'
+import type { Registration } from '../../../utils/types'
 
 export default function DentistForm (): JSX.Element {
   const [email, setEmail] = createSignal('')
@@ -19,7 +19,7 @@ export default function DentistForm (): JSX.Element {
   const [error, setError] = createSignal<string | null>(null)
 
   const signUp = (): void => {
-    const registrationData: RegistrationData = {
+    const registrationData: Registration = {
       email: email(),
       password: password(),
       firstName: firstName(),
@@ -57,6 +57,7 @@ export default function DentistForm (): JSX.Element {
           window.location.href = '/calendar' // calendar is a home page for the dentist
         })
     } catch (error) {
+      setError('Something went wrong, try again.')
       console.error('Error during login:', error)
     }
   }

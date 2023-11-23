@@ -65,7 +65,7 @@ export interface Notification {
   id?: string
 }
 
-export interface RegistrationData {
+export interface Registration {
   email: string
   password: string
   firstName: string
