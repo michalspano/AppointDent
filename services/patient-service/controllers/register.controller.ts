@@ -7,7 +7,7 @@ import {
   sendServerError,
   sendUnauthorized,
   sendBadRequest
-} from './controllerUtils';
+} from './utils';
 
 const TOPIC = 'INSERTUSER';
 const RESPONSE_TOPIC = 'INSERTUSERRES';
@@ -16,12 +16,11 @@ export const registerController = async (req: Request, res: Response): Promise<R
   console.log('Inside registerController');
   const {
     email,
-    pass,
+    password,
     birthDate,
-    lName,
-    fName
+    lastName,
+    firstName
   } = req.body;
-
   // To verify if required dependencies are defined
   if (database === undefined) {
     return sendServerError(res, 'Database undefined');
@@ -34,14 +33,12 @@ export const registerController = async (req: Request, res: Response): Promise<R
   const reqId = Math.floor(Math.random() * 1000);
 
   // To publish registration information to MQTT topic
-  client.publish(TOPIC, `${reqId}/${email}/${pass}/*`);
   client.subscribe(RESPONSE_TOPIC);
+  client.publish(TOPIC, `${reqId}/${email}/${password}/*`);
 
   try {
     // To wait for MQTT response
     const mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
-    console.log('MQTT result: ', mqttResult);
-
     // To handle unsuccessful authorization
     if (mqttResult === '0') {
       return sendUnauthorized(res, 'Unable to authorize');
@@ -59,17 +56,17 @@ export const registerController = async (req: Request, res: Response): Promise<R
   // To insert user into the database
   const query = database.prepare(`
     INSERT INTO patients 
-    (email, pass, birthDate, lName, fName) 
+    (email, password, birthDate, lastName, firstName) 
     VALUES (?, ?, ?, ?, ?)
   `);
-  query.run(email, pass, birthDate, lName, fName);
+  query.run(email, password, birthDate, lastName, firstName);
 
   // To return success response with created user's information
   const createdPatient = {
     email,
     birthDate,
-    lName,
-    fName
+    lastName,
+    firstName
   };
   return sendCreated(res, createdPatient);
 };

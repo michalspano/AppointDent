@@ -2,7 +2,7 @@ import { type Request, type Response } from 'express';
 import database from '../db/config';
 import { client } from '../mqtt/mqtt';
 import { getServiceResponse } from './helper';
-import { sendServerError, sendNotFound, sendUnauthorized } from './controllerUtils';
+import { sendServerError, sendNotFound, sendUnauthorized } from './utils';
 
 const TOPIC = 'AUTHREQ';
 const RESPONSE_TOPIC = 'AUTHRES';
@@ -12,8 +12,6 @@ export const updatePatientController = async (req: Request, res: Response): Prom
     const email = req.params.email;
     const { sessionKey } = req.cookies;
     const updatedInfo = req.body;
-
-    console.log('Received update request for email:', email);
 
     if (database === undefined) {
       return sendServerError(res);
@@ -29,7 +27,6 @@ export const updatePatientController = async (req: Request, res: Response): Prom
 
     const reqId = Math.floor(Math.random() * 1000);
     client.publish(TOPIC, `${reqId}/${email}/${sessionKey}/*`);
-    console.log(`${reqId}/${email}/${sessionKey}/*`);
     client.subscribe(RESPONSE_TOPIC);
 
     try {

@@ -15,7 +15,7 @@ config();
 // app.use('/', patientRoute);
 
 app.use(cookieParser());
-app.use('/api/v1/patients', patientRoute);
+app.use('/', patientRoute);
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello from: AppointDent - Patients Service');

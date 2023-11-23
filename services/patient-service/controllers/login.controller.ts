@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import database from '../db/config';
 import { client } from '../mqtt/mqtt';
-import { sendServerError, sendCreated, sendSuccess } from './controllerUtils';
+import { sendServerError, sendCreated, sendSuccess } from './utils';
 
 const TOPIC = 'CREATESESSION';
 const RESPONSE_TOPIC = 'SESSION';
@@ -31,7 +31,7 @@ async function getServiceResponse (reqId: string, RESPONSE_TOPIC: string, isLogi
 }
 
 export const loginController = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
-  const { email, pass } = req.body;
+  const { email, password } = req.body;
   if (database === undefined) {
     return sendServerError(res, 'Database undefined');
   }
@@ -40,8 +40,8 @@ export const loginController = async (req: Request, res: Response): Promise<Resp
   }
 
   const reqId = Math.floor(Math.random() * 1000);
-  client.publish(TOPIC, `${reqId}/${email}/${pass}/*`);
   client.subscribe(RESPONSE_TOPIC);
+  client.publish(TOPIC, `${reqId}/${email}/${password}/*`);
 
   try {
     const mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
