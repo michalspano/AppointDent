@@ -7,7 +7,7 @@ const TOPIC = 'CREATESESSION';
 const RESPONSE_TOPIC = 'SESSION';
 
 export const login = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
-  const { email, pass } = req.body;
+  const { email, password } = req.body;
   if (database === undefined) {
     return res.status(500).send('Database undefined');
   }
@@ -16,7 +16,7 @@ export const login = async (req: Request, res: Response): Promise<Response<any, 
   }
 
   const reqId = Math.floor(Math.random() * 1000);
-  client.publish(TOPIC, `${reqId}/${email}/${pass}/*`);
+  client.publish(TOPIC, `${reqId}/${email}/${password}/*`);
   client.subscribe(RESPONSE_TOPIC);
   let mqttResult;
   try {

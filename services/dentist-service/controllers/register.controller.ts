@@ -7,7 +7,7 @@ const TOPIC = 'INSERTUSER';
 const RESPONSE_TOPIC = 'INSERTUSERRES';
 
 export const register = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
-  const { email, pass, fName, lName, clinicCountry, clinicCity, clinicStreet, clinicHouseNumber, clinicZipCode, picture } = req.body;
+  const { email, password, firstName, lastName, clinicCountry, clinicCity, clinicStreet, clinicHouseNumber, clinicZipCode, picture } = req.body;
   if (database === undefined) {
     return res.status(500).json({ message: 'Database undefined' });
   }
@@ -16,7 +16,7 @@ export const register = async (req: Request, res: Response): Promise<Response<an
   }
 
   const reqId = Math.floor(Math.random() * 1000); // Generates a random integer between 0 and 999
-  client.publish(TOPIC, `${reqId}/${email}/${pass}/*`); // REQID/USERID/SECRET/*
+  client.publish(TOPIC, `${reqId}/${email}/${password}/*`); // REQID/USERID/SECRET/*
   client.subscribe(RESPONSE_TOPIC);
   try {
     const mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
@@ -38,12 +38,12 @@ export const register = async (req: Request, res: Response): Promise<Response<an
         (email, pass, fName, lName, clinic_country, clinic_city, clinic_street, clinic_house_number, clinic_zipcode, picture) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
-  query.run(email, pass, fName, lName, clinicCountry, clinicCity, clinicStreet, clinicHouseNumber, clinicZipCode, picture);
+  query.run(email, password, firstName, lastName, clinicCountry, clinicCity, clinicStreet, clinicHouseNumber, clinicZipCode, picture);
 
   const createdDentist = {
     email,
-    fName,
-    lName,
+    firstName,
+    lastName,
     clinicCountry,
     clinicCity,
     clinicStreet,
