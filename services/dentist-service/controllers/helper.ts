@@ -1,7 +1,14 @@
 import { client } from '../mqtt/mqtt';
 const TIMEOUT = 10000;
 
-export async function getServiceResponse (reqId: string, RESPONSE_TOPIC: string, isLoginFlow: boolean = false): Promise<string> {
+/**
+ * Used to wait for a response from mqtt before continuing the execution of the request processing.
+ * @param reqId the id of the request sent over MQTT
+ * @param RESPONSE_TOPIC the topic which to listen for
+ * @param isLoginFlow used to
+ * @returns The result if the user is authenticated or not
+ */
+export async function getServiceResponse (reqId: string, RESPONSE_TOPIC: string): Promise<string> {
   return await new Promise((resolve, reject) => {
     const timeout = setTimeout(() => {
       client?.unsubscribe(RESPONSE_TOPIC);
@@ -13,13 +20,10 @@ export async function getServiceResponse (reqId: string, RESPONSE_TOPIC: string,
           clearTimeout(timeout);
           client?.unsubscribe(topic);
           client?.removeListener('message', eventHandler);
-          isLoginFlow
-            ? resolve(message.toString().split('/')[1])
-            : resolve(message.toString().split('/')[1][0]);
+          resolve(message.toString().split('/')[1]);
         }
       }
     };
-    client?.subscribe(RESPONSE_TOPIC);
     client?.on('message', eventHandler);
   });
 }

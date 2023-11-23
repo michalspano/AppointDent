@@ -6,33 +6,37 @@ import { getServiceResponse } from './helper';
 const TOPIC = 'AUTHREQ';
 const RESPONSE_TOPIC = 'AUTHRES';
 
+/**
+ * Used to delete a dentist from the database.
+ * @param req request
+ * @param res response
+ * @returns response object
+ */
 export const deleteDentist = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
   const { email } = req.params;
-  let { session } = req.headers;
+  const { sessionKey } = req.cookies;
   if (database === undefined) {
     return res.status(500).send('Database undefined');
   }
 
   if (client === undefined) {
-    return res.status(201).json({ message: 'MQTT connection failed' });
+    return res.status(503).json({ message: 'MQTT connection failed' });
   }
 
-  if (session === undefined) {
+  if (sessionKey === undefined) {
     return res.status(400).json({ message: 'Missing session cookie' });
-  } else if (Array.isArray(session)) {
-    session = session.join(',');
   }
   const reqId = Math.floor(Math.random() * 1000);
-  client.publish(TOPIC, `${reqId}/${email}/${session}/*`);
+  client.publish(TOPIC, `${reqId}/${email}/${sessionKey}/*`);
   client.subscribe(RESPONSE_TOPIC);
 
   try {
     const mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
     if (mqttResult === '0') {
-      return res.status(201).json({ message: 'Unable to authorize' });
+      return res.status(401).json({ message: 'Unable to authorize' });
     }
   } catch (error) {
-    return res.status(500).json({ message: 'Service Timeout' });
+    return res.status(504).json({ message: 'Service Timeout' });
   }
 
   const query = database.prepare('DELETE FROM dentists WHERE email = ?');
@@ -43,9 +47,13 @@ export const deleteDentist = async (req: Request, res: Response): Promise<Respon
     return res.status(404).json({ message: 'Dentist not found' });
   }
 
-  return res.json({ message: 'Dentist deleted successfully' });
+  return res.status(200).json({ message: 'Dentist deleted successfully' });
 };
-
+/**
+ * Used to wrap the async function in the sync function to satisfy TS constraints
+ * @param req request
+ * @param res response
+ */
 export const deleteDentistWrapper = (req: Request, res: Response): void => {
   void deleteDentist(req, res);
 };
