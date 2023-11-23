@@ -7,6 +7,12 @@ import { sendServerError, sendNotFound, sendUnauthorized } from './utils';
 const TOPIC = 'AUTHREQ';
 const RESPONSE_TOPIC = 'AUTHRES';
 
+/**
+ * Used to update a patient's data in the system
+ * @param req request
+ * @param res response
+ * @returns request object
+ */
 export const updatePatientController = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
   try {
     const email = req.params.email;
@@ -72,6 +78,11 @@ export const updatePatientController = async (req: Request, res: Response): Prom
   }
 };
 
+/**
+ * Wraps the promise returning function to conform to ts constraints
+ * @param req request
+ * @param res response
+ */
 export const updatePatientWrapper = (req: Request, res: Response): void => {
   void updatePatientController(req, res);
 };

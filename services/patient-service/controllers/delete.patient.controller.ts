@@ -8,7 +8,7 @@ const TOPIC = 'AUTHREQ';
 const RESPONSE_TOPIC = 'AUTHRES';
 
 /**
- *
+ * Used for deleting a patient from the system
  * @param req request
  * @param res response
  * @returns nothing
@@ -59,7 +59,11 @@ export const deletePatientController = async (req: Request, res: Response): Prom
     return sendServerError(res);
   }
 };
-
+/**
+ * Wraps the promise returning deletion function in a sync function that is accepted by ts constraints.
+ * @param req request
+ * @param res response
+ */
 export const deletePatientWrapper = (req: Request, res: Response): void => {
   void deletePatientController(req, res);
 };

@@ -12,8 +12,13 @@ import {
 const TOPIC = 'INSERTUSER';
 const RESPONSE_TOPIC = 'INSERTUSERRES';
 
+/**
+ * Used to register a new patient in the system
+ * @param req request
+ * @param res response
+ * @returns request object
+ */
 export const registerController = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
-  console.log('Inside registerController');
   const {
     email,
     password,
@@ -82,7 +87,11 @@ function checkEmailRegistered (email: string): boolean {
 
   return emailCheckResult !== null && emailCheckResult.count > 0;
 };
-
+/**
+ * Wraps the promise returning function to conform to ts constraints
+ * @param req request
+ * @param res response
+ */
 export const registerPatientWrapper = (req: Request, res: Response): void => {
   void registerController(req, res);
 };

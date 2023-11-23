@@ -2,34 +2,16 @@ import type { Request, Response } from 'express';
 import database from '../db/config';
 import { client } from '../mqtt/mqtt';
 import { sendServerError, sendCreated, sendSuccess } from './utils';
+import { getServiceResponse } from './helper';
 
 const TOPIC = 'CREATESESSION';
 const RESPONSE_TOPIC = 'SESSION';
-const TIMEOUT = 10000;
-
-async function getServiceResponse (reqId: string, RESPONSE_TOPIC: string, isLoginFlow: boolean = false): Promise<string> {
-  return await new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => {
-      client?.unsubscribe(RESPONSE_TOPIC);
-      reject(new Error('MQTT timeout'));
-    }, TIMEOUT);
-    const eventHandler = (topic: string, message: Buffer): void => {
-      if (topic === RESPONSE_TOPIC) {
-        if (message.toString().startsWith(`${reqId}/`)) {
-          clearTimeout(timeout);
-          client?.unsubscribe(topic);
-          client?.removeListener('message', eventHandler);
-          isLoginFlow
-            ? resolve(message.toString().split('/')[1])
-            : resolve(message.toString().split('/')[1]);
-        }
-      }
-    };
-    client?.subscribe(RESPONSE_TOPIC);
-    client?.on('message', eventHandler);
-  });
-}
-
+/**
+ * Used to login a user with the help of mqtt into the system.
+ * @param req request
+ * @param res response
+ * @returns request object
+ */
 export const loginController = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
   const { email, password } = req.body;
   if (database === undefined) {
@@ -62,7 +44,11 @@ export const loginController = async (req: Request, res: Response): Promise<Resp
     client?.unsubscribe(RESPONSE_TOPIC);
   }
 };
-
+/**
+ * Wraps the promise returning function to conform to ts constraints
+ * @param req request
+ * @param res response
+ */
 export const loginPatientWrapper = (req: Request, res: Response): void => {
   void loginController(req, res);
 };

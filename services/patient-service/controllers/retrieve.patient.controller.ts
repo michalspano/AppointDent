@@ -7,6 +7,12 @@ import { sendServerError, sendUnauthorized } from './utils';
 const TOPIC = 'AUTHREQ';
 const RESPONSE_TOPIC = 'AUTHRES';
 
+/**
+ * Used to retrieve patient data as long as the patient is logged in.
+ * @param req request
+ * @param res response
+ * @returns request object
+ */
 export const getPatientController = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
   try {
     const email = req.params.email;
@@ -53,7 +59,11 @@ export const getPatientController = async (req: Request, res: Response): Promise
     return sendServerError(res);
   }
 };
-
+/**
+ * Wraps the promise returning function to conform to ts constraints
+ * @param req request
+ * @param res response
+ */
 export function getPatientWrapper (req: Request, res: Response): void {
   void getPatientController(req, res);
 }
