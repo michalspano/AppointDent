@@ -2,7 +2,6 @@ import { type Request, type Response } from 'express';
 import database from '../db/config';
 import { client } from '../mqtt/mqtt';
 import { getServiceResponse } from './helper';
-import { sendServerError, sendNotFound, sendUnauthorized, sendSuccess } from './utils';
 
 const TOPIC = 'AUTHREQ';
 const RESPONSE_TOPIC = 'AUTHRES';
@@ -19,15 +18,15 @@ export const deletePatientController = async (req: Request, res: Response): Prom
     const { sessionKey } = req.cookies;
 
     if (database === undefined) {
-      return sendServerError(res);
+      return res.sendStatus(500);
     }
 
     if (client === undefined) {
-      return sendUnauthorized(res, 'MQTT connection failed');
+      return res.sendStatus(500);
     }
 
     if (sessionKey === undefined) {
-      return res.status(400).json({ message: 'Missing session cookie' });
+      return res.sendStatus(400);
     }
 
     const reqId = Math.floor(Math.random() * 1000);
@@ -40,23 +39,21 @@ export const deletePatientController = async (req: Request, res: Response): Prom
         RESPONSE_TOPIC
       );
       if (mqttResult === '0') {
-        return sendUnauthorized(res, 'Unable to authorize');
+        return res.sendStatus(401);
       }
     } catch (error) {
-      return res.status(504).json({ message: 'Service Timeout' });
+      return res.sendStatus(504);
     }
 
     const query = database.prepare('DELETE FROM patients WHERE email = ?');
     const result = query.run(email);
 
     if (result.changes === 0) {
-      return sendNotFound(res, 'Patient not found');
+      return res.sendStatus(404);
     }
-
-    return sendSuccess(res, 'Patient deleted successfully');
+    return res.sendStatus(204);
   } catch (error) {
-    console.error('Error deleting patient:', error);
-    return sendServerError(res);
+    return res.sendStatus(500);
   }
 };
 /**

@@ -2,7 +2,6 @@ import { type Request, type Response } from 'express';
 import database from '../db/config';
 import { client } from '../mqtt/mqtt';
 import { getServiceResponse } from './helper';
-import { sendServerError, sendUnauthorized } from './utils';
 
 const TOPIC = 'AUTHREQ';
 const RESPONSE_TOPIC = 'AUTHRES';
@@ -19,15 +18,15 @@ export const getPatientController = async (req: Request, res: Response): Promise
     const { sessionKey } = req.cookies;
 
     if (database === undefined) {
-      return sendServerError(res);
+      return res.sendStatus(500);
     }
 
     if (client === undefined) {
-      return sendUnauthorized(res, 'MQTT connection failed');
+      return res.sendStatus(500);
     }
 
     if (sessionKey === undefined) {
-      return res.status(400).json({ message: 'Missing session cookie' });
+      return res.sendStatus(400);
     }
 
     const reqId = Math.floor(Math.random() * 1000);
@@ -37,10 +36,10 @@ export const getPatientController = async (req: Request, res: Response): Promise
     try {
       const mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
       if (mqttResult === '0') {
-        return res.status(401).json({ message: 'Unable to authorize' });
+        return res.sendStatus(401);
       }
     } catch (error) {
-      return res.status(504).json({ message: 'Service Timeout' });
+      return res.sendStatus(500);
     }
 
     let result: unknown[];
@@ -48,15 +47,13 @@ export const getPatientController = async (req: Request, res: Response): Promise
       result = database.prepare('SELECT email,birthDate,lastName,firstName FROM patients WHERE email = ?').all(email);
     } catch (err: Error | unknown) {
       console.log(err);
-      return res.status(500).json({
-        message: 'Internal server error: fail performing selection.'
-      });
+      return res.sendStatus(500);
     }
-    return res.status(200).json(result);
+    return res.json(result);
   } catch (error) {
     console.error('Error updating patient:', error);
 
-    return sendServerError(res);
+    return res.sendStatus(500);
   }
 };
 /**

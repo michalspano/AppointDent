@@ -1,7 +1,6 @@
 import type { Request, Response } from 'express';
 import database from '../db/config';
 import { client } from '../mqtt/mqtt';
-import { sendServerError, sendCreated, sendSuccess } from './utils';
 import { getServiceResponse } from './helper';
 
 const TOPIC = 'CREATESESSION';
@@ -15,10 +14,10 @@ const RESPONSE_TOPIC = 'SESSION';
 export const loginController = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
   const { email, password } = req.body;
   if (database === undefined) {
-    return sendServerError(res, 'Database undefined');
+    return res.sendStatus(500);
   }
   if (client === undefined) {
-    return sendCreated(res, { message: 'MQTT connection failed' });
+    return res.sendStatus(500);
   }
 
   const reqId = Math.floor(Math.random() * 1000);
@@ -29,17 +28,17 @@ export const loginController = async (req: Request, res: Response): Promise<Resp
     const mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
 
     if (mqttResult === '0') {
-      return sendCreated(res, { message: 'Unable to authorize' });
+      return res.sendStatus(401);
     }
 
     if (mqttResult !== undefined && mqttResult.length === 1 && mqttResult === '0') {
-      return sendServerError(res, 'Email or password is incorrect');
+      return res.sendStatus(400);
     } else {
       res.cookie('sessionKey', mqttResult, { httpOnly: true });
-      return sendSuccess(res, 'Login successful');
+      return res.sendStatus(200);
     }
   } catch (error) {
-    return sendServerError(res, 'Service Timeout');
+    return res.sendStatus(500);
   } finally {
     client?.unsubscribe(RESPONSE_TOPIC);
   }

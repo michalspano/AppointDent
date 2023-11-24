@@ -2,13 +2,6 @@ import type { Request, Response } from 'express';
 import database from '../db/config';
 import { client } from '../mqtt/mqtt';
 import { getServiceResponse } from './helper';
-import {
-  sendCreated,
-  sendServerError,
-  sendUnauthorized,
-  sendBadRequest
-} from './utils';
-
 const TOPIC = 'INSERTUSER';
 const RESPONSE_TOPIC = 'INSERTUSERRES';
 
@@ -28,10 +21,27 @@ export const registerController = async (req: Request, res: Response): Promise<R
   } = req.body;
   // To verify if required dependencies are defined
   if (database === undefined) {
-    return sendServerError(res, 'Database undefined');
+    return res.sendStatus(500);
   }
   if (client === undefined) {
-    return sendUnauthorized(res, 'MQTT connection failed');
+    return res.sendStatus(500);
+  }
+
+  // To check if the email is already registered
+  if (checkEmailRegistered(email)) {
+    return res.sendStatus(400);
+  }
+
+  try {
+  // To insert user into the database
+    const query = database.prepare(`
+    INSERT INTO patients 
+    (email, password, birthDate, lastName, firstName) 
+    VALUES (?, ?, ?, ?, ?)
+  `);
+    query.run(email, password, birthDate, lastName, firstName);
+  } catch (err) {
+    return res.sendStatus(400);
   }
 
   // To generate a random reqId
@@ -46,34 +56,14 @@ export const registerController = async (req: Request, res: Response): Promise<R
     const mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
     // To handle unsuccessful authorization
     if (mqttResult === '0') {
-      return sendUnauthorized(res, 'Unable to authorize');
+      return res.sendStatus(401);
     }
   } catch (error) {
     console.error('Error in registerController:', error);
-    return sendServerError(res, 'Service Timeout');
+    return res.sendStatus(500);
   }
 
-  // To check if the email is already registered
-  if (checkEmailRegistered(email)) {
-    return sendBadRequest(res, 'Email is already registered');
-  }
-
-  // To insert user into the database
-  const query = database.prepare(`
-    INSERT INTO patients 
-    (email, password, birthDate, lastName, firstName) 
-    VALUES (?, ?, ?, ?, ?)
-  `);
-  query.run(email, password, birthDate, lastName, firstName);
-
-  // To return success response with created user's information
-  const createdPatient = {
-    email,
-    birthDate,
-    lastName,
-    firstName
-  };
-  return sendCreated(res, createdPatient);
+  return res.sendStatus(201);
 };
 
 // To check if the email is already registered

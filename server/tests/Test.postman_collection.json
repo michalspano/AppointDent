@@ -1,10 +1,9 @@
 {
 	"info": {
-		"_postman_id": "0677c5fa-3f91-4ae4-a0f1-9bf9e63bfcb1",
+		"_postman_id": "6eb329ac-4fd0-4127-aa6c-bf305d056997",
 		"name": "Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "31133267",
-		"_collection_link": "https://appointdent.postman.co/workspace/AppointDent~3d7b8d88-ecc1-4d83-a513-eb9122453c58/collection/31133267-0677c5fa-3f91-4ae4-a0f1-9bf9e63bfcb1?action=share&source=collection_link&creator=31133267"
+		"_exporter_id": "28264405"
 	},
 	"item": [
 		{
@@ -1671,6 +1670,238 @@
 								"v1",
 								"appointments",
 								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "patient-service",
+			"item": [
+				{
+					"name": "POST/api/patients/register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code shall be 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"sophia2043.appleseed@email.com\",\n    \"password\": \"complicatedpassword\",\n    \"birthDate\": \"2023\",\n    \"lastName\": \"Appleseeed\",\n    \"firstName\": \"Sophia\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/patients/register",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"patients",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST/api/patients/login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"sophia2043.appleseed@email.com\",\n    \"password\": \"complicatedpassword\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/patients/login",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"patients",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PATCH/api/patients/:id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 200\", function(){",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"const patientEmail = pm.environment.get(\"patientEmail\");",
+									"console.log(\"Patient email: \", patientEmail);",
+									"",
+									"pm.test(\"Set Environment Variable\", function () {",
+									"    const responseJson = pm.response.json();console.log(\"Response Body:\", responseJson); ",
+									"    const patientEmail = responseJson.email;",
+									"    pm.environment.set(\"patientEmail\", patientEmail);",
+									"    console.log(\"Email: \", patientEmail)",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"Wilma\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/patients/sophia2043.appleseed@email.com",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"patients",
+								"sophia2043.appleseed@email.com"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /api/patients/:id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 200\", function(){",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"const patientEmail = pm.environment.get(\"patientEmail\");",
+									"console.log(\"Patient email: \", patientEmail);",
+									"",
+									"pm.test(\"Set Environment Variable\", function () {",
+									"    const responseJson = pm.response.json();console.log(\"Response Body:\", responseJson); ",
+									"    const patientEmail = responseJson.email;",
+									"    pm.environment.set(\"patientEmail\", patientEmail);",
+									"    console.log(\"Email: \", patientEmail)",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/patients/sophia2043.appleseed@email.com",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"patients",
+								"sophia2043.appleseed@email.com"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE/api/patients/:id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 204\", function(){",
+									"    pm.response.to.have.status(204);",
+									"})",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/patients/sophia2043.appleseed@email.com",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"patients",
+								"sophia2043.appleseed@email.com"
 							]
 						}
 					},
