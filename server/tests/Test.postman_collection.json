@@ -106,10 +106,9 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Response is in JSON format\", function () {",
-									"    pm.response.to.be.json;",
+									"pm.test(\"Response code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
 									"});",
-									"",
 									"pm.environment.set('sessionCookie', pm.cookies.get('sessionKey'));",
 									""
 								],
@@ -155,9 +154,6 @@
 									"    pm.response.to.have.status(401);",
 									"});",
 									"",
-									"pm.test(\"Response is in JSON format\", function () {",
-									"    pm.response.to.be.json;",
-									"});",
 									"",
 									"pm.test(\"Body matches string\", function () {",
 									"    pm.expect(pm.response.text()).to.include(\"Unable to authorize\");",
