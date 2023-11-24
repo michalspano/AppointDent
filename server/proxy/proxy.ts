@@ -9,10 +9,12 @@ type ProxyTargets = Record<string, string>;
  * now will be the "fallback" (default) values.
  */
 const proxyTargets: ProxyTargets = {
+  sessions: 'http://localhost:3001',
   patients: 'http://localhost:3002',
   appointments: 'http://localhost:3003',
   notifications: 'http://localhost:3004',
   dentists: 'http://localhost:3005'
+
 };
 
 const proxies: ProxyMap = constructProxies(proxyTargets);

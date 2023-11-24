@@ -12,6 +12,12 @@ const RESPONSE_TOPIC = 'INSERTUSERRES';
  * @returns request object
  */
 export const registerController = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
+  if (req.body.email === undefined) return res.sendStatus(400);
+  if (req.body.password === undefined) return res.sendStatus(400);
+  if (req.body.birthDate === undefined) return res.sendStatus(400);
+  if (req.body.lastName === undefined) return res.sendStatus(400);
+  if (req.body.firstName === undefined) return res.sendStatus(400);
+
   const {
     email,
     password,
@@ -49,7 +55,7 @@ export const registerController = async (req: Request, res: Response): Promise<R
 
   // To publish registration information to MQTT topic
   client.subscribe(RESPONSE_TOPIC);
-  client.publish(TOPIC, `${reqId}/${email}/${password}/*`);
+  client.publish(TOPIC, `${reqId}/${email}/${password}/p/*`); // p for patient type
 
   try {
     // To wait for MQTT response

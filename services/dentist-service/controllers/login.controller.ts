@@ -24,6 +24,8 @@ export const login = async (req: Request, res: Response): Promise<Response<any, 
   if (client === undefined) {
     return res.status(503).json({ message: 'MQTT connection failed' });
   }
+  if (request.email === undefined) return res.sendStatus(400);
+  if (request.password === undefined) return res.sendStatus(400);
 
   const reqId = Math.floor(Math.random() * 1000);
   client.subscribe(RESPONSE_TOPIC); // Subscribe first to ensure we dont miss anything

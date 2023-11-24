@@ -3,8 +3,8 @@ import database from '../db/config';
 import { client } from '../mqtt/mqtt';
 import { getServiceResponse } from './helper';
 
-const TOPIC = 'AUTHREQ';
-const RESPONSE_TOPIC = 'AUTHRES';
+const TOPIC = 'DELUSER';
+const RESPONSE_TOPIC = 'DELUSERRES';
 
 /**
  * Used to delete a dentist from the database.
@@ -13,6 +13,9 @@ const RESPONSE_TOPIC = 'AUTHRES';
  * @returns response object
  */
 export const deleteDentist = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
+  if (req.params.email === undefined) return res.sendStatus(400);
+  if (req.cookies.sessionKey === undefined) return res.sendStatus(400);
+
   const { email } = req.params;
   const { sessionKey } = req.cookies;
   if (database === undefined) {
@@ -23,9 +26,6 @@ export const deleteDentist = async (req: Request, res: Response): Promise<Respon
     return res.status(503).json({ message: 'MQTT connection failed' });
   }
 
-  if (sessionKey === undefined) {
-    return res.status(400).json({ message: 'Missing session cookie' });
-  }
   const reqId = Math.floor(Math.random() * 1000);
   client.publish(TOPIC, `${reqId}/${email}/${sessionKey}/*`);
   client.subscribe(RESPONSE_TOPIC);
