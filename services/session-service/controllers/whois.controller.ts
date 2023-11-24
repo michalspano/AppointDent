@@ -3,7 +3,14 @@ import type { Request, Response } from 'express';
 import * as crypto from 'crypto';
 import { type WhoIsRequest } from '../types/types';
 
-// Get all appointments slots that are not assigned to a patient.
+/**
+ * This function has the responsibility of informing whoever is interested who they are logged in as.
+ * Since information is shared at a minimum, a client has to make a request to this endpoint
+ * to be able to see who they are logged in as in the system.
+ * @param req request
+ * @param res response
+ * @returns response object
+ */
 async function whois (req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
   try {
     if (req.cookies === undefined) return res.sendStatus(400);

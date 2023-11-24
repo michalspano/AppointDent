@@ -63,7 +63,7 @@ async function parseRawRequest (rawMsg: string): Promise<DeleteUserRequest> {
 }
 
 /**
- * Start user insertion listener
+ * Start user delettion listener
  * @param client
  * @description Used for inserting users to the system.
  * expected message format: REQID/EMAIL/PASSWORD/*
@@ -74,7 +74,7 @@ async function parseRawRequest (rawMsg: string): Promise<DeleteUserRequest> {
 export async function listenForDeletion (client: mqtt.MqttClient): Promise<void> {
   // Set up a listener for MQTT messages
   client?.on('message', (topic: string, message: Buffer) => {
-    // Check if the topic is 'INSERTUSER'
+    // Check if the topic is 'deluser'
     if (topic === TOPIC) {
       // Parse the raw request, insert the user, and publish the response
       parseRawRequest(message.toString()).then((result: DeleteUserRequest) => {
@@ -89,7 +89,7 @@ export async function listenForDeletion (client: mqtt.MqttClient): Promise<void>
       });
     }
   });
-  // Subscribe the client to the INSERTUSER topic
+  // Subscribe the client to the delete user topic
   client.subscribe(TOPIC);
   console.log('Insertion Listener Started');
 }
