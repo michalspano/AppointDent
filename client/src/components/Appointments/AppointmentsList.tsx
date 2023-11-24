@@ -14,11 +14,11 @@ export default function AppointmentsList (): JSX.Element {
 
   async function fetchAppointments (): Promise<void> {
     try {
-      const response = await Api.get('/appointments/dentists/generic.doctor@clinit_name.se') // TODO: replace with actual email when BE supports it
+      const response = await Api.get('/appointments/dentists/generic.doctor@clinit_name.se?onlyAvailable=true') // TODO: replace with actual email when BE supports it
       const appointments = response.data
       const formattedAppointments = appointments.map((appointment: any) => ({
         id: appointment.id,
-        title: appointment.patientId !== null ? appointment.patientId : '', // add filter only unbooked appointments
+        title: appointment.patientId !== null ? appointment.patientId : '',
         start: new Date(appointment.start_timestamp * 1000).toISOString().slice(0, 16),
         end: new Date(appointment.end_timestamp * 1000).toISOString().slice(0, 16)
       }))
@@ -97,20 +97,15 @@ export default function AppointmentsList (): JSX.Element {
 
   const onBookAppointment = (): void => {
     if ((selectedDate() != null) && (selectedTime() != null)) {
-      const bookedAppointment = {
-        date: selectedDate(),
-        timeSlot: selectedTime()
-      }
       setShowConfirmation(true)
-      console.log('Booked Appointment:', bookedAppointment) // connect to BE
     } else {
       console.error('Please select a date and time slot before booking.')
     }
   }
   onCleanup(() => {})
 
-  const dentist = 'Doctor John Doe' // receive as props when navigating from map
-  const location = 'Linnegatan 15'
+  const dentist = 'Doctor Ann Smith' // receive as props when navigating from map
+  const location = 'Linnégatan 15'
 
   return (
       <div class="h-full w-full flex flex-col justify-center items-center lg:justify-start lg:items-start overflow-hidden">
