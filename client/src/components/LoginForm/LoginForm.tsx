@@ -49,7 +49,8 @@ export default function LoginForm (): JSX.Element {
           onChange={(event) => setPassword(event.target.value)}
         />
         {error() !== null && <p class="text-error">{error()}</p>}
-        <button type="submit" class="log-in-btn h-12 mb-10 bg-secondary rounded-xl text-base" onClick={login}>
+        <button type="submit" class="log-in-btn h-12 mb-10 bg-secondary rounded-xl text-base"
+        onClick={login}>
             Log in
             </button>
         <p class="font-extralight">Not registered yet?

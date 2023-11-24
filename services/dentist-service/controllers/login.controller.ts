@@ -5,6 +5,7 @@ import { getServiceResponse } from './helper';
 
 const TOPIC = 'CREATESESSION';
 const RESPONSE_TOPIC = 'SESSION';
+
 interface LoginRequest {
   email: string
   password: string
@@ -23,6 +24,8 @@ export const login = async (req: Request, res: Response): Promise<Response<any, 
   if (client === undefined) {
     return res.status(503).json({ message: 'MQTT connection failed' });
   }
+  if (request.email === undefined) return res.sendStatus(400);
+  if (request.password === undefined) return res.sendStatus(400);
 
   const reqId = Math.floor(Math.random() * 1000);
   client.subscribe(RESPONSE_TOPIC); // Subscribe first to ensure we dont miss anything
@@ -40,7 +43,7 @@ export const login = async (req: Request, res: Response): Promise<Response<any, 
     return res.status(401).json({ message: 'Email or password is incorrect' });
   } else { // REQID/SESSIONKEY/* (success)
     res.cookie('sessionKey', mqttResult, { httpOnly: true });
-    return res.status(200).json({ message: 'Login successful' });
+    return res.sendStatus(200);
   }
 };
 /**

@@ -3,6 +3,7 @@ import { heartbeat } from './heartbeat';
 import { listenForAuthorise } from './authorisation';
 import { listenForInsertion } from './insert-user';
 import { listenForSessionCreation } from './create-session';
+import { listenForDeletion } from './delete-user';
 
 // Define client with an initial value of "undefined"
 let client = undefined as mqtt.MqttClient | undefined;
@@ -15,6 +16,7 @@ export const mqttClient = {
       if (client != null) {
         void listenForAuthorise(client);
         void listenForInsertion(client);
+        void listenForDeletion(client);
         void listenForSessionCreation(client);
         // Send heartbeat with interval of 1 second
         void heartbeat(client, serviceName, 1000);
