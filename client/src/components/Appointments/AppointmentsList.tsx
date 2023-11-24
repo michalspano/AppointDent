@@ -1,9 +1,14 @@
-import { For, createSignal, onCleanup, type JSX, createEffect } from 'solid-js'
+import { createSignal, type JSX, createEffect } from 'solid-js'
 import dentist_img from '../../assets/dentist_img.jpeg'
 import { Api } from '../../utils/api'
-export default function AppointmentList (): JSX.Element {
+import type { Appointment } from '../../utils/types'
+export default function AppointmentsList (): JSX.Element {
   createEffect(async () => {
     await fetchAppointments()
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    setInterval(async () => {
+      await fetchAppointments()
+    }, 5000)
   })
 
   async function fetchAppointments (): Promise<void> {
@@ -12,7 +17,7 @@ export default function AppointmentList (): JSX.Element {
       const appointments = response.data
       const formattedAppointments = appointments.map((appointment: any) => ({
         id: appointment.id,
-        title: appointment.patientId !== null ? appointment.patientId : '', // filter only unbooked appointments
+        title: appointment.patientId !== null ? appointment.patientId : '', // add filter only unbooked appointments
         start: new Date(appointment.start_timestamp * 1000).toISOString().slice(0, 16),
         end: new Date(appointment.end_timestamp * 1000).toISOString().slice(0, 16)
       }))
@@ -30,89 +35,88 @@ export default function AppointmentList (): JSX.Element {
         appointments
       }))
       groupedAppointmentsArray.sort((a, b) => (a.day > b.day ? 1 : -1))
-
-      console.log(groupedAppointmentsArray)
-
-      setAvailableDaySlots(groupedAppointmentsArray)
+      setAvailableDays(groupedAppointmentsArray)
     } catch (error) {
       throw new Error('Error fetching appointments')
     }
   }
 
-  const [availableDaySlots, setAvailableDaySlots] = createSignal([])
-  const [availableTimeSlots, setAvailableTimeSlots] = createSignal([])
-  const [selectedDate, setSelectedDate] = createSignal<number | null>(null)
-  const [selectedTimeSlot, setSelectedTimeSlot] = createSignal<number | null>(null)
-
-  const formatDate = (date: number): string => {
-    const options = { day: 'numeric', month: 'short' }
-    return new Date(date).toLocaleDateString([], options)
+  interface GroupedAppointments {
+    day: string
+    appointments: unknown
   }
 
-  const formatTime = (date: number): string => {
-    const options = { hour: '2-digit', minute: '2-digit' }
+  const [availableDays, setAvailableDays] = createSignal<GroupedAppointments[]>([])
+  const [availableTime, setAvailableTime] = createSignal<Appointment[]>([])
+  const [selectedDate, setSelectedDate] = createSignal<string | null>(null)
+  const [selectedTime, setSelectedTime] = createSignal<Appointment | null>(null)
+
+  const formatDate = (date: string): string => {
+    const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' }
+    return new Date(date).toLocaleDateString(undefined, options)
+  }
+
+  const formatTime = (date: string): string => {
+    const options: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit' }
     return new Date(date).toLocaleTimeString([], options)
   }
 
-  const handleDateSelect = (date: any): void => {
-    setSelectedDate(date)
-    const selectedAppointments = availableDaySlots().filter((appointment) => {
-      const startTimestamp = appointment.start
-      const endTimestamp = appointment.end
-
-      return startTimestamp <= selectedDate() && selectedDate() <= endTimestamp
-    })
-
-    setAvailableTimeSlots(selectedAppointments)
+  const onDateSelect = (appointment: any): void => {
+    setSelectedDate(appointment.day)
+    const availableDaysData = availableDays()
+    const isMatchingDay = (entry: { day: any }): boolean => entry.day === appointment.day
+    const selectedDayData = availableDaysData.find(isMatchingDay)
+    if (selectedDayData !== undefined) {
+      setAvailableTime(selectedDayData.appointments as Appointment[])
+    }
   }
-  const handleTimeSlotSelect = (timeSlot: any): void => {
-    setSelectedTimeSlot(timeSlot)
+  const onTimeSelect = (timeSlot: any): void => {
+    setSelectedTime(timeSlot)
   }
 
-  const handleBookAppointment = (): void => {
-    if ((selectedDate() != null) && (selectedTimeSlot() != null)) {
-      const bookedAppointmentInfo = {
+  const onBookAppointment = (): void => {
+    if ((selectedDate() != null) && (selectedTime() != null)) {
+      const bookedAppointment = {
         date: selectedDate(),
-        timeSlot: selectedTimeSlot()
+        timeSlot: selectedTime()
       }
-      console.log('Booked Appointment:', bookedAppointmentInfo)
+      console.log('Booked Appointment:', bookedAppointment) // connect to BE
     } else {
       console.error('Please select a date and time slot before booking.')
     }
   }
 
   return (
-      <div class="h-full w-full flex flex-col justify-start items-center">
+      <div class="h-full w-full flex flex-col justify-start items-start overflow-hidden">
         <div class='w-full flex justify-start m-10'>
           <h1 class='text-2xl font-bold pl-10'>Available Slots</h1>
-          <div class='h-5/6 w-5/6' id='slots'></div>
         </div>
-        <div class='flex flex-row items-center m-6'>
-          <div class='flex-col w-full items-center'>
+        <div class='flex flex-col lg:flex-row justify-start m-6 ml-48'>
+          <div class='flex-col justify-start'>
             <img class='rounded-lg' src={dentist_img} alt="Dentist picture" />
             <div class='flex-col text-center mt-4 text-lg'>
-              <h1>Doctor John Doe</h1>
-              <h1 class='mt-2'>Location: Linnegatan 15</h1>
+              <h1 class='font-semibold'>Doctor John Doe</h1>
+              <h1 class='mt-2 font-semibold'>Location: Linnegatan 15</h1>
             </div>
           </div>
           <div>
-            <div class="m-6">
-              <h3 class='text-lg mt-10'>Please, select date and time to book the appointment</h3>
-              <h3 class='text-lg mt-10'>Select Date</h3>
-              <div class='flex flex-row w-full'>
-                {availableDaySlots().map((slot) => (
-                <div class={`flex w-35 m-4 h-20 w-32 rounded cursor-pointer items-center justify-center ${selectedDate() === slot.start ? 'text-white bg-primary' : 'bg-grey'}`} onClick={() => { handleDateSelect(slot.start) }}>
-                  {formatDate(slot.start)}
+            <div class="m-6 ml-20 mt-0">
+              <h3 class='desc text-xl text-slate-500'>Please, select the preferred date and time to schedule your appointment.</h3>
+              <h3 class='text-lg mt-10 font-medium'>Select Date</h3>
+              <div class='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-15 w-full'>
+                {availableDays().slice(0, 5).map((appointment) => (
+                <div class={`flex w-35 m-4 h-20 w-32 rounded-lg cursor-pointer font-semibold items-center justify-center ${selectedDate() === appointment.day ? 'bg-primary' : 'bg-grey'}`} onClick={() => { onDateSelect(appointment) }}>
+                  {formatDate(appointment.day)}
                 </div>
                 ))}
               </div>
               {(selectedDate() != null) && (
               <div>
-                <h3 class='text-lg mt-10'>Select Time on {formatDate(selectedDate())}</h3>
-                {availableTimeSlots().length > 0
+                <h3 class='text-lg mt-6 font-medium'>Select Time</h3>
+                {availableTime().length > 0
                   ? <ul class="flex flex-row w-full">
-                  {availableTimeSlots().map((appointment) => (
-                  <div class={`flex cursor-pointer w-35 m-4 h-20 w-32 rounded cursor-pointer items-center justify-center ${selectedTimeSlot() === appointment ? 'text-white bg-primary' : 'bg-grey'}`} onClick={() => { handleTimeSlotSelect(appointment) }}>
+                  {availableTime().map((appointment: Appointment) => (
+                  <div class={`flex cursor-pointer w-35 m-4 h-20 w-32 rounded-lg cursor-pointer font-semibold items-center justify-center ${selectedTime() === appointment ? 'text-white bg-primary' : 'bg-grey'}`} onClick={() => { onTimeSelect(appointment) }}>
                     {formatTime(appointment.start)} - {formatTime(appointment.end)}
                   </div>
                   ))}
@@ -120,8 +124,8 @@ export default function AppointmentList (): JSX.Element {
                   : <p>No available time slots for the selected date.</p>}
               </div>
               )}
-              {(selectedDate() != null) && (selectedTimeSlot() != null) && (
-              <button class='bg-secondary rounded text-white p-2 mr-3 text-black' onClick={handleBookAppointment}>
+              {(selectedDate() != null) && (selectedTime() != null) && (
+              <button class='bg-secondary rounded-lg text-white p-4 mr-3 mt-6 ml-4 text-black px-8' onClick={onBookAppointment}>
                 Book Appointment
               </button>
               )}
