@@ -25,7 +25,6 @@ export async function deleteUser (request: DeleteUserRequest): Promise<void> {
       const sessionResult: unknown = sessionQuery?.get(userResult.session_hash);
       // Get the current timestamp
       const timestamp = Math.round(Date.now() / 1000);
-      console.log(sessionResult);
       // Can not authenticate user if the session is undefined or expired
       if (sessionResult === undefined || (sessionResult as Session).expiry < timestamp) { reject(new Error('Cannot authenticate user')); return; }
       const userDeleteQuery = database?.prepare('DELETE FROM users WHERE email = ?');
