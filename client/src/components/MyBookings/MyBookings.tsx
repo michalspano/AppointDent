@@ -9,10 +9,15 @@ export default function MyBookings (): JSX.Element {
   createEffect(async () => {
     await fetchAppointments()
   })
+
+  /**
+ * Get a dentist from the dentist service based on their email
+ * @param dentistId - Email of the dentist
+ * @returns Dentist's address, first name and last name
+ */
   const fetchDentist = async (dentistId: string): Promise<any> => {
     try {
       const dentistResponse = await Api.get(`dentists/${dentistId}`)
-      console.log(dentistResponse)
       const dentistData = dentistResponse.data[0]
       return {
         address: `${dentistData.clinicStreet} ${dentistData.clinicHouseNumber}, ${dentistData.clinicCity}`,
@@ -20,11 +25,13 @@ export default function MyBookings (): JSX.Element {
         lastName: dentistData.lastName
       }
     } catch (error) {
-      console.error('Error fetching dentist:', error)
-      return {}
+      throw new Error('Error fetching dentist')
     }
   }
 
+  /**
+   * Get all appointments from a user
+   */
   const fetchAppointments = async (): Promise<void> => {
     try {
       const response = await Api.get('appointments/patients/12312321') // Replace with the actual patient id
@@ -34,6 +41,7 @@ export default function MyBookings (): JSX.Element {
         appointmentsData.map(async (appointment: any) => {
           const dentistInfo = await fetchDentist(appointment.dentistId)
           return {
+            // Parse the integer format of a date into human readable date
             start_timestamp: new Date(appointment.start_timestamp * 1000).toLocaleString('sv-SE', {
               month: 'short',
               day: 'numeric',
@@ -56,7 +64,7 @@ export default function MyBookings (): JSX.Element {
       )
       setAppointments(formattedAppointments)
     } catch (error) {
-      console.error('Error fetching appointments:', error)
+      throw new Error('Error fetching appointments')
     }
   }
 
