@@ -63,9 +63,9 @@ async function parseRawRequest (rawMsg: string): Promise<DeleteUserRequest> {
 }
 
 /**
- * Start user delettion listener
+ * Start user deletion listener
  * @param client
- * @description Used for inserting users to the system.
+ * @description Used for deleting users from the system.
  * expected message format: REQID/EMAIL/PASSWORD/*
  * REQID: Random unique id that requestor sets to identify an authentication request. Is not stored persistently in a DB.
  * EMAIL: User's email
