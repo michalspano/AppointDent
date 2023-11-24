@@ -15,10 +15,10 @@ export default function LoginNav (): JSX.Element {
 
   return <>
   <div class="navbar flex flex-row justify-end pt-5">
-  <Link class={`mr-3 ${currentRoute() === '/' ? 'currentpage' : 'not-currentpage'}`} href="/">
+  <Link class={`mr-3 text-black ${currentRoute() === '/' ? 'currentpage' : ''}`} href="/">
          Log in
        </Link>
-       <Link class={`mr-10 ${currentRoute() === '/signup' || currentRoute() === '/dentist-signup' || currentRoute() === '/patient-signup' ? 'currentpage' : 'not-currentpage'}`} href="/signup">
+       <Link class={`mr-10 text-black ${currentRoute() === '/signup' || currentRoute() === '/dentist-signup' || currentRoute() === '/patient-signup' ? 'currentpage' : ''}`} href="/signup">
           Sign up
         </Link>
       </div>
