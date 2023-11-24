@@ -1,9 +1,10 @@
 {
 	"info": {
-		"_postman_id": "6eb329ac-4fd0-4127-aa6c-bf305d056997",
+		"_postman_id": "0677c5fa-3f91-4ae4-a0f1-9bf9e63bfcb1",
 		"name": "Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "28264405"
+		"_exporter_id": "31133267",
+		"_collection_link": "https://appointdent.postman.co/workspace/AppointDent~3d7b8d88-ecc1-4d83-a513-eb9122453c58/collection/31133267-0677c5fa-3f91-4ae4-a0f1-9bf9e63bfcb1?action=share&source=collection_link&creator=31133267"
 	},
 	"item": [
 		{
