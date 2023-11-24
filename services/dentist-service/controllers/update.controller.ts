@@ -14,7 +14,10 @@ const RESPONSE_TOPIC = 'AUTHRES';
  * @returns a response object
  */
 export const updateDentist = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
+  if (req.cookies.sessionKey === undefined) return res.sendStatus(400);
+  if (req.params.email === undefined) return res.sendStatus(400);
   const { email } = req.params;
+
   const { sessionKey } = req.cookies; // Get the session key from the cookies.
   const updatedInfo = req.body as Partial<RegisterRequest>;
   if (database === undefined) {
@@ -22,9 +25,6 @@ export const updateDentist = async (req: Request, res: Response): Promise<Respon
   }
   if (client === undefined) {
     return res.status(503).json({ message: 'MQTT connection failed' });
-  }
-  if (sessionKey === undefined) {
-    return res.status(400).json({ message: 'Missing session cookie' });
   }
 
   const reqId = Math.floor(Math.random() * 1000);

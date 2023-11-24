@@ -5,6 +5,7 @@ import { getServiceResponse } from './helper';
 
 const TOPIC = 'CREATESESSION';
 const RESPONSE_TOPIC = 'SESSION';
+
 /**
  * Used to login a user with the help of mqtt into the system.
  * @param req request
@@ -12,6 +13,9 @@ const RESPONSE_TOPIC = 'SESSION';
  * @returns request object
  */
 export const loginController = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
+  if (req.body.email === undefined) return res.sendStatus(400);
+  if (req.body.password === undefined) return res.sendStatus(400);
+
   const { email, password } = req.body;
   if (database === undefined) {
     return res.sendStatus(500);

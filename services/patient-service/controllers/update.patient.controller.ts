@@ -14,6 +14,9 @@ const RESPONSE_TOPIC = 'AUTHRES';
  */
 export const updatePatientController = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
   try {
+    if (req.params.email === undefined) return res.sendStatus(400);
+    if (req.cookies.sessionKey === undefined) return res.sendStatus(400);
+
     const email = req.params.email;
     const { sessionKey } = req.cookies;
     const updatedInfo = req.body;

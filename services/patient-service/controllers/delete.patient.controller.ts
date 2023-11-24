@@ -3,8 +3,8 @@ import database from '../db/config';
 import { client } from '../mqtt/mqtt';
 import { getServiceResponse } from './helper';
 
-const TOPIC = 'AUTHREQ';
-const RESPONSE_TOPIC = 'AUTHRES';
+const TOPIC = 'DELUSER';
+const RESPONSE_TOPIC = 'DELUSERRES';
 
 /**
  * Used for deleting a patient from the system
@@ -14,6 +14,9 @@ const RESPONSE_TOPIC = 'AUTHRES';
  */
 export const deletePatientController = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
   try {
+    if (req.params.email === undefined) return res.sendStatus(400);
+    if (req.cookies.sessionKey === undefined) return res.sendStatus(400);
+
     const { email } = req.params;
     const { sessionKey } = req.cookies;
 
@@ -23,10 +26,6 @@ export const deletePatientController = async (req: Request, res: Response): Prom
 
     if (client === undefined) {
       return res.sendStatus(500);
-    }
-
-    if (sessionKey === undefined) {
-      return res.sendStatus(400);
     }
 
     const reqId = Math.floor(Math.random() * 1000);
