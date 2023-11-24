@@ -5,6 +5,7 @@ import { getServiceResponse } from './helper';
 
 const TOPIC = 'CREATESESSION';
 const RESPONSE_TOPIC = 'SESSION';
+
 interface LoginRequest {
   email: string
   password: string
@@ -40,7 +41,7 @@ export const login = async (req: Request, res: Response): Promise<Response<any, 
     return res.status(401).json({ message: 'Email or password is incorrect' });
   } else { // REQID/SESSIONKEY/* (success)
     res.cookie('sessionKey', mqttResult, { httpOnly: true });
-    return res.status(200).json({ message: 'Login successful' });
+    return res.sendStatus(200);
   }
 };
 /**

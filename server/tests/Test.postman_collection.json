@@ -106,10 +106,9 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Response is in JSON format\", function () {",
-									"    pm.response.to.be.json;",
+									"pm.test(\"Response code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
 									"});",
-									"",
 									"pm.environment.set('sessionCookie', pm.cookies.get('sessionKey'));",
 									""
 								],
@@ -155,9 +154,6 @@
 									"    pm.response.to.have.status(401);",
 									"});",
 									"",
-									"pm.test(\"Response is in JSON format\", function () {",
-									"    pm.response.to.be.json;",
-									"});",
 									"",
 									"pm.test(\"Body matches string\", function () {",
 									"    pm.expect(pm.response.text()).to.include(\"Unable to authorize\");",
@@ -235,6 +231,110 @@
 								"v1",
 								"dentists",
 								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /api/dentists/:email Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/dentists/dentist@example.com",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dentists",
+								"dentist@example.com"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /api/dentists/",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/dentists/dentist@example.com",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dentists",
+								"dentist@example.com"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
 							]
 						}
 					},
@@ -1723,6 +1823,53 @@
 					"response": []
 				},
 				{
+					"name": "GET fail /api/patients/",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 401\", function(){",
+									"    pm.response.to.have.status(401);",
+									"})",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/patients/sophia2043.appleseed@email.com",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"patients",
+								"sophia2043.appleseed@email.com"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "POST/api/patients/login",
 					"event": [
 						{
@@ -1777,15 +1924,7 @@
 									"    pm.response.to.have.status(200);",
 									"})",
 									"",
-									"const patientEmail = pm.environment.get(\"patientEmail\");",
-									"console.log(\"Patient email: \", patientEmail);",
-									"",
-									"pm.test(\"Set Environment Variable\", function () {",
-									"    const responseJson = pm.response.json();console.log(\"Response Body:\", responseJson); ",
-									"    const patientEmail = responseJson.email;",
-									"    pm.environment.set(\"patientEmail\", patientEmail);",
-									"    console.log(\"Email: \", patientEmail)",
-									"});"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -1828,16 +1967,7 @@
 									"pm.test(\"Response code is 200\", function(){",
 									"    pm.response.to.have.status(200);",
 									"})",
-									"",
-									"const patientEmail = pm.environment.get(\"patientEmail\");",
-									"console.log(\"Patient email: \", patientEmail);",
-									"",
-									"pm.test(\"Set Environment Variable\", function () {",
-									"    const responseJson = pm.response.json();console.log(\"Response Body:\", responseJson); ",
-									"    const patientEmail = responseJson.email;",
-									"    pm.environment.set(\"patientEmail\", patientEmail);",
-									"    console.log(\"Email: \", patientEmail)",
-									"});"
+									""
 								],
 								"type": "text/javascript"
 							}

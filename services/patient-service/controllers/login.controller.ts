@@ -5,6 +5,7 @@ import { getServiceResponse } from './helper';
 
 const TOPIC = 'CREATESESSION';
 const RESPONSE_TOPIC = 'SESSION';
+
 /**
  * Used to login a user with the help of mqtt into the system.
  * @param req request
