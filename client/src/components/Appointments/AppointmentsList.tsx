@@ -1,5 +1,5 @@
 import { createSignal, type JSX, createEffect, onCleanup } from 'solid-js'
-import dentist_img from '../../assets/dentist_img.jpeg'
+import default_doctor from '../../assets/default_doctor.jpg'
 import { Api } from '../../utils/api'
 import type { Appointment } from '../../utils/types'
 import BookingConfirmationPopup from './BookingConfirmation'
@@ -106,22 +106,23 @@ export default function AppointmentsList (): JSX.Element {
 
   const dentist = 'Doctor Ann Smith' // receive as props when navigating from map
   const location = 'Linnégatan 15'
+  const dentistImage = default_doctor
 
   return (
       <div class="h-full w-full flex flex-col justify-center items-center lg:justify-start lg:items-start overflow-hidden">
         <div class='w-full flex justify-start m-10'>
           <h1 class='text-2xl font-bold pl-10'>Available Slots</h1>
         </div>
-        <div class='flex flex-col lg:flex-row justify-start m-6 lg:ml-20 lg:ml-40'>
-          <div class='flex flex-col justify-start sm:items-center'>
-            <img class='rounded-lg lg:w-full sm:w-6/12' src={dentist_img} alt="Dentist picture" />
+        <div class='flex flex-col lg:flex-row justify-start m-6 lg:ml-20'>
+          <div class='flex flex-col justify-start sm:items-center lg:w-2/5'>
+            <img class='rounded-lg lg:11/12 sm:w-6/12' src={dentistImage} alt="Dentist image" />
             <div class='flex-col text-center mt-4 text-lg'>
               <h1 class='font-semibold'>{dentist}</h1>
               <h1 class='mt-2'>Location: <strong>{location}</strong></h1>
             </div>
           </div>
           <div>
-            <div class="m-6 lg:ml-20 mt-0">
+            <div class="m-6 lg:ml-10 mt-0">
               <h3 class='desc text-xl text-slate-500 xs:mt-8 md:mt-0 font-semibold'>Please, select your preferred date and time to schedule your appointment.</h3>
               <h3 class='text-lg mt-10 font-medium'>Select Date</h3>
               <div class='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-15 w-full'>
