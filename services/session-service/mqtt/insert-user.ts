@@ -6,6 +6,7 @@ import { validateRequestFormat } from '../helper/validator';
 
 const TOPIC = 'INSERTUSER';
 const RESPONSE_TOPIC = 'INSERTUSERRES';
+const ALLOWED_TYPES = ['p', 'd'];
 /**
  * Insert user into database.
  * @param user The user object to be inserted.
@@ -14,15 +15,16 @@ const RESPONSE_TOPIC = 'INSERTUSERRES';
 export async function insertUser (user: CreateUser): Promise<void> {
   await new Promise<void>((resolve, reject) => {
     try {
+      if (!ALLOWED_TYPES.includes(user.type)) { reject(new Error('Invalid type')); return; }
       // SQL query to enter user to database
-      const insertQuery = database?.prepare('INSERT INTO users (email, password_hash) VALUES (?, ?)');
-      if (insertQuery === undefined) reject(new Error('Query is undefined.'));
+      const insertQuery = database?.prepare('INSERT INTO users (email, password_hash, type) VALUES (?, ?, ?)');
+      if (insertQuery === undefined) { reject(new Error('Query is undefined.')); return; }
 
       // Hash the user's password
       const hash: string = crypto.createHash('sha256').update(user.password).digest('hex');
       // Execute the query with user email, hashed password and session hash which will be empty.
-      const result: QueryResult = insertQuery?.run(user.email, hash) as QueryResult;
-      if (result.changes === 0) reject(new Error('No changes made.'));
+      const result: QueryResult = insertQuery?.run(user.email, hash, user.type) as QueryResult;
+      if (result.changes === 0) { reject(new Error('No changes made.')); return; }
       console.log('User added successfully.');
       resolve();
     } catch (err) {
@@ -42,11 +44,12 @@ export async function insertUser (user: CreateUser): Promise<void> {
  */
 async function parseRawRequest (rawMsg: string): Promise<CreateUser> {
   const msgArr: string[] = rawMsg.split('/');
-  await validateRequestFormat(msgArr);
+  await validateRequestFormat(msgArr, 5);
   const request: CreateUser = {
     reqId: msgArr[0],
     email: msgArr[1],
     password: msgArr[2],
+    type: msgArr[3],
     session_hash: ''
   };
   return request;
@@ -56,10 +59,11 @@ async function parseRawRequest (rawMsg: string): Promise<CreateUser> {
  * Start user insertion listener
  * @param client
  * @description Used for inserting users to the system.
- * expected message format: REQID/EMAIL/PASSWORD/*
+ * expected message format: REQID/EMAIL/PASSWORD/type/*
  * REQID: Random unique id that requestor sets to identify an authentication request. Is not stored persistently in a DB.
  * EMAIL: User's email
  * PASSWORD: User's password in plaintext
+ * type: d or p. Dentist or patient
  */
 export async function listenForInsertion (client: mqtt.MqttClient): Promise<void> {
   // Set up a listener for MQTT messages

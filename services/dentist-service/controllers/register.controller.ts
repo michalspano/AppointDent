@@ -82,7 +82,7 @@ export const register = async (req: Request, res: Response): Promise<Response<an
    */
   const reqId = Math.floor(Math.random() * 1000); // Generates a random integer between 0 and 999
   client.subscribe(RESPONSE_TOPIC);
-  client.publish(TOPIC, `${reqId}/${request.email}/${request.password}/*`); // REQID/USERID/SECRET/*
+  client.publish(TOPIC, `${reqId}/${request.email}/${request.password}/d/*`); // REQID/USERID/SECRET/type/* d for dentist
   try {
     const mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
     if (mqttResult === '0') {

@@ -4,24 +4,10 @@ import { type Statement } from 'better-sqlite3';
 import { type AuthenticationRequest, type Session, type User } from '../types/types';
 import { executeQuery } from '../helper/query';
 import { EXPIRE_IN_SECONDS } from '../helper/constants';
+import { validateRequestFormat } from '../helper/validator';
 
 const TOPIC = 'AUTHREQ';
 const RESPONSE_TOPIC = 'AUTHRES';
-
-/**
- * Validate the format of an MQTT request array.
- * @param msgArr The array representing the MQTT request.
- * @description This method validates that the MQTT request ends with a '*'
- * and throws an error with the correct request format.
- */
-async function validateRequestFormat (msgArr: string[]): Promise<void> {
-  if (!msgArr[msgArr.length - 1].includes('*')) {
-    throw Error('Could not find "*" in message! Please double check that you are sending the full data!');
-  }
-  if (msgArr.length !== 4) {
-    throw Error('Invalid format: REQID/EMAIL/SESSION/*');
-  }
-}
 
 /**
  * Parse a raw MQTT authorisation request
@@ -31,7 +17,7 @@ async function validateRequestFormat (msgArr: string[]): Promise<void> {
  */
 async function parseRawRequest (rawMsg: string): Promise<AuthenticationRequest> {
   const msgArr: string[] = rawMsg.split('/');
-  await validateRequestFormat(msgArr);
+  await validateRequestFormat(msgArr, 4);
   const request: AuthenticationRequest = {
     reqId: msgArr[0],
     email: msgArr[1],
