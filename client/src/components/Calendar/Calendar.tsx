@@ -122,7 +122,7 @@ export default function DentistCalendar (): JSX.Element {
       const calendar: Calendar = new Calendar(calendarEl, {
         plugins: [timeGridPlugin],
         dayHeaderContent: function (arg) {
-          return new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(arg.date)
+          return new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(arg.date)
         },
         initialView: 'timeGridWeek',
         locale: 'sv-SE',
