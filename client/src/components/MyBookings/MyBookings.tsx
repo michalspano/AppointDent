@@ -1,52 +1,69 @@
-import { For, createSignal, onCleanup, type JSX } from 'solid-js'
+import { For, createSignal, createEffect, type JSX } from 'solid-js'
 import Booking from './Booking'
 import { type Appointment } from './types'
+import { Api } from '../../utils/api'
 
 export default function MyBookings (): JSX.Element {
-// Note: This array will not be hardcoded in the future.
-  const [appointments, setAppointments] = createSignal([
-    {
-      id: '1',
-      time: 'November 19, 10:00',
-      dentistName: 'Dr. Smith',
-      location: 'Dental Clinic A'
-    },
-    {
-      id: '2',
-      time: 'November 18, 10:00',
-      dentistName: 'Dr. Johnson',
-      location: 'Dental Clinic B'
-    },
-    {
-      id: '3',
-      time: 'November 20, 10:00',
-      dentistName: 'Dr. Williams',
-      location: 'Dental Clinic C'
+  const [appointments, setAppointments] = createSignal<Appointment[]>([])
+
+  createEffect(async () => {
+    await fetchAppointments()
+  })
+
+  const fetchAppointments = async (): Promise<void> => {
+    try {
+      const response = await Api.get('appointments/patients/12312321') // Replace with the actual patient id
+      const appointments = response.data
+      console.log(appointments)
+      const formattedAppointments = appointments.map((appointment: any) => ({
+        start_timestamp: new Date(appointment.start_timestamp * 1000).toLocaleString('sv-SE', {
+          month: 'short',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: 'numeric'
+        }),
+        end_timestamp: new Date(appointment.end_timestamp * 1000).toLocaleString('sv-SE', {
+          month: 'short',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: 'numeric'
+        }),
+        dentistId: appointment.dentistId,
+        id: appointment.id,
+        address: ''
+      }))
+      setAppointments(formattedAppointments)
+    } catch (error) {
+      console.error('Error fetching appointments:', error)
     }
-  ])
+  }
 
   /**
    * Removes the selected appointment from the array of appointments.
    * @param id The id of the appointment being cancelled.
    */
-  const handleCancelBooking = (id: string): void => {
-    setAppointments((prevAppointments: Appointment[]) => {
-      const foundIndex = prevAppointments.findIndex(appointment => appointment.id === id)
-      if (foundIndex === -1) {
-        // Handle the case where the ID is not found
-        console.error(`Appointment with ID ${id} not found.`)
-        return prevAppointments
+  const handleCancelBooking = async (id: string): Promise<void> => {
+    try {
+      try {
+        await Api.patch(`appointments/${id}?toBook=false`)
+      } catch (err) {
+        throw new Error(`Error cancelling appointment with ID ${id}`)
       }
-      const newAppointments = [...prevAppointments]
-      newAppointments.splice(foundIndex, 1)
-      return newAppointments
-    })
+      // If the cancellation is successful, update the local state.
+      setAppointments((prevAppointments: Appointment[]) => {
+        const foundIndex = prevAppointments.findIndex(appointment => appointment.id === id)
+        if (foundIndex === -1) {
+          console.error(`Appointment with ID ${id} not found.`)
+          return prevAppointments
+        }
+        const newAppointments = [...prevAppointments]
+        newAppointments.splice(foundIndex, 1)
+        return newAppointments
+      })
+    } catch (err) {
+      throw new Error(`Error cancelling appointment with ID ${id}`)
+    }
   }
-
-  // Cleanup the signal to prevent memory leaks
-  onCleanup(() => {
-    setAppointments([])
-  })
 
   return (
     <div class="h-full w-full flex flex-col justify-start items-center">
@@ -58,7 +75,11 @@ export default function MyBookings (): JSX.Element {
           <Booking
           // pass in the appointment as props
             {...appointment}
-            onCancel={() => { handleCancelBooking(appointment.id) }}
+            onCancel={() => {
+              handleCancelBooking(appointment.id).catch((error) => {
+                console.error('Error cancelling appointment:', error)
+              })
+            }}
           />
         )}</For>
       </div>
