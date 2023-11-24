@@ -14,7 +14,7 @@ export default function AppointmentsList (): JSX.Element {
 
   async function fetchAppointments (): Promise<void> {
     try {
-      const response = await Api.get('/appointments/dentists/generic.doctor@clinit_name.se') // NB! replace with actual email
+      const response = await Api.get('/appointments/dentists/generic.doctor@clinit_name.se') // TODO: replace with actual email when BE supports it
       const appointments = response.data
       const formattedAppointments = appointments.map((appointment: any) => ({
         id: appointment.id,
@@ -39,6 +39,18 @@ export default function AppointmentsList (): JSX.Element {
       setAvailableDays(groupedAppointmentsArray)
     } catch (error) {
       throw new Error('Error fetching appointments')
+    }
+  }
+
+  async function bookAppointment (appointment: Appointment): Promise<void> {
+    console.log(appointment)
+    const appointmentId = appointment.id
+    try {
+      await Api.patch(`/appointments/${appointmentId}?toBook=true`, { patientId: '12312321' }).then(() => { // TODO: replace with real patientId when BE supports it
+        console.log('Appointment created successfully')
+      })
+    } catch (error) {
+      throw new Error('Error creating appointment')
     }
   }
 
@@ -149,11 +161,17 @@ export default function AppointmentsList (): JSX.Element {
         {showConfirmation() && (
           <BookingConfirmationPopup
           onConfirm={() => {
-            console.log('success')
-            setShowConfirmation(false)
-            setSelectedDate('')
-            setSelectedTime('')
-            setSelectedAppointment(null)
+            const appointment = selectedAppointment()
+            if (appointment !== null) {
+              bookAppointment(appointment).then(() => {
+                setShowConfirmation(false)
+                setSelectedDate('')
+                setSelectedTime('')
+                setSelectedAppointment(null)
+              }).catch((error: any) => {
+                console.error('Error deleting appointment:', error)
+              })
+            }
           }}
           onCancel={() => {
             setShowConfirmation(false)
