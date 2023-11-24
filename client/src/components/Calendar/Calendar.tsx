@@ -21,8 +21,7 @@ export default function DentistCalendar (): JSX.Element {
     end: ''
   })
 
-  async function handleFormSubmit (e: any): Promise<void> {
-    e.preventDefault()
+  async function handleFormSubmit (): Promise<void> {
     try {
       await addAppointment(newAppointment())
     } catch (error) {
@@ -58,8 +57,8 @@ export default function DentistCalendar (): JSX.Element {
         // Make sure that the patient email is the title. If appointment is unbooked, then there is no title.
         title: appointment.patientId !== null ? appointment.patientId : '',
         // Parse the start and end times from integer to string.
-        start: new Date(appointment.start_timestamp * 1000).toISOString().slice(0, 16),
-        end: new Date(appointment.end_timestamp * 1000).toISOString().slice(0, 16)
+        start: new Date(appointment.start_timestamp * 1000).toLocaleString('sv-SE'),
+        end: new Date(appointment.end_timestamp * 1000).toLocaleString('sv-SE')
       }))
 
       setSlots(formattedAppointments)
@@ -122,8 +121,11 @@ export default function DentistCalendar (): JSX.Element {
       // Create a FullCalendar instance
       const calendar: Calendar = new Calendar(calendarEl, {
         plugins: [timeGridPlugin],
+        dayHeaderContent: function (arg) {
+          return new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(arg.date)
+        },
         initialView: 'timeGridWeek',
-        locale: 'en-GB',
+        locale: 'sv-SE',
         customButtons: {
           addButton: {
             text: 'Add a slot',
@@ -181,7 +183,7 @@ export default function DentistCalendar (): JSX.Element {
             id='eventForm'
             onSubmit={(e) => {
               e.preventDefault()
-              handleFormSubmit(e).catch((error) => {
+              handleFormSubmit().catch((error) => {
                 console.error('Error adding appointment:', error)
                 // Handle the error, show a message to the user, etc.
               })
