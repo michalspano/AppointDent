@@ -1827,6 +1827,53 @@
 					"response": []
 				},
 				{
+					"name": "GET fail /api/patients/",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 401\", function(){",
+									"    pm.response.to.have.status(401);",
+									"})",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/patients/sophia2043.appleseed@email.com",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"patients",
+								"sophia2043.appleseed@email.com"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "POST/api/patients/login",
 					"event": [
 						{
@@ -1881,15 +1928,7 @@
 									"    pm.response.to.have.status(200);",
 									"})",
 									"",
-									"const patientEmail = pm.environment.get(\"patientEmail\");",
-									"console.log(\"Patient email: \", patientEmail);",
-									"",
-									"pm.test(\"Set Environment Variable\", function () {",
-									"    const responseJson = pm.response.json();console.log(\"Response Body:\", responseJson); ",
-									"    const patientEmail = responseJson.email;",
-									"    pm.environment.set(\"patientEmail\", patientEmail);",
-									"    console.log(\"Email: \", patientEmail)",
-									"});"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -1932,16 +1971,7 @@
 									"pm.test(\"Response code is 200\", function(){",
 									"    pm.response.to.have.status(200);",
 									"})",
-									"",
-									"const patientEmail = pm.environment.get(\"patientEmail\");",
-									"console.log(\"Patient email: \", patientEmail);",
-									"",
-									"pm.test(\"Set Environment Variable\", function () {",
-									"    const responseJson = pm.response.json();console.log(\"Response Body:\", responseJson); ",
-									"    const patientEmail = responseJson.email;",
-									"    pm.environment.set(\"patientEmail\", patientEmail);",
-									"    console.log(\"Email: \", patientEmail)",
-									"});"
+									""
 								],
 								"type": "text/javascript"
 							}

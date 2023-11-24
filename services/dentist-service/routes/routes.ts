@@ -9,6 +9,7 @@ const router = Router();
 
 router.post('/register', registerDentistWrapper);
 router.post('/login', loginDentistWrapper);
+router.get('/login', loginDentistWrapper);
 router.patch('/:email', updateDentistWrapper);
 router.delete('/:email', deleteDentistWrapper);
 router.get('/:email', retrieveDentistWrapper);
