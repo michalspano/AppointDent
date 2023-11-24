@@ -1,4 +1,4 @@
-import { createSignal, type JSX, createEffect } from 'solid-js'
+import { createSignal, type JSX, createEffect, onCleanup } from 'solid-js'
 import dentist_img from '../../assets/dentist_img.jpeg'
 import { Api } from '../../utils/api'
 import type { Appointment } from '../../utils/types'
@@ -85,42 +85,43 @@ export default function AppointmentsList (): JSX.Element {
       console.error('Please select a date and time slot before booking.')
     }
   }
+  onCleanup(() => {})
 
   return (
-      <div class="h-full w-full flex flex-col justify-start items-start overflow-hidden">
+      <div class="h-full w-full flex flex-col justify-center items-center lg:justify-start lg:items-start overflow-hidden">
         <div class='w-full flex justify-start m-10'>
           <h1 class='text-2xl font-bold pl-10'>Available Slots</h1>
         </div>
-        <div class='flex flex-col lg:flex-row justify-start m-6 ml-48'>
-          <div class='flex-col justify-start'>
-            <img class='rounded-lg' src={dentist_img} alt="Dentist picture" />
+        <div class='flex flex-col lg:flex-row justify-start m-6 lg:ml-20 lg:ml-40'>
+          <div class='flex flex-col justify-start'>
+            <img class='rounded-lg sm:w-25' src={dentist_img} alt="Dentist picture" />
             <div class='flex-col text-center mt-4 text-lg'>
               <h1 class='font-semibold'>Doctor John Doe</h1>
               <h1 class='mt-2 font-semibold'>Location: Linnegatan 15</h1>
             </div>
           </div>
           <div>
-            <div class="m-6 ml-20 mt-0">
-              <h3 class='desc text-xl text-slate-500'>Please, select the preferred date and time to schedule your appointment.</h3>
+            <div class="m-6 lg:ml-20 mt-0">
+              <h3 class='desc text-xl text-slate-500 xs:mt-8 md:mt-0 font-semibold'>Please, select your preferred date and time to schedule your appointment.</h3>
               <h3 class='text-lg mt-10 font-medium'>Select Date</h3>
-              <div class='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-15 w-full'>
+              <div class='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-15 w-full'>
                 {availableDays().slice(0, 5).map((appointment) => (
-                <div class={`flex w-35 m-4 h-20 w-32 rounded-lg cursor-pointer font-semibold items-center justify-center ${selectedDate() === appointment.day ? 'bg-primary' : 'bg-grey'}`} onClick={() => { onDateSelect(appointment) }}>
+                <div class={`flex w-35 m-4 h-20 rounded-lg cursor-pointer font-semibold items-center justify-center ${selectedDate() === appointment.day ? 'bg-primary' : 'bg-grey'}`} onClick={() => { onDateSelect(appointment) }}>
                   {formatDate(appointment.day)}
                 </div>
                 ))}
               </div>
               {(selectedDate() != null) && (
-              <div>
+              <div class='w-full'>
                 <h3 class='text-lg mt-6 font-medium'>Select Time</h3>
                 {availableTime().length > 0
-                  ? <ul class="flex flex-row w-full">
+                  ? <div class="grid grid-cols-3 xs:grid-cols-1 s:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-15 w-11/12">
                   {availableTime().map((appointment: Appointment) => (
-                  <div class={`flex cursor-pointer w-35 m-4 h-20 w-32 rounded-lg cursor-pointer font-semibold items-center justify-center ${selectedTime() === appointment ? 'text-white bg-primary' : 'bg-grey'}`} onClick={() => { onTimeSelect(appointment) }}>
+                  <div class={`flex w-35 m-4 h-20 w-38 rounded-lg cursor-pointer font-semibold items-center justify-center ${selectedTime() === appointment ? 'bg-primary' : 'bg-grey'}`} onClick={() => { onTimeSelect(appointment) }}>
                     {formatTime(appointment.start)} - {formatTime(appointment.end)}
                   </div>
                   ))}
-                </ul>
+                </div>
                   : <p>No available time slots for the selected date.</p>}
               </div>
               )}
