@@ -36,7 +36,7 @@ export const loginController = async (req: Request, res: Response): Promise<Resp
       return res.sendStatus(400);
     } else {
       res.cookie('sessionKey', mqttResult, { httpOnly: true });
-      return res.status(200).json({ email });
+      return res.sendStatus(200);
     }
   } catch (error) {
     return res.sendStatus(500);
