@@ -1,17 +1,64 @@
 import database from '../db/config';
+import { client } from '../mqtt/mqtt';
 import type { Request, Response } from 'express';
-import { parseBinaryQueryParam } from '../utils';
+import * as utils from '../utils';
 
-// Get all appointments slots that are not assigned to a patient.
-export const getAllAppointments = (req: Request, res: Response): Response<any, Record<string, any>> => {
+const TOPIC: string = 'AUTHREQ';
+const RESPONSE_TOPIC: string = 'AUTHRES';
+
+/**
+ * @description A controller function to get all appointments.
+ * This function is encapsulated in a wrapper function to resolve the
+ * asynchronous nature of the function being wrapped.
+ *
+ * @see utils/index.ts#verifySession
+ * @see utils/index.ts#genReqId
+ * @see getAllAppointmentsWrapper
+ *
+ * @returns Promise that resolves to a response object.
+ */
+const getAllAppointments = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
   if (database === undefined) {
     return res.status(500).json({
       message: 'Internal server error: database connection failed.'
     });
   }
 
-  // TODO: ensure that the caller of the request has a valid session.
+  if (client === undefined) {
+    return res.status(503).json({
+      message: 'Service unavailable: MQTT connection failed.'
+    });
+  }
 
+  const email: string | undefined = req.params.email;
+  const sessionKey: string | undefined = req.cookies.sessionKey;
+
+  if (sessionKey === undefined || email === undefined) {
+    return res.status(400).json({
+      message: 'Bad request: missing session key or email.'
+    });
+  }
+
+  // To get appointments, the user must be logged in.
+  // That means, a valid session must be present.
+  const reqId: string = utils.genReqId();
+  client.publish(TOPIC, `${reqId}/${email}/${sessionKey}/*`);
+  client.subscribe(RESPONSE_TOPIC);
+
+  try {
+    const result: string = await utils.verifySession(reqId, RESPONSE_TOPIC);
+    if (result !== '1') {
+      return res.status(401).json({
+        message: 'Unauthorized: invalid session.'
+      });
+    }
+  } catch (err: Error | unknown) {
+    return res.status(504).json({
+      message: 'Service timeout: unable to verify session.'
+    });
+  }
+
+  // Session has been validated, proceed with the request.
   let result: unknown[];
   try {
     result = database.prepare('SELECT * FROM appointments WHERE patientId IS NULL').all();
@@ -22,6 +69,19 @@ export const getAllAppointments = (req: Request, res: Response): Response<any, R
   }
 
   return res.status(200).json(result);
+};
+
+/**
+ * @description A wrapper function for getAllAppointments to resolve the
+ * asynchronous nature of the function being wrapped.
+ *
+ * @param req A request object.
+ * @param res A response object.
+ *
+ * @see getAllAppointments
+ */
+export const getAllAppointmentsWrapper = (req: Request, res: Response): void => {
+  void getAllAppointments(req, res);
 };
 
 // Get all appointments slots that are assigned to a patient.
@@ -79,7 +139,7 @@ export const getAppointmentsByDentistId = (req: Request, res: Response): Respons
   // By default, all appointments are returned.
   let getOnlyAvailable: boolean;
   try {
-    getOnlyAvailable = parseBinaryQueryParam(req.query.onlyAvailable);
+    getOnlyAvailable = utils.parseBinaryQueryParam(req.query.onlyAvailable);
   } catch (err: Error | unknown) {
     return res.status(400).json({
       message: 'Bad request: invalid query parameter.'

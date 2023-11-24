@@ -83,7 +83,7 @@ export const verifySession = async (reqId: string, RESPONSE_TOPIC: string): Prom
           clearTimeout(timeout);
           client?.unsubscribe(topic);
           client?.removeListener('message', eventHandler);
-          resolve(message.toString().split('/')[1][0]);
+          resolve(message.toString().split('/')[1]);
         }
       }
     };

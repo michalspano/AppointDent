@@ -6,7 +6,9 @@ import * as deleteControllers from '../controllers/delete.controller';
 
 const router: Router = Router();
 
-router.get('/', getControllers.getAllAppointments);
+// TODO: this is the source of fail for newman; for some reason
+// 400 HEAD is returned on the initial GET /.
+router.get('/', getControllers.getAllAppointmentsWrapper);
 router.get('/:id', getControllers.getAppointment);
 router.post('/', createAppointment);
 router.delete('/', deleteControllers.deleteAllAppointments);
