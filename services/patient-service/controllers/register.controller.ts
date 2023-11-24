@@ -12,6 +12,12 @@ const RESPONSE_TOPIC = 'INSERTUSERRES';
  * @returns request object
  */
 export const registerController = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
+  if (req.body.email === undefined) return res.sendStatus(400);
+  if (req.body.password === undefined) return res.sendStatus(400);
+  if (req.body.birthDate === undefined) return res.sendStatus(400);
+  if (req.body.lastName === undefined) return res.sendStatus(400);
+  if (req.body.firstName === undefined) return res.sendStatus(400);
+
   const {
     email,
     password,

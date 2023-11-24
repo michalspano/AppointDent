@@ -9,6 +9,8 @@ import { client } from '../mqtt/mqtt';
  * @returns a response object
  */
 export const getDentist = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
+  if (req.params.email === undefined) return res.sendStatus(400);
+
   const { email } = req.params;
   if (database === undefined) {
     return res.status(500).send('Database undefined');

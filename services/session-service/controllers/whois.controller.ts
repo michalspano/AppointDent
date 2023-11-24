@@ -13,7 +13,7 @@ import { type WhoIsRequest } from '../types/types';
  */
 async function whois (req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
   try {
-    if (req.cookies === undefined) return res.sendStatus(400);
+    if (req.cookies.sessionKey === undefined) return res.sendStatus(400);
     const { sessionKey } = req.cookies; // Get the session key from the cookies.
     const hash: string = crypto.createHash('sha256').update(sessionKey).digest('hex');
 
@@ -39,6 +39,7 @@ async function whois (req: Request, res: Response): Promise<Response<any, Record
     if (result.email === undefined || result.type === undefined) return res.sendStatus(400);
     return res.status(200).json(result);
   } catch (err) {
+    console.log(err);
     return res.sendStatus(500);
   }
 };
