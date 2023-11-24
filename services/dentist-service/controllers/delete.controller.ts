@@ -3,8 +3,8 @@ import database from '../db/config';
 import { client } from '../mqtt/mqtt';
 import { getServiceResponse } from './helper';
 
-const TOPIC = 'AUTHREQ';
-const RESPONSE_TOPIC = 'AUTHRES';
+const TOPIC = 'DELUSER';
+const RESPONSE_TOPIC = 'DELUSERRES';
 
 /**
  * Used to delete a dentist from the database.

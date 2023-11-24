@@ -52,7 +52,7 @@ async function authenticateRequest (request: AuthenticationRequest): Promise<boo
       const userQuery: Statement<any> | Statement<[any]> | undefined = database?.prepare('SELECT session_hash FROM users WHERE email = ?');
       const userResult: User = userQuery?.get(request.email) as User;
 
-      if (userResult === undefined) resolve(false);
+      if (userResult === undefined) { resolve(false); return; }
 
       // Retrieve the session expiry from the database
       const sessionQuery: Statement<any> | Statement<[any]> | undefined = database?.prepare('SELECT expiry FROM sessions WHERE hash = ?');
@@ -61,7 +61,7 @@ async function authenticateRequest (request: AuthenticationRequest): Promise<boo
       const timestamp = Math.round(Date.now() / 1000);
 
       // Can not authenticate user if the session is undefined or expired
-      if (sessionResult === undefined || (sessionResult as Session).expiry < timestamp) resolve(false);
+      if (sessionResult === undefined || (sessionResult as Session).expiry < timestamp) { resolve(false); return; }
 
       // Update the session expiry in the database by 1 hour from now
       executeQuery('UPDATE sessions SET expiry = ? WHERE token = ?', [(timestamp + EXPIRE_IN_SECONDS), request.session_key], true, true);

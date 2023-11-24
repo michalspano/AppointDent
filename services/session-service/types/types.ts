@@ -32,3 +32,9 @@ export interface CreateUser {
   password: string
   session_hash: string
 };
+
+export interface DeleteUserRequest {
+  reqId: string
+  email: string
+  session_key: string
+}
