@@ -34,7 +34,6 @@ export const getDentist = async (req: Request, res: Response): Promise<Response<
  * @returns a response object
  */
 export const getAllDentists = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
-  const { email } = req.params;
   if (database === undefined) {
     return res.status(500).send('Database undefined');
   }
@@ -44,7 +43,7 @@ export const getAllDentists = async (req: Request, res: Response): Promise<Respo
 
   let result: unknown[];
   try {
-    result = database.prepare('SELECT email,firstName,lastName,clinicCountry,clinicCity,clinicStreet,clinicHouseNumber,clinicZipCode,picture FROM dentists').all(email);
+    result = database.prepare('SELECT email,firstName,lastName,clinicCountry,clinicCity,clinicStreet,clinicHouseNumber,clinicZipCode,picture FROM dentists').all();
   } catch (err: Error | unknown) {
     console.log(err);
     return res.sendStatus(500);
