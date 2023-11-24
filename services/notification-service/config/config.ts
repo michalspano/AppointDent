@@ -1,6 +1,8 @@
 import express, { type Express, type Request } from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import { authoriseUser } from '../middlewares/authorisation';
 
 const app: Express = express();
 interface CorsOptions {
@@ -30,6 +32,9 @@ app.use(cors(corsOptionsSetter));
 app.use(express.json()); // for parsing application/json
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use('/:id', authoriseUser);
+app.use('/:email', authoriseUser);
 
 const port: string = process.env.PORT ?? '3004';
 
