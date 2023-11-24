@@ -49,7 +49,7 @@ async function postNot (rawMsg: string): Promise<Notification | Error> {
 
       notification = result as Notification;
       notification.id = id;
-      notification.timestamp = Date.parse(Date.now().toString());
+      notification.timestamp = Math.round(Date.now() / 1000);
       const notInsertion = database?.prepare('INSERT INTO notifications (id, timestamp, message, email) VALUES (?, ?, ?, ?)');
       if (notInsertion === undefined) {
         reject(new Error('Insertion query not found.'));
