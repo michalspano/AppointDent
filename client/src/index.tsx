@@ -11,11 +11,12 @@ import UserProfile from './routes/UserProfile.tsx'
 import Map from './routes/Map.tsx'
 import Navbar from './components/Navbar/Navbar.tsx'
 import MyBookingsPage from './routes/MyBookings.tsx'
+import NotificationsPage from './routes/NotificationsPage.tsx'
 
 const root = document.getElementById('root')
 if (root === null) throw Error('Root undefined!')
 
-const unLoggedInRoutes = ['/', '/signup', '/dentist-signup', '/patient-signup']
+const unLoggedInRoutes = ['/', '/signup', '/dentist-signup', '/patient-signup', '/notifications']
 
 const shouldShowNavbar = (): boolean => {
   const currentPath = window.location.pathname
@@ -34,6 +35,7 @@ render(() => <div>
         <Route path="/user-profile" component={UserProfile} />
         <Route path="/map" component={Map} />
         <Route path="/my-bookings" component={MyBookingsPage} />
+        <Route path="/notifications" component={NotificationsPage}/>
       </Routes>
     </Router>
 
