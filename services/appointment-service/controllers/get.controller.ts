@@ -11,13 +11,13 @@ const RESPONSE_TOPIC: string = 'AUTHRES';
  * @description A controller function to get all appointments.
  * This function is encapsulated in a wrapper function to resolve the
  * asynchronous nature of the function being wrapped.
- * 
+ *
  * This endpoint is protected by the session service. It can only be accessed
  * when the user has a valid session. The session is verified by the session
  * service.
  *
  * @see verifySession
- * @see SessionResponse 
+ * @see SessionResponse
  * @see getAllAppointmentsWrapper
  *
  * @returns Promise that resolves to a response object.

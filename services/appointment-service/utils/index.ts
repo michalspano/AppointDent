@@ -2,10 +2,9 @@
  * @description Utility functions for the appointment service.
  */
 
-import { type Appointment } from '../types/types';
+import { type Appointment, type SessionResponse } from '../types/types';
 import { client } from '../mqtt/mqtt';
 import { randomBytes } from 'crypto';
-import { SessionResponse } from '../types/types';
 
 /**
  * @description the default timeout for the MQTT client to wait for a response.
@@ -84,7 +83,7 @@ export const verifySession = async (reqId: string, RESPONSE_TOPIC: string): Prom
           clearTimeout(timeout);
           client?.unsubscribe(topic);
           client?.removeListener('message', eventHandler);
-          
+
           // Convert to enum type SessionResponse.
           const rawMsg: string = message.toString().split('/')[1];
           resolve(parseInt(rawMsg) as SessionResponse);
