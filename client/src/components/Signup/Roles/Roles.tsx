@@ -37,7 +37,7 @@ export default function Roles (): JSX.Element {
            </div>
         <p class="font-extralight mt-10">Already have an account?
         <span class="font-medium">
-        <A href="/"> Log in.</A>
+        <A class='text-black' href="/"> Log in.</A>
             </span>
           </p>
         </div>

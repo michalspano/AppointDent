@@ -11,6 +11,7 @@ export default function CustomInput (customInputProps: CustomInputProps): JSX.El
       value={customInputProps.value}
       placeholder={customInputProps.placeHolder}
       onChange={customInputProps.onChange}
+      disabled={customInputProps.disabled}
     />
   </>
 }

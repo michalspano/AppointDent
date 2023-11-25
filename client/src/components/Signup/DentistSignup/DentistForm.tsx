@@ -54,7 +54,7 @@ export default function DentistForm (): JSX.Element {
       // navigate to logged in view
         .then(() => {
         // navigate to logged in view
-          window.location.href = '/calendar' // calendar is a home page for the dentist
+          window.location.replace('/calendar')
         })
     } catch (error) {
       setError('Something went wrong, try again.')
@@ -96,7 +96,7 @@ export default function DentistForm (): JSX.Element {
               onChange={(event) => setLastName(event.target.value)}
             />
           </div>
-          <label class="block pl-2 text-xs font-extralight pb-1">
+          <label class="text-black block pl-2 text-xs font-extralight pb-1">
                 Address of the clinic
           </label>
            <input
@@ -133,7 +133,7 @@ export default function DentistForm (): JSX.Element {
               onChange={(event) => setClinicZipcode(event.target.value)}
             />
           </div>
-          <label class="block pl-2 text-xs font-extralight pb-1">
+          <label class="text-black block pl-2 text-xs font-extralight pb-1">
                 Upload a profile image
           </label>
           <input
@@ -150,7 +150,7 @@ export default function DentistForm (): JSX.Element {
             </button>
         <p class="font-extralight">Already have an account?
         <span class="font-medium">
-        <A href="/"> Log in.</A>
+        <A class='text-black' href="/"> Log in.</A>
             </span>
           </p>
         </div>
