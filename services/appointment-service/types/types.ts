@@ -12,3 +12,12 @@ export interface Appointment {
   dentistId: UUID
   patientId: UUID | null
 };
+
+/**
+ * @description a custom type that denotes the response type
+ * of the session service in terms of the allowed types of users.
+ */
+export enum UserType {
+  Dentist = 'd',
+  Patient = 'p'
+};
