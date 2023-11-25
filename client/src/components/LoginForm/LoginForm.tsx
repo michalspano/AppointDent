@@ -16,11 +16,16 @@ export default function LoginForm (): JSX.Element {
       return
     }
     Api
-      .post('/dentists/login', { email: email(), password: password() })
+      .post('/dentists/login', { email: email(), password: password() }, { withCredentials: true })
       .then(() => {
-        const isUserDentist = false // replace when we have the object of current user
-        const navLink = isUserDentist ? '/calendar' : '/map'
-        window.location.href = navLink
+        Api.get('/sessions/whois', { withCredentials: true }).then((result) => {
+          const isUserDentist: string = result.data.type // replace when we have the object of current user
+          const navLink = isUserDentist === 'd' ? '/calendar' : '/map'
+          window.location.replace(navLink)
+        }).catch((err) => {
+          console.error('Fail whois')
+          console.error(err)
+        })
       })
       .catch((error: any) => {
         console.error('Error during login', error)
@@ -55,7 +60,7 @@ export default function LoginForm (): JSX.Element {
             </button>
         <p class="font-extralight">Not registered yet?
         <span class="font-medium">
-        <A href="/signup"> Create an account.</A>
+        <A class='text-black' href="/signup"> Create an account.</A>
             </span>
           </p>
         </div>
