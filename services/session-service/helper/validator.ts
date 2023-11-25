@@ -4,11 +4,11 @@
  * @description This method validates that the MQTT request has a correct format
  * and throws an error with the correct request format.
  */
-export async function validateRequestFormat (msgArr: string[]): Promise<void> {
+export async function validateRequestFormat (msgArr: string[], requiredLength: number): Promise<void> {
   if (!msgArr[msgArr.length - 1].includes('*')) {
     throw Error('Could not find "*" in message! Please double check that you are sending the full data!');
   }
-  if (msgArr.length !== 4) {
+  if (msgArr.length !== requiredLength) {
     throw Error('Invalid format: REQID/EMAIL/PASSWORD/*');
   }
 }

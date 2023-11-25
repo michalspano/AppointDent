@@ -1,11 +1,658 @@
 {
 	"info": {
-		"_postman_id": "89ad9f96-4416-4965-8482-80ec5a9b22eb",
-		"name": "Appointdent",
-		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_postman_id": "6eb329ac-4fd0-4127-aa6c-bf305d056997",
+		"name": "Test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "28264405"
 	},
 	"item": [
+		{
+			"name": "dentist-service",
+			"item": [
+				{
+					"name": "POST /api/dentists/register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"pm.environment.set('sessionCookie', pm.cookies.get('sessionKey'));",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"dentist@example.com\",\n  \"password\": \"secretpassword\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"clinicCountry\": \"Country\",\n  \"clinicCity\": \"City\",\n  \"clinicStreet\": \"Street\",\n  \"clinicHouseNumber\": 123,\n  \"clinicZipCode\": 12345,\n  \"picture\": \"base64encodedimage\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/dentists/register",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dentists",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE fail /api/dentists/:id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/dentists/dentist@example.com",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dentists",
+								"dentist@example.com"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /api/dentists/register (invalid)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code shall be 409\", function () {",
+									"    pm.response.to.have.status(409);",
+									"});",
+									"",
+									"pm.test(\"Body matches string\", function () {",
+									"    pm.expect(pm.response.text()).to.include(\"Email is already registered\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"dentist@example.com\", // this email was already registered\n  \"password\": \"secretpassword\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"clinicCountry\": \"Country\",\n  \"clinicCity\": \"City\",\n  \"clinicStreet\": \"Street\",\n  \"clinicHouseNumber\": 123,\n  \"clinicZipCode\": 12345,\n  \"picture\": \"base64encodedimage\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/dentists/register",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dentists",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /api/session/whois fail",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/sessions/whois",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sessions",
+								"whois"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /api/dentists/login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.environment.set('sessionCookie', pm.cookies.get('sessionKey'));",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"dentist@example.com\",\n  \"password\": \"secretpassword\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/dentists/login",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dentists",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /api/session/whois",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Retrieve correct whois data\", function () {",
+									"        var jsonData = pm.response.json();",
+									"        pm.expect(jsonData.email).to.eql(\"dentist@example.com\");",
+									"        pm.expect(jsonData.type).to.eql(\"d\");",
+									"    });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/sessions/whois",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sessions",
+								"whois"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /api/dentists/login (invalid)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code shall be 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Body matches string\", function () {",
+									"    pm.expect(pm.response.text()).to.include(\"Unable to authorize\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"fake_dentist@example.com\", // email is not registered yet\n  \"password\": \"secretpassword\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/dentists/login",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dentists",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST api/dentists/login (invalid) 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code shall be 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"pm.test(\"Body matches string\", function () {",
+									"    pm.expect(pm.response.text()).to.include(\"Unable to authorize\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"dentist.not.registered@example.com\", // this email was not registered\n  \"password\": \"password\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"clinicCountry\": \"Country\",\n  \"clinicCity\": \"City\",\n  \"clinicStreet\": \"Street\",\n  \"clinicHouseNumber\": 123,\n  \"clinicZipCode\": 12345,\n  \"picture\": \"base64encodedimage\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/dentists/login",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dentists",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /api/dentists/:email Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/dentists/dentist@example.com",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dentists",
+								"dentist@example.com"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /api/dentists/",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/dentists/dentist@example.com",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dentists",
+								"dentist@example.com"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PATCH /api/dentists/:email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"firstName\": \"Kate\" }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/dentists/dentist@example.com",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dentists",
+								"dentist@example.com"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PATCH api/dentists/:email (invalid)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code shall be 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Response is in JSON format\", function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"// this request is invalid, since it the update fields don't march the schema",
+									"pm.test(\"Body matches string\", function () {",
+									"    pm.expect(pm.response.text()).to.include(\"Invalid input\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"invalidField\": \"Invalid value\" } // update fields don't march the schema",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/dentists/dentist@example.com",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dentists",
+								"dentist@example.com"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE /api/dentists/:id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response time is less than 2000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/dentists/dentist@example.com",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dentists",
+								"dentist@example.com"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /api/dentists/register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"pm.environment.set('sessionCookie', pm.cookies.get('sessionKey'));",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"dentist@example.com\",\n  \"password\": \"secretpassword\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"clinicCountry\": \"Country\",\n  \"clinicCity\": \"City\",\n  \"clinicStreet\": \"Street\",\n  \"clinicHouseNumber\": 123,\n  \"clinicZipCode\": 12345,\n  \"picture\": \"base64encodedimage\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/dentists/register",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dentists",
+								"register"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
 		{
 			"name": "appointment-service",
 			"item": [
@@ -28,7 +675,17 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{host}}/api/v1/appointments"
+						"url": {
+							"raw": "{{host}}/api/v1/appointments",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"appointments"
+							]
+						}
 					},
 					"response": []
 				},
@@ -89,7 +746,17 @@
 								}
 							}
 						},
-						"url": "{{host}}/api/v1/appointments"
+						"url": {
+							"raw": "{{host}}/api/v1/appointments",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"appointments"
+							]
+						}
 					},
 					"response": []
 				},
@@ -120,7 +787,19 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/v1/appointments"
+						"url": {
+							"raw": "http://localhost:3000/api/v1/appointments",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"appointments"
+							]
+						}
 					},
 					"response": []
 				},
@@ -151,7 +830,17 @@
 								}
 							}
 						},
-						"url": "{{host}}/api/v1/appointments"
+						"url": {
+							"raw": "{{host}}/api/v1/appointments",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"appointments"
+							]
+						}
 					},
 					"response": []
 				},
@@ -182,7 +871,17 @@
 								}
 							}
 						},
-						"url": "{{host}}/api/v1/appointments"
+						"url": {
+							"raw": "{{host}}/api/v1/appointments",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"appointments"
+							]
+						}
 					},
 					"response": []
 				},
@@ -213,7 +912,17 @@
 								}
 							}
 						},
-						"url": "{{host}}/api/v1/appointments"
+						"url": {
+							"raw": "{{host}}/api/v1/appointments",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"appointments"
+							]
+						}
 					},
 					"response": []
 				},
@@ -244,7 +953,17 @@
 								}
 							}
 						},
-						"url": "{{host}}/api/v1/appointments"
+						"url": {
+							"raw": "{{host}}/api/v1/appointments",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"appointments"
+							]
+						}
 					},
 					"response": []
 				},
@@ -736,7 +1455,17 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{host}}/api/v1/appointments"
+						"url": {
+							"raw": "{{host}}/api/v1/appointments",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"appointments"
+							]
+						}
 					},
 					"response": []
 				},
@@ -1087,7 +1816,18 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "{{host}}/api/v1/appointments/foobar"
+						"url": {
+							"raw": "{{host}}/api/v1/appointments/foobar",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"appointments",
+								"foobar"
+							]
+						}
 					},
 					"response": []
 				},
@@ -1195,7 +1935,454 @@
 					"request": {
 						"method": "DELETE",
 						"header": [],
-						"url": "{{host}}/api/v1/appointments/"
+						"url": {
+							"raw": "{{host}}/api/v1/appointments/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"appointments",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "patient-service",
+			"item": [
+				{
+					"name": "POST/api/patients/register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code shall be 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"sophia2043.appleseed@email.com\",\n    \"password\": \"complicatedpassword\",\n    \"birthDate\": \"2023\",\n    \"lastName\": \"Appleseeed\",\n    \"firstName\": \"Sophia\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/patients/register",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"patients",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE fail /api/patients/:id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 401\", function(){",
+									"    pm.response.to.have.status(401);",
+									"})",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/patients/sophia2043.appleseed@email.com",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"patients",
+								"sophia2043.appleseed@email.com"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET fail /api/patients/",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 401\", function(){",
+									"    pm.response.to.have.status(401);",
+									"})",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/patients/sophia2043.appleseed@email.com",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"patients",
+								"sophia2043.appleseed@email.com"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST fail /api/session/whois",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/sessions/whois",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sessions",
+								"whois"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST/api/patients/login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"sophia2043.appleseed@email.com\",\n    \"password\": \"complicatedpassword\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/patients/login",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"patients",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /api/session/whois",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Retrieve correct whois data\", function () {",
+									"        var jsonData = pm.response.json();",
+									"        pm.expect(jsonData.email).to.eql(\"sophia2043.appleseed@email.com\");",
+									"        pm.expect(jsonData.type).to.eql(\"p\");",
+									"    });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/sessions/whois",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sessions",
+								"whois"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PATCH/api/patients/:id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 200\", function(){",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"Wilma\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/patients/sophia2043.appleseed@email.com",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"patients",
+								"sophia2043.appleseed@email.com"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /api/patients/:id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 200\", function(){",
+									"    pm.response.to.have.status(200);",
+									"})",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/patients/sophia2043.appleseed@email.com",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"patients",
+								"sophia2043.appleseed@email.com"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE/api/patients/:id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 204\", function(){",
+									"    pm.response.to.have.status(204);",
+									"})",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/patients/sophia2043.appleseed@email.com",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"patients",
+								"sophia2043.appleseed@email.com"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST/api/patients/register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code shall be 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"sophia2043.appleseed@email.com\",\n    \"password\": \"complicatedpassword\",\n    \"birthDate\": \"2023\",\n    \"lastName\": \"Appleseeed\",\n    \"firstName\": \"Sophia\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/patients/register",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"patients",
+								"register"
+							]
+						}
 					},
 					"response": []
 				}

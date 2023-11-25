@@ -30,5 +30,17 @@ export interface CreateUser {
   reqId: string
   email: string
   password: string
+  type: string
   session_hash: string
 };
+
+export interface DeleteUserRequest {
+  reqId: string
+  email: string
+  session_key: string
+}
+
+export interface WhoIsRequest {
+  email: string
+  type: string
+}

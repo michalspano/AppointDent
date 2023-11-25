@@ -18,7 +18,7 @@ const RESPONSE_TOPIC = 'SESSION';
  */
 async function parseRawRequest (rawMsg: string): Promise<CreateSessionRequest> {
   const msgArr: string[] = rawMsg.split('/');
-  await validateRequestFormat(msgArr);
+  await validateRequestFormat(msgArr, 4);
   const request: CreateSessionRequest = {
     reqId: msgArr[0],
     email: msgArr[1],

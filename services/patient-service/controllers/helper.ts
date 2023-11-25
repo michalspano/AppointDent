@@ -1,6 +1,5 @@
 import { client } from '../mqtt/mqtt';
 const TIMEOUT = 10000;
-
 /**
  * Used to wait for a response from mqtt before continuing the execution of the request processing.
  * @param reqId the id of the request sent over MQTT
@@ -24,6 +23,7 @@ export async function getServiceResponse (reqId: string, RESPONSE_TOPIC: string)
         }
       }
     };
+    client?.subscribe(RESPONSE_TOPIC);
     client?.on('message', eventHandler);
   });
 }
