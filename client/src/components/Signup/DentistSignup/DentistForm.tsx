@@ -67,8 +67,7 @@ export default function DentistForm (): JSX.Element {
 
   const login = async (): Promise<void> => {
     try {
-      await Api.post('/dentists/login', { email: email(), password: password() })
-      // navigate to logged in view
+      await Api.post('/dentists/login', { email: email(), password: password() }, { withCredentials: true })
         .then(() => {
         // navigate to logged in view
           window.location.replace('/calendar')
