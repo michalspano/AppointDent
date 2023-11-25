@@ -98,23 +98,29 @@ export default function MyBookings (): JSX.Element {
   }
 
   return (
-    <div class="h-full w-full flex flex-col justify-start items-center">
+    <div class="h-full w-full flex flex-col justify-start items-center pl-10">
       <div class='w-full flex justify-start m-10'>
-        <h1 class='text-2xl font-bold pl-10'>My bookings</h1>
+        <h1 class='text-2xl font-bold'>My bookings</h1>
       </div>
-      <div class='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 w-full'>
-        <For each={appointments()}>{(appointment: Appointment) => (
-          <Booking
-          // pass in the appointment as props
-            {...appointment}
-            onCancel={() => {
-              handleCancelBooking(appointment.id).catch((error) => {
-                console.error('Error cancelling appointment:', error)
-              })
-            }}
-          />
-        )}</For>
+      {appointments().length === 0
+        ? (
+        <p class='flex w-full justify-start '>You have not booked any appointments.</p>
+          )
+        : (
+        <div class='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 w-full'>
+          <For each={appointments()}>{(appointment: Appointment) => (
+            <Booking
+              // pass in the appointment as props
+              {...appointment}
+              onCancel={() => {
+                handleCancelBooking(appointment.id).catch((error) => {
+                  console.error('Error cancelling appointment:', error)
+                })
+              }}
+            />
+          )}</For>
+        </div>
+          )}
       </div>
-    </div>
   )
 }
