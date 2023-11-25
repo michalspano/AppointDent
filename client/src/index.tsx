@@ -16,7 +16,7 @@ import NotificationsPage from './routes/NotificationsPage.tsx'
 const root = document.getElementById('root')
 if (root === null) throw Error('Root undefined!')
 
-const unLoggedInRoutes = ['/', '/signup', '/dentist-signup', '/patient-signup', '/notifications']
+const unLoggedInRoutes = ['/', '/signup', '/dentist-signup', '/patient-signup']
 
 const shouldShowNavbar = (): boolean => {
   const currentPath = window.location.pathname
