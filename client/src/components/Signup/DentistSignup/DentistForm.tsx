@@ -54,7 +54,7 @@ export default function DentistForm (): JSX.Element {
       // navigate to logged in view
         .then(() => {
         // navigate to logged in view
-          window.location.href = '/calendar' // calendar is a home page for the dentist
+          window.location.replace('/calendar')
         })
     } catch (error) {
       setError('Something went wrong, try again.')
