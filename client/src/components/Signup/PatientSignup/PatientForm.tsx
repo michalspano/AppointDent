@@ -12,13 +12,6 @@ export default function PatientForm (): JSX.Element {
   const [firstName, setFirstName] = createSignal('')
   const [lastName, setLastName] = createSignal('')
   const [error, setError] = createSignal<string | null>(null)
-  /* const fields = [
-    userEmail,
-    userPassword,
-    userFirstName,
-    userLastName,
-    userBirthday
-  ] */
 
   const signup = (): void => {
     const requiredFields = [email(), password(), firstName(), lastName(), dateOfBirth()]
@@ -28,8 +21,10 @@ export default function PatientForm (): JSX.Element {
       return
     }
 
-    Api
-      .post('/patients/register', requiredFields)
+    Api.post('/patients/register', requiredFields)
+      .then((response) => {
+        console.log('Signup successful', response.data)
+      })
 
       .catch((error: any) => {
         console.error('Error during sign up', error)

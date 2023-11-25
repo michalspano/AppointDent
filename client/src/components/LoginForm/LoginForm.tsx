@@ -1,11 +1,12 @@
 import { type JSX } from 'solid-js/jsx-runtime'
+import { createSignal } from 'solid-js'
 import './LoginForm.css'
 import logo from '../../assets/logo.png'
 import { A } from '@solidjs/router'
-import { createSignal } from 'solid-js'
 import { Api } from '../../utils/api'
+import { type UserType } from '../../utils/types'
 
-export default function LoginForm (): JSX.Element {
+export default function LoginForm (props: { userType: UserType }): JSX.Element {
   const [email, setEmail] = createSignal('')
   const [password, setPassword] = createSignal('')
   const [error, setError] = createSignal<string | null>(null)
@@ -30,6 +31,7 @@ export default function LoginForm (): JSX.Element {
       .catch((error: any) => {
         console.error('Error during login', error)
       })
+
     setError(null)
   }
 

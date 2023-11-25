@@ -1,6 +1,10 @@
 /**
  * Response data type from geocoding API
  */
+export enum UserType {
+  Dentist,
+  Patient
+}
 export interface Place {
   boundingBox: [string, string, string, string]
   class: string
