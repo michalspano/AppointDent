@@ -1,11 +1,12 @@
 import { createSignal, type JSX, createEffect, onCleanup } from 'solid-js'
 import default_doctor from '../../assets/default_doctor.jpg'
 import { Api } from '../../utils/api'
-import type { Appointment } from '../../utils/types'
+import type { Appointment, Dentist } from '../../utils/types'
 import BookingConfirmationPopup from './BookingConfirmation'
 export default function AppointmentsList (): JSX.Element {
   createEffect(async () => {
     await fetchAppointments()
+    await fetchDentist()
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     setInterval(async () => {
       await fetchAppointments()
@@ -13,8 +14,9 @@ export default function AppointmentsList (): JSX.Element {
   })
 
   async function fetchAppointments (): Promise<void> {
+    const dentistEmail = 'generic.doctor@clinit_name.se' // get from params or local storage
     try {
-      const response = await Api.get('/appointments/dentists/generic.doctor@clinit_name.se?onlyAvailable=true') // TODO: replace with actual email when BE supports it
+      const response = await Api.get(`/appointments/dentists/${dentistEmail}?onlyAvailable=true`)
       const appointments = response.data
       const formattedAppointments = appointments.map((appointment: any) => ({
         id: appointment.id,
@@ -37,6 +39,20 @@ export default function AppointmentsList (): JSX.Element {
       }))
       groupedAppointmentsArray.sort((a, b) => (a.day > b.day ? 1 : -1))
       setAvailableDays(groupedAppointmentsArray)
+    } catch (error) {
+      throw new Error('Error fetching appointments')
+    }
+  }
+
+  async function fetchDentist (): Promise<void> {
+    try {
+      const dentistEmail = 'generic.doctor@clinit_name.se' // get from params or local storage
+      const response = await Api.get(`/dentists/${dentistEmail}`)
+      const dentistRes = response.data[0]
+      setDentist(dentistRes)
+      setDentistName(`${dentist()?.firstName} ${dentist()?.lastName}`)
+      setDentistLocation(`${dentist()?.clinicStreet}, ${dentist()?.clinicHouseNumber}`)
+      setDentistImage(default_doctor) // TODO change to dentist()?.picture when we add image parsing support
     } catch (error) {
       throw new Error('Error fetching appointments')
     }
@@ -65,6 +81,10 @@ export default function AppointmentsList (): JSX.Element {
   const [selectedTime, setSelectedTime] = createSignal<string>('')
   const [showConfirmation, setShowConfirmation] = createSignal<boolean>(false)
   const [selectedAppointment, setSelectedAppointment] = createSignal<Appointment | null>(null)
+  const [dentist, setDentist] = createSignal<Dentist>()
+  const [dentistName, setDentistName] = createSignal<string>()
+  const [dentistLocation, setDentistLocation] = createSignal<string>()
+  const [dentistImage, setDentistImage] = createSignal<string>()
 
   const formatDate = (date: string): string => {
     const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' }
@@ -104,10 +124,6 @@ export default function AppointmentsList (): JSX.Element {
   }
   onCleanup(() => {})
 
-  const dentist = 'Doctor Ann Smith' // receive as props when navigating from map
-  const location = 'Linnégatan 15'
-  const dentistImage = default_doctor
-
   return (
       <div class="h-full w-full flex flex-col justify-center items-center lg:justify-start lg:items-start overflow-hidden">
         <div class='w-full flex justify-start m-10'>
@@ -115,10 +131,10 @@ export default function AppointmentsList (): JSX.Element {
         </div>
         <div class='flex flex-col lg:flex-row justify-start m-6 lg:ml-20'>
           <div class='flex flex-col justify-start sm:items-center lg:w-2/5'>
-            <img class='rounded-lg lg:11/12 sm:w-6/12' src={dentistImage} alt="Dentist image" />
+            <img class='rounded-lg lg:11/12 sm:w-6/12' src={dentistImage()} alt="Dentist image" />
             <div class='flex-col text-center mt-4 text-lg'>
-              <h1 class='font-semibold'>{dentist}</h1>
-              <h1 class='mt-2'>Location: <strong>{location}</strong></h1>
+              <h1 class='font-semibold'>{dentistName()}</h1>
+              <h1 class='mt-2'>Location: <strong>{dentistLocation()}</strong></h1>
             </div>
           </div>
           <div>
@@ -154,7 +170,7 @@ export default function AppointmentsList (): JSX.Element {
             </div>
           </div>
         </div>
-        {showConfirmation() && (
+        {showConfirmation() && dentistName() !== null && dentistLocation() !== null && (
           <BookingConfirmationPopup
           onConfirm={() => {
             const appointment = selectedAppointment()
@@ -172,8 +188,8 @@ export default function AppointmentsList (): JSX.Element {
           onCancel={() => {
             setShowConfirmation(false)
           }}
-          dentist={dentist}
-          location={location}
+          dentistName={dentistName()}
+          location={dentistLocation()}
           date={`${formatDate(selectedDate())} at ${formatTimeEntry(selectedAppointment())}`}
         />
         )}

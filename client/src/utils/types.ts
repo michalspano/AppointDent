@@ -33,10 +33,8 @@ export interface Patient {
 export interface Dentist {
   userEmail: string
   password?: string
-  name: {
-    firstName: string
-    lastName: string
-  }
+  firstName: string
+  lastName: string
   session?: {
     token: string
     expiry?: number
@@ -48,6 +46,8 @@ export interface Dentist {
     houseNumber: string
     country: string
   }
+  clinicStreet: string
+  clinicHouseNumber: string
   picture: string
 }
 
