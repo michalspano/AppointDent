@@ -30,7 +30,7 @@ const getAllAppointments = async (req: Request, res: Response): Promise<Response
     });
   }
 
-  const email: string | undefined = req.params.email;
+  const email: string | undefined = req.body.email;
   const sessionKey: string | undefined = req.cookies.sessionKey;
 
   if (sessionKey === undefined || email === undefined) {
@@ -38,6 +38,10 @@ const getAllAppointments = async (req: Request, res: Response): Promise<Response
       message: 'Bad request: missing session key or email.'
     });
   }
+
+  // TODO: make a call to the session-service to obtain the type
+  // of the user via the `whois` endpoint/topic. This is to be implemented.
+  // Hint: a custom type can be used to denote the allowed types of users.
 
   // To get appointments, the user must be logged in.
   // That means, a valid session must be present.
