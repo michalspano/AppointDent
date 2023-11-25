@@ -60,10 +60,11 @@ export default function AppointmentsList (): JSX.Element {
   }
 
   async function bookAppointment (appointment: Appointment): Promise<void> {
-    console.log(appointment)
     const appointmentId = appointment.id
+    const patientResponse = await Api.get('sessions/whois', { withCredentials: true })
+    const patientEmail = patientResponse.data.email
     try {
-      await Api.patch(`/appointments/${appointmentId}?toBook=true`, { patientId: '12312321' }).then(() => { // TODO: replace with real patientId when BE supports it
+      await Api.patch(`/appointments/${appointmentId}?toBook=true`, { patientId: patientEmail }).then(() => {
         console.log('Appointment created successfully')
       })
     } catch (error) {
@@ -90,12 +91,12 @@ export default function AppointmentsList (): JSX.Element {
 
   const formatDate = (date: string): string => {
     const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' }
-    return new Date(date).toLocaleDateString(undefined, options)
+    return new Date(date).toLocaleDateString('sv-SE', options)
   }
 
   const formatTime = (date: string): string => {
     const options: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit' }
-    return new Date(date).toLocaleTimeString([], options)
+    return new Date(date).toLocaleTimeString('sv-SE', options)
   }
 
   const formatTimeEntry = (appointment: any): string => {
