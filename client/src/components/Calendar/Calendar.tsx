@@ -50,7 +50,9 @@ export default function DentistCalendar (): JSX.Element {
  */
   async function fetchAppointments (): Promise<void> {
     try {
-      const response = await Api.get('/appointments/dentists/dentist@gmail.com/') // NB! replace with actual email
+      const dentistResponse = await Api.get('sessions/whois')
+      const dentistEmail = dentistResponse.data.email
+      const response = await Api.get(`/appointments/dentists/${dentistEmail}`) // NB! replace with actual email
       const appointments = response.data
       const formattedAppointments = appointments.map((appointment: any) => ({
         id: appointment.id,
