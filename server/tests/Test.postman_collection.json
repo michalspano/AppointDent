@@ -669,8 +669,7 @@
 										"exec": [
 											"pm.test(\"Response code is 201\", function () {",
 											"    pm.response.to.have.status(201);",
-											"});",
-											"pm.environment.set('sessionKey', pm.cookies.get('sessionKey'));"
+											"});"
 										],
 										"type": "text/javascript"
 									}
@@ -681,7 +680,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"email\": \"sample.dentist@gmail.com\",\n  \"password\": \"pass123pass456\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"clinicCountry\": \"Country\",\n  \"clinicCity\": \"City\",\n  \"clinicStreet\": \"Sesame Street\",\n  \"clinicHouseNumber\": 11,\n  \"clinicZipCode\": 197312,\n  \"picture\": \"base64encodedimage\"\n}",
+									"raw": "{\n  \"email\": \"{{dentistEmailSample}}\",\n  \"password\": \"pass123pass456\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"clinicCountry\": \"Country\",\n  \"clinicCity\": \"City\",\n  \"clinicStreet\": \"Sesame Street\",\n  \"clinicHouseNumber\": 11,\n  \"clinicZipCode\": 197312,\n  \"picture\": \"base64encodedimage\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -723,7 +722,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"email\": \"sample.dentist@gmail.com\",\n  \"password\": \"pass123pass456\"\n}",
+									"raw": "{\n  \"email\": \"{{dentistEmailSample}}\",\n  \"password\": \"pass123pass456\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -745,50 +744,438 @@
 							},
 							"response": []
 						}
-					]
+					],
+					"description": "A sample dentist created for the `appointment-service`."
 				},
 				{
-					"name": "GET / (as dentist)",
-					"event": [
+					"name": "generate-sample-appointments",
+					"item": [
 						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Response code shall be 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									""
-								],
-								"type": "text/javascript"
-							}
+							"name": "POST /api/appointments",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response code shall be 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Response is in JSON format\", function () {",
+											"    pm.response.to.be.json;",
+											"});",
+											"",
+											"// Parse the request and response JSON bodies",
+											"",
+											"var requestJson = JSON.parse(pm.request.body.raw);",
+											"var responseJson = pm.response.json();",
+											"",
+											"// Get the number of keys in the request and response",
+											"var requestKeys = Object.keys(requestJson).length;",
+											"var responseKeys = Object.keys(responseJson).length;",
+											"",
+											"// Compare the number of keys",
+											"// Must be lower by 2, because there's the auto-generated key in the",
+											"// response and patientId is set to NULL automatically.",
+											"pm.test(\"Number of keys in request is lower by 1 than the response\", function () {",
+											"    pm.expect(requestKeys).to.equal(responseKeys - 2);",
+											"});",
+											"",
+											"// Check if the patientId property is set to null",
+											"pm.test(\"Verify patientId is set to null\", function() {",
+											"    pm.expect(responseJson.patientId).to.equal(null);",
+											"});",
+											"",
+											"",
+											"// Set the ID for other tests.",
+											"const appointmentId = pm.response.json().id;",
+											"pm.environment.set(\"appointmentId\", appointmentId);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"start_timestamp\": 123131312,\n    \"end_timestamp\": 123131987,\n    \"dentistId\": \"{{dentistEmailSample}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/appointments",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"appointments"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "POST /api/appointments 2",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response code shall be 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Response is in JSON format\", function () {",
+											"    pm.response.to.be.json;",
+											"});",
+											"",
+											"// Parse the request and response JSON bodies",
+											"",
+											"var requestJson = JSON.parse(pm.request.body.raw);",
+											"var responseJson = pm.response.json();",
+											"",
+											"// Get the number of keys in the request and response",
+											"var requestKeys = Object.keys(requestJson).length;",
+											"var responseKeys = Object.keys(responseJson).length;",
+											"",
+											"// Compare the number of keys",
+											"// Must be lower by 2, because there's the auto-generated key in the",
+											"// response and patientId is set to NULL automatically.",
+											"pm.test(\"Number of keys in request is lower by 1 than the response\", function () {",
+											"    pm.expect(requestKeys).to.equal(responseKeys - 2);",
+											"});",
+											"",
+											"// Check if the patientId property is set to null",
+											"pm.test(\"Verify patientId is set to null\", function() {",
+											"    pm.expect(responseJson.patientId).to.equal(null);",
+											"});",
+											"",
+											"",
+											"// Set the ID for other tests.",
+											"const appointmentId = pm.response.json().id;",
+											"pm.environment.set(\"appointmentId\", appointmentId);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"start_timestamp\": 31231241412,\n    \"end_timestamp\": 312321241412,\n    \"dentistId\": \"{{dentistEmailSample}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/appointments",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"appointments"
+									]
+								}
+							},
+							"response": []
 						}
 					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"sample.patient@gmail.com\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+					"description": "Generate sample appointments used for the `appointment-service`."
+				},
+				{
+					"name": "GET /",
+					"item": [
+						{
+							"name": "GET / (as dentist)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response code shall be 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"// Parse the response JSON",
+											"var jsonData = pm.response.json();",
+											"",
+											"// Check if the response is an array",
+											"pm.test(\"Response is an array\", function () {",
+											"    pm.expect(jsonData).to.be.an('array');",
+											"});",
+											"",
+											"// Check if each item in the array is an object",
+											"// and ensure that each patientId is NULL",
+											"pm.test(\"Items in the array are objects and patienId is NULL\", function () {",
+											"    if (jsonData.length > 0) {",
+											"        jsonData.forEach(function (item) {",
+											"            pm.expect(item).to.be.an('object');",
+											"            pm.expect(item.patientId).to.be.null; // must be NULL",
+											"        });",
+											"    }",
+											"});",
+											""
+										],
+										"type": "text/javascript"
+									}
 								}
-							}
-						},
-						"url": {
-							"raw": "{{host}}/",
-							"host": [
-								"{{host}}"
 							],
-							"path": [
-								""
-							]
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"{{dentistEmailSample}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/appointments",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"appointments"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET / (as *empty* dentist)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response code shall be 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response is an object\", function () {",
+											"    pm.expect(pm.response.json()).to.be.an('object');",
+											"});",
+											"",
+											"pm.test(\"Response contains 'message' attribute\", function () {",
+											"    pm.expect(pm.response.json()).to.have.property('message');",
+											"});",
+											"",
+											"pm.test(\"Contains correct response message\", function () {",
+											"    pm.expect(pm.response.json().message).to.equal(\"Bad request: missing session key or email.\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{ }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/appointments",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"appointments"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET / (invalid cookie)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response code shall be 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});",
+											"",
+											"pm.test(\"Response is an object\", function () {",
+											"    pm.expect(pm.response.json()).to.be.an('object');",
+											"});",
+											"",
+											"pm.test(\"Response contains 'message' attribute\", function () {",
+											"    pm.expect(pm.response.json()).to.have.property('message');",
+											"});",
+											"",
+											"pm.test(\"Contains correct response message\", function () {",
+											"    pm.expect(pm.response.json().message).to.equal(\"Unauthorized: invalid session.\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Cookie",
+										"value": "sessionKey=f8f2f1fc-80c9-4329-ad89-3551231312312",
+										"description": "An invalid cookie that overwrites the one passed.",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"{{dentistEmailSample}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/appointments",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"appointments"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET / (as *invalid* dentist)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response code shall be 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});",
+											"",
+											"pm.test(\"Response is an object\", function () {",
+											"    pm.expect(pm.response.json()).to.be.an('object');",
+											"});",
+											"",
+											"pm.test(\"Response contains 'message' attribute\", function () {",
+											"    pm.expect(pm.response.json()).to.have.property('message');",
+											"});",
+											"",
+											"pm.test(\"Contains correct response message\", function () {",
+											"    pm.expect(pm.response.json().message).to.equal(\"Unauthorized: invalid session.\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"{{dentistEmailSample}}_DSADA\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/appointments",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"appointments"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET invalid route",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response code shall be 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"",
+											"pm.test(\"Response message is 'Not found.'\", function () {",
+											"    pm.expect(pm.response.text()).to.include('Not found.');",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/v1/appointments/foo/bar",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"appointments",
+										"foo",
+										"bar"
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
 				}
 			]
 		},
@@ -919,7 +1306,7 @@
 					"response": []
 				},
 				{
-					"name": "POST fail /api/session/whois",
+					"name": "GET fail /api/session/whois",
 					"event": [
 						{
 							"listen": "test",
