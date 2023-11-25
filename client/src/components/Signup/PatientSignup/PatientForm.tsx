@@ -19,11 +19,9 @@ export default function PatientForm (): JSX.Element {
       password: password(),
       firstName: firstName(),
       lastName: lastName(),
-      dateOfBirth: dateOfBirth()
+      birthDate: dateOfBirth()
     }
 
-    console.log('s')
-    console.log(requiredFields)
     if (Object.values(requiredFields).some((field) => field === '')) {
       setError('Please fill in all fields.')
       return
