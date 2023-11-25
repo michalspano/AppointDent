@@ -1,13 +1,19 @@
 import type { Response, Request } from 'express';
 import database from '../db/config';
 import { type Statement } from 'better-sqlite3';
+import { authoriseUser } from './authorisation';
 
 // Delete specific notification
-export const deleteNotification = function (req: Request, res: Response): Response<any, Record<string, any>> {
+const deleteAsyncNotification = async function (req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
   if (database === undefined) {
     return res.status(500).json({
       message: 'Internal server error: database connection failed.'
     });
+  }
+
+  const authRes = await authoriseUser(req, res);
+  if (authRes !== undefined) {
+    return authRes;
   }
 
   const notId = req.params.id;
@@ -44,11 +50,16 @@ export const deleteNotification = function (req: Request, res: Response): Respon
 };
 
 // Delete all notifications that belong to a user
-export const deleteAllNotification = function (req: Request, res: Response): Response<any, Record<string, any>> {
+const deleteAsyncAllNotification = async function (req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
   if (database === undefined) {
     return res.status(500).json({
       message: 'Internal server error: database connection failed.'
     });
+  }
+
+  const authRes = await authoriseUser(req, res);
+  if (authRes !== undefined) {
+    return authRes;
   }
 
   const userEmail = req.params.email;
@@ -81,4 +92,12 @@ export const deleteAllNotification = function (req: Request, res: Response): Res
 
   // Everything went well, notify the client
   return res.sendStatus(204);
+};
+
+export const deleteAllNotification = function (req: Request, res: Response): void {
+  void deleteAsyncAllNotification(req, res);
+};
+
+export const deleteNotification = function (req: Request, res: Response): void {
+  void deleteAsyncNotification(req, res);
 };

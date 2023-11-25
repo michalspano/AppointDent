@@ -1,11 +1,17 @@
 import type { Response, Request } from 'express';
 import database from '../db/config';
+import { authoriseUser } from './authorisation';
 
-export const getNotifications = function (req: Request, res: Response): Response<any, Record<string, any>> {
+const getAsyncNotifications = async function (req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
   if (database === undefined) {
     return res.status(500).json({
       message: 'Internal server error: database connection failed.'
     });
+  }
+
+  const authRes = await authoriseUser(req, res);
+  if (authRes !== undefined) {
+    return authRes;
   }
 
   const userEmail = req.params.email;
@@ -19,4 +25,8 @@ export const getNotifications = function (req: Request, res: Response): Response
   }
 
   return res.status(200).json(notifications);
+};
+
+export const getNotifications = function (req: Request, res: Response): void {
+  void getAsyncNotifications(req, res);
 };
