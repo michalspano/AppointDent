@@ -17,12 +17,14 @@ export default function LoginForm (props: { userType: UserType }): JSX.Element {
       return
     }
 
+    console.log('User type:', props.userType)
     let loginEndpoint = ''
     if (props.userType === UserType.Dentist) {
       loginEndpoint = '/dentists/login'
     } else if (props.userType === UserType.Patient) {
       loginEndpoint = '/patients/login'
     }
+    console.log('Login endpoint:', loginEndpoint)
 
     Api.post(loginEndpoint, { email: email(), password: password() })
       .then(() => {

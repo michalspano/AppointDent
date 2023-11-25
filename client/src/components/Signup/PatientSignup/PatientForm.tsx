@@ -27,14 +27,18 @@ export default function PatientForm (): JSX.Element {
       return
     }
 
-    await Api.post('/patients/register', requiredFields)
+    console.log('Sending data:', requiredFields)
+
+    await Api.post('/patients/register', requiredFields, { responseType: 'json' })
       .then((response) => {
         console.log('Signup successful', response.data)
       })
 
       .catch((error: any) => {
         console.error('Error during sign up', error)
+        console.log('Server response:', error.response)
       })
+    console.log('Sending request to /patients/register', requiredFields)
 
     setError(null)
   }
