@@ -53,7 +53,7 @@ export default function AppointmentsList (): JSX.Element {
       setDentist(dentistRes)
       setDentistName(`${dentist()?.firstName} ${dentist()?.lastName}`)
       setDentistLocation(`${dentist()?.clinicStreet}, ${dentist()?.clinicHouseNumber}`)
-      setDentistImage(default_doctor) // TODO change to dentist()?.picture when we add image parsing support
+      setDentistImage(dentist()?.picture ?? default_doctor) // TODO change to dentist()?.picture when we add image parsing support
     } catch (error) {
       throw new Error('Error fetching dentist')
     }
