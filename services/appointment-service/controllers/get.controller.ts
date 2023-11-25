@@ -97,13 +97,13 @@ export const getAppointmentsByPatientId = (req: Request, res: Response): Respons
   }
 
   // TODO: ensure that a valid session is present.
+  // Advantage: the inherently, a valid session means that the user is logged in
+  // and exists in the database. Therefore, there's no need to make a call to the
+  // patient-service to ensure that the patient exists.
   // Ensure that the caller of the request is the patient that is being queried.
   // Don't allow a patient to query another patient's appointments.
 
   const patientEmail: string = req.params.email;
-
-  // TODO: make a call to patient-service to ensure that the patient exists.
-  // If not, return 404. For now, it is assumed that the patient exists.
 
   let result: unknown[];
   try {
@@ -127,15 +127,13 @@ export const getAppointmentsByDentistId = (req: Request, res: Response): Respons
   }
 
   // TODO: ensure that a valid session is present.
+  // This means that the dentist is logged in and exists in the database.
   // Ideally, only the unbooked appointments should be made 'visible'
   // publicly, however, that may be a choice of the dentist. For now,
   // there's no restriction on the visibility of the appointments in
   // this regard.
 
   const dentistEmail: string = req.params.email;
-
-  // TODO: make a call to the patient-service to ensure that the dentist exists.
-  // If not, return 404. For now, it is assumed that the patient exists.
 
   let result: unknown[];
 
@@ -165,6 +163,10 @@ export const getAppointmentsByDentistId = (req: Request, res: Response): Respons
 };
 
 // Get an appointment by id.
+// The appointment ID has hashed anyway, so only having the valid session
+// is enough to ensure that the user is authorized to access the appointment.
+// Moral question: what's the probability that a user can guess the appointment
+// ID? The answer should be: very low.
 export const getAppointment = (req: Request, res: Response): Response<any, Record<string, any>> => {
   if (database === undefined) {
     return res.status(500).json({

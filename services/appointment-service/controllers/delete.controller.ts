@@ -3,6 +3,7 @@ import type { Request, Response } from 'express';
 import { type Statement } from 'better-sqlite3';
 
 // Delete all appointment entries; preserve the schema.
+// TODO: ensure that only a **dentist** can delete **own** appointments.
 export const deleteAllAppointments = (req: Request, res: Response): Response<any, Record<string, any>> => {
   if (database === undefined) {
     return res.status(500).json({

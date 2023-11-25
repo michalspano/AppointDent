@@ -1,22 +1,16 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import * as utils from '../utils';
+import { client } from '../mqtt/mqtt';
 import database from '../db/config';
 import { type Appointment } from '../types/types';
 import type Database from 'better-sqlite3';
 import { type Statement } from 'better-sqlite3';
-import { destructUnknownToAppointment, parseBinaryQueryParam } from '../utils';
 import type { Request, Response } from 'express';
+import { destructUnknownToAppointment, parseBinaryQueryParam } from '../utils';
 
-/*
- * Note: this is a note for the developer that takes on the continued
- * issue related to this controller. Basically, the type of the user
- * is not explicitly defined. Instead, how to determine the type of the
- * user is based on the following (supposing we extract the ID from the
- * session cookie):
- * - query the dentist-service to determine if the user exists in the
- *  dentist database. If so, then the user is a dentist.
- * - query the patient-service to determine if the user exists in the
- * patient database. If so, then the user is a patient.
- * Otherwise, the user is not authorized and an appropriate error should
- * be returned. */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+const TOPIC: string = 'AUTHREQ';
+const RESPONSE_TOPIC: string = 'AUTHRES';
 
 /**
  * @description the controller for the PATCH /appointments/:id route. In
@@ -28,22 +22,23 @@ import type { Request, Response } from 'express';
  * patients, hence patientId is null. If the appointment is booked, then
  * patientId is not null.
  *
+ * @see verifySession
+ * @see genReqId
+ *
  * @param req request object
  * @param res response object
- * @returns TODO: this is subject to change, hence edit this comment.
+ * @returns A promise that resolves to a response object.
  */
-const bookAppointment = (req: Request, res: Response): Response<any, Record<string, any>> => {
+const bookAppointment = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
   if (database === undefined) {
     return res.status(500).json({
       message: 'Internal server error: database connection failed.'
     });
   }
 
-  // TODO: properly handle the session and ensure that the route is protected.
-  // Use MQTT and the session-service.
-
-  // TODO: determine the type of the user based on the request (see above comments
-  // for the explanation).
+  // Our system should only allow patients to book appointments.
+  // Use the `whois` abstraction provided by the session service to
+  // determine the role (i.e., type) of the user.
 
   const id: string = req.params.id;
   let appointment: unknown;
@@ -109,4 +104,14 @@ const bookAppointment = (req: Request, res: Response): Response<any, Record<stri
   return res.status(200).json(appointmentObj);
 };
 
-export default bookAppointment;
+/**
+ * @description a wrapper function for the bookAppointment function.
+ *
+ * @param req a request object
+ * @param res a response object
+ */
+const bookAppointmentWrapper = (req: Request, res: Response): void => {
+  void bookAppointment(req, res);
+};
+
+export default bookAppointmentWrapper;

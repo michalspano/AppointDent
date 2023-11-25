@@ -5,6 +5,7 @@ import { type Appointment } from '../types/types';
 import type { Request, Response } from 'express';
 
 // Create a new appointment.
+// TODO: ensure that only a **dentist** can create an **own** appointment.
 const createAppointment = (req: Request, res: Response): Response<any, Record<string, any>> => {
   if (database === undefined) {
     return res.status(500).json({ message: 'Internal server error: database connection failed.' });
