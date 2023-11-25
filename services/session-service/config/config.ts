@@ -12,7 +12,7 @@ const allowedOrigins = ['http://localhost:5173'];
 /**
      * This function has the responsibility of dynamically setitng the
      * Access-Control-Allow-Origin header by checking if the current origin
-     * is present in the allowedOrigins array. This is a technical constraint
+     * is  present in the allowedOrigins array. This is a technical constraint
      * from modern browsers that we have to comply with.
      * @param req request
      * @param corsCallback callback to the CORS function
