@@ -91,5 +91,5 @@ export async function listenForDeletion (client: mqtt.MqttClient): Promise<void>
   });
   // Subscribe the client to the delete user topic
   client.subscribe(TOPIC);
-  console.log('Insertion Listener Started');
+  console.log('Deletion Listener Started');
 }
