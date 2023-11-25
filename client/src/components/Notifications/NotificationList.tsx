@@ -3,7 +3,7 @@ import Notification from './Notification'
 import { type NotificationData } from './types'
 
 const NotificationsList = (props: { notifications: NotificationData[] }): JSX.Element => (
-  <div class="w-full flex justify-center m-10">
+  <div class="w-full flex flex-col align-left m-10">
     <For each={props.notifications} fallback={<div>No notifications available</div>}>
       {(notification) => (
         <Notification {...notification} />

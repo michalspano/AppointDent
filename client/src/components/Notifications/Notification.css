@@ -1,3 +1,24 @@
 .notification {
-    color: white;
-  }
+  color: black;
+  font-size: 18px;
+  text-align: left;
+  margin-bottom: 20px;
+  margin-left: 30px;
+}
+
+.notification span {
+  color: grey;
+  font-size: 16px;
+}
+
+.border-line {
+  width: 90%;
+  border-bottom: 1px solid rgb(152, 152, 152);
+  margin: 0 auto;
+  margin-top: 20px;
+  margin: 20px 0 0 0;
+}
+
+.h-full h1 {
+  padding-left: 70px;
+}

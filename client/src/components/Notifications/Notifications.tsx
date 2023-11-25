@@ -8,17 +8,22 @@ export default function Notifications (): JSX.Element {
     {
       id: '1',
       date: new Date().toISOString().slice(0, 16),
-      message: 'This is the first hard coded notification message'
+      message: 'Your appointment scheduled for December 17th has been canceled due to unexpected staff scheduling changes'
     },
     {
       id: '2',
       date: new Date().toISOString().slice(0, 16),
-      message: 'This is the second hard coded notification message'
+      message: 'Your appointment on March 20th has been canceled due to severe weather conditions affecting clinic operations'
     },
     {
-      id: '3',
+      id: '4',
       date: new Date().toISOString().slice(0, 16),
-      message: 'This is the thrid hard coded notification message'
+      message: 'Your appointment scheduled for December 17th has been canceled due to unexpected staff scheduling changes'
+    },
+    {
+      id: '4',
+      date: new Date().toISOString().slice(0, 16),
+      message: 'We regret to inform you that your appointment on February 10th has been canceled due to an unexpected medical emergency'
     }
   ])
 
@@ -27,7 +32,7 @@ export default function Notifications (): JSX.Element {
   })
 
   return (
-    <div class="h-full w-full flex flex-col justify-start items-center">
+    <div class="h-full w-full flex flex-col justify-start align-left">
       <h1 class="text-2xl font-bold pl-10 mt-6">Notifications</h1>
       <NotificationsList notifications={notifications()} />
     </div>
