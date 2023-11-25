@@ -13,15 +13,23 @@ export default function PatientForm (): JSX.Element {
   const [lastName, setLastName] = createSignal('')
   const [error, setError] = createSignal<string | null>(null)
 
-  const signup = (): void => {
-    const requiredFields = [email(), password(), firstName(), lastName(), dateOfBirth()]
+  const signup = async (): Promise<void> => {
+    const requiredFields: any = {
+      email: email(),
+      password: password(),
+      firstName: firstName(),
+      lastName: lastName(),
+      dateOfBirth: dateOfBirth()
+    }
 
-    if (requiredFields.some((field) => field === '')) {
+    console.log('s')
+    console.log(requiredFields)
+    if (Object.values(requiredFields).some((field) => field === '')) {
       setError('Please fill in all fields.')
       return
     }
 
-    Api.post('/patients/register', requiredFields)
+    await Api.post('/patients/register', requiredFields)
       .then((response) => {
         console.log('Signup successful', response.data)
       })
@@ -75,7 +83,16 @@ export default function PatientForm (): JSX.Element {
               onChange={(event) => setDateOfBirth(event.target.value)}
             />
         {error() !== null && <p class="text-error">{error()}</p>}
-        <button type="submit" class="log-in-btn h-12 mb-6 bg-secondary rounded-xl text-base" onclick={signup} >
+        <button type="submit" class="log-in-btn h-12 mb-6 bg-secondary rounded-xl text-base"
+        onclick={() => {
+          signup()
+            .then(() => {
+              // Code to execute after successful signup
+            })
+            .catch((error) => {
+              console.error('Error creating account:', error)
+            })
+        }}>
             Create account
             </button>
         <p class="font-extralight">Already have an account?
