@@ -77,23 +77,23 @@ export default function DentistProfile (dentistProp: DentistProfileProps): JSX.E
           <img class="w-40 " src={logo} alt="AppointDent" />
         </div>
           <h1 class="mb-2 mt-4 text-lg">{dentist.name.firstName}'s Profile</h1>
-          <CustomInput value={dentist.userEmail} inputType='text' onChange={(event) => { setDentist('userEmail', event.target.value) }}/>
+          <CustomInput value={dentist.userEmail} inputType='text' onChange={(event) => { setDentist('userEmail', event.target.value) }} disabled={true}/>
           <div class="flex flex-row">
-            <CustomInput class='mr-2' value={dentist.name.firstName} inputType='text' onChange={(event) => { setDentist('name', 'firstName', event.target.value) }}/>
-            <CustomInput value={dentist.name.lastName} inputType='text' onChange={(event) => { setDentist('name', 'lastName', event.target.value) }}/>
+            <CustomInput class='mr-2' value={dentist.name.firstName} inputType='text' onChange={(event) => { setDentist('name', 'firstName', event.target.value) }} disabled={false}/>
+            <CustomInput value={dentist.name.lastName} inputType='text' onChange={(event) => { setDentist('name', 'lastName', event.target.value) }} disabled={false}/>
           </div>
-          <label class="block pl-2 text-xs font-extralight pb-1">
+          <label class="text-black block pl-2 text-xs font-extralight pb-1">
                 Address of the clinic
           </label>
           <div class="flex flex-row">
-            <CustomInput class='mr-2' value={dentist.address.city} inputType='text' onChange={(event) => { setDentist('address', 'city', event.target.value) }}/>
-            <CustomInput value={dentist.address.street} inputType='text' onChange={(event) => { setDentist('address', 'street', event.target.value) }}/>
+            <CustomInput class='mr-2' value={dentist.address.city} inputType='text' onChange={(event) => { setDentist('address', 'city', event.target.value) }} disabled={false}/>
+            <CustomInput value={dentist.address.street} inputType='text' onChange={(event) => { setDentist('address', 'street', event.target.value) }} disabled={false}/>
           </div>
           <div class="flex flex-row">
-            <CustomInput class='mr-2' value={dentist.address.houseNumber} inputType='text' onChange={(event) => { setDentist('address', 'houseNumber', event.target.value) }}/>
-            <CustomInput value={dentist.address.zip} inputType='number' onChange={(event) => { setDentist('address', 'zip', Number(event.target.value)) }}/>
+            <CustomInput class='mr-2' value={dentist.address.houseNumber} inputType='text' onChange={(event) => { setDentist('address', 'houseNumber', event.target.value) }} disabled={false}/>
+            <CustomInput value={dentist.address.zip} inputType='number' onChange={(event) => { setDentist('address', 'zip', Number(event.target.value)) }} disabled={false}/>
           </div>
-          <CustomInput value='' accept='.jpeg, .jpg, .png' inputType='file' placeHolder='Upload a profile image' onChange={(event) => { uploadProPic(event.target) } }/>
+          <CustomInput value='' accept='.jpeg, .jpg, .png' inputType='file' placeHolder='Upload a profile image' onChange={(event) => { uploadProPic(event.target) } } disabled={false}/>
           {getError() !== null ? <p class="text-error">{(getError() as Error).message}</p> : <></>}
           <button type="submit" class="log-in-btn h-12 mb-6 bg-secondary rounded-xl text-base" onClick={() => { patchDentist(dentist) }}>
              Save changes
