@@ -34,7 +34,9 @@ export default function MyBookings (): JSX.Element {
    */
   const fetchAppointments = async (): Promise<void> => {
     try {
-      const response = await Api.get('appointments/patients/12312321') // Replace with the actual patient id
+      const patientResponse = await Api.get('sessions/whois', { withCredentials: true })
+      const patientEmail = patientResponse.data.email
+      const response = await Api.get(`appointments/patients/${patientEmail}`) // Replace with the actual patient id
       const appointmentsData = response.data
 
       const formattedAppointments = await Promise.all(
