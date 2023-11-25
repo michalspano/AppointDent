@@ -58,8 +58,8 @@ async function addNewDentist (dentist: Dentist, map: leaflet.Map): Promise<void>
      * We wait until the popup is open, before we attach event handler.
      */
     map.on('popupopen', (event) => {
-      const content = event.popup.getContent() as string | undefined
-      if (typeof content === 'string' && content.includes('showSlotsButton')) {
+      const htmlContent = event.popup.getContent() as string | undefined
+      if (typeof htmlContent === 'string' && htmlContent.includes('showSlotsButton')) { // We check if the content contains html
         const showSlotsButton = document.getElementById('showSlotsButton')
         showSlotsButton?.addEventListener('click', (e) => {
           openAvailableSlots((e.target as HTMLInputElement)?.value)
