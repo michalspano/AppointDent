@@ -4,7 +4,7 @@ import location from '../../assets/location.png'
 import { type Appointment } from './types'
 
 interface BookingProps extends Appointment {
-  onCancel: () => void
+  onCancel: (id: string) => void
 }
 
 export default function Booking (props: BookingProps): JSX.Element {
@@ -19,7 +19,9 @@ export default function Booking (props: BookingProps): JSX.Element {
             <img class='w-5 h-auto mr-2' src={location} alt="Location icon" />
             <p class='details'>{props.address}</p>
           </div>
-          <button class="delete-btn mt-5 px-4 text-white py-2 bg-error rounded-xl" onClick={props.onCancel}>Cancel booking</button>
+          <button class="delete-btn mt-5 px-4 text-white py-2 bg-error rounded-xl" onClick={() => {
+            props.onCancel(props.id)
+          }}>Cancel booking</button>
         </div>
       </div>
     </div>

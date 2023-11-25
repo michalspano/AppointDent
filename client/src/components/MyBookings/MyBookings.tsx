@@ -2,9 +2,12 @@ import { For, createSignal, createEffect, type JSX } from 'solid-js'
 import Booking from './Booking'
 import { type Appointment } from './types'
 import { Api } from '../../utils/api'
+import ConfirmationPopup from './DeleteConfirmation'
 
 export default function MyBookings (): JSX.Element {
   const [appointments, setAppointments] = createSignal<Appointment[]>([])
+  const [showConfirmation, setShowConfirmation] = createSignal<boolean>(false)
+  const [appointmentToDeleteId, setAppointmentToDeleteId] = createSignal<string | null>(null)
 
   createEffect(async () => {
     await fetchAppointments()
@@ -113,14 +116,31 @@ export default function MyBookings (): JSX.Element {
               // pass in the appointment as props
               {...appointment}
               onCancel={() => {
-                handleCancelBooking(appointment.id).catch((error) => {
-                  console.error('Error cancelling appointment:', error)
-                })
+                setAppointmentToDeleteId(appointment.id)
+                setShowConfirmation(true)
               }}
             />
           )}</For>
         </div>
           )}
+
+{showConfirmation() && (
+        <ConfirmationPopup
+          onConfirm={() => {
+            // Handle cancel booking logic here
+            const idToDelete = appointmentToDeleteId()
+            if (idToDelete !== null) {
+              handleCancelBooking(idToDelete).catch((error) => {
+                console.error('Error cancelling appointment:', error)
+              })
+            }
+            setShowConfirmation(false) // Hide the confirmation popup
+          }}
+          onCancel={() => {
+            setShowConfirmation(false)
+          }}
+        />
+)}
       </div>
   )
 }
