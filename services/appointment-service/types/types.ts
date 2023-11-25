@@ -14,8 +14,20 @@ export interface Appointment {
 };
 
 /**
+ * @description the session service responds with 0 on a failed session
+ * verification, and 1 on a successful session verification. This enum
+ * type maps the response to a more readable format.
+ */
+export enum SessionResponse {
+  Fail = 0,
+  Success = 1
+};
+
+/**
  * @description a custom type that denotes the response type
  * of the session service in terms of the allowed types of users.
+ * Similarly as the SessionResponse enum, this type maps the
+ * response to a more readable format.
  */
 export enum UserType {
   Dentist = 'd',

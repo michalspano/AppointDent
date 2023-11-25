@@ -5,17 +5,12 @@
 import { type Appointment } from '../types/types';
 import { client } from '../mqtt/mqtt';
 import { randomBytes } from 'crypto';
+import { SessionResponse } from '../types/types';
 
 /**
  * @description the default timeout for the MQTT client to wait for a response.
  */
 const TIMEOUT: number = 10000;
-
-/**
- * @description the session service responds with 0 on a failed session
- * verification, and 1 on a successful session verification.
- */
-type SessionResponse = '1' | '0';
 
 /**
  * @description a helper function to convert an unknown object to an
@@ -89,7 +84,10 @@ export const verifySession = async (reqId: string, RESPONSE_TOPIC: string): Prom
           clearTimeout(timeout);
           client?.unsubscribe(topic);
           client?.removeListener('message', eventHandler);
-          resolve(message.toString().split('/')[1] as SessionResponse);
+          
+          // Convert to enum type SessionResponse.
+          const rawMsg: string = message.toString().split('/')[1];
+          resolve(parseInt(rawMsg) as SessionResponse);
         }
       }
     };

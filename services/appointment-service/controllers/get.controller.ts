@@ -1,7 +1,8 @@
 import database from '../db/config';
 import { client } from '../mqtt/mqtt';
-import type { Request, Response } from 'express';
 import * as utils from '../utils';
+import type { Request, Response } from 'express';
+import { SessionResponse } from '../types/types';
 
 const TOPIC: string = 'AUTHREQ';
 const RESPONSE_TOPIC: string = 'AUTHRES';
@@ -10,9 +11,13 @@ const RESPONSE_TOPIC: string = 'AUTHRES';
  * @description A controller function to get all appointments.
  * This function is encapsulated in a wrapper function to resolve the
  * asynchronous nature of the function being wrapped.
+ * 
+ * This endpoint is protected by the session service. It can only be accessed
+ * when the user has a valid session. The session is verified by the session
+ * service.
  *
- * @see utils/index.ts#verifySession
- * @see utils/index.ts#genReqId
+ * @see verifySession
+ * @see SessionResponse 
  * @see getAllAppointmentsWrapper
  *
  * @returns Promise that resolves to a response object.
@@ -34,14 +39,8 @@ const getAllAppointments = async (req: Request, res: Response): Promise<Response
   const sessionKey: string | undefined = req.cookies.sessionKey;
 
   if (sessionKey === undefined || email === undefined) {
-    return res.status(400).json({
-      message: 'Bad request: missing session key or email.'
-    });
+    return res.status(400).json({ message: 'Bad request: missing session key or email.' });
   }
-
-  // TODO: make a call to the session-service to obtain the type
-  // of the user via the `whois` endpoint/topic. This is to be implemented.
-  // Hint: a custom type can be used to denote the allowed types of users.
 
   // To get appointments, the user must be logged in.
   // That means, a valid session must be present.
@@ -50,11 +49,12 @@ const getAllAppointments = async (req: Request, res: Response): Promise<Response
   client.subscribe(RESPONSE_TOPIC);
 
   try {
-    const result: string = await utils.verifySession(reqId, RESPONSE_TOPIC);
-    if (result !== '1') {
-      return res.status(401).json({
-        message: 'Unauthorized: invalid session.'
-      });
+    const result: SessionResponse = await utils.verifySession(
+      reqId.toString(),
+      RESPONSE_TOPIC
+    ) as SessionResponse;
+    if (result !== SessionResponse.Success) {
+      return res.status(401).json({ message: 'Unauthorized: invalid session.' });
     }
   } catch (err: Error | unknown) {
     return res.status(504).json({
