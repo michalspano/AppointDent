@@ -24,6 +24,10 @@ async function geoCodeAddress (address: string): Promise<Place> {
 async function addNewDentist (dentist: Dentist, map: leaflet.Map): Promise<void> {
   const dentistCombinedAddress: string = dentist.address.street + ' ' + dentist.address.houseNumber + ' ' + dentist.address.zip + ' ' + dentist.address.city
   geoCodeAddress(dentistCombinedAddress).then((result: Place) => {
+    function openAvailableSlots (): void {
+      console.log('pressed')
+      window.location.replace('/book-appointment/' + btoa(dentist.userEmail))
+    }
     const dentistCard = `
     <div class="flex flex-wrap items-center gap-4">
       <div class="picture">
@@ -32,7 +36,7 @@ async function addNewDentist (dentist: Dentist, map: leaflet.Map): Promise<void>
       <div class="details"><p>${dentist.name.firstName} ${dentist.name.lastName}</p>
         <p>${dentist.address.street} ${dentist.address.houseNumber}</p>
         <p>${dentist.address.zip} ${dentist.address.city}</p>
-        <button class="showSlots mt-2 px-2 text-white w-full py-1 bg-secondary rounded-xl text-base">See slots</button>
+        <button class="showSlots mt-2 px-2 text-white w-full py-1 bg-secondary rounded-xl text-base" onclick="${openAvailableSlots}">See slots</button>
       </div>
     </div>`
     // The combined html element that is rendered in the popup

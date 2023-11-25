@@ -1,10 +1,13 @@
 import { createSignal, type JSX, createEffect, onCleanup } from 'solid-js'
 import default_doctor from '../../assets/default_doctor.jpg'
 import { Api } from '../../utils/api'
-import type { Appointment, Dentist } from '../../utils/types'
+import type { Appointment, Registration } from '../../utils/types'
 import BookingConfirmationPopup from './BookingConfirmation'
+import { useParams } from '@solidjs/router'
 export default function AppointmentsList (): JSX.Element {
   createEffect(async () => {
+    const params = useParams<{ email: string }>()
+    setDentistEmail(atob(params.email))
     await fetchAppointments()
     await fetchDentist()
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -14,9 +17,8 @@ export default function AppointmentsList (): JSX.Element {
   })
 
   async function fetchAppointments (): Promise<void> {
-    const dentistEmail = 'generic.doctor@clinit_name.se' // get from params or local storage
     try {
-      const response = await Api.get(`/appointments/dentists/${dentistEmail}?onlyAvailable=true`)
+      const response = await Api.get(`/appointments/dentists/${dentistEmail()}?onlyAvailable=true`)
       const appointments = response.data
       const formattedAppointments = appointments.map((appointment: any) => ({
         id: appointment.id,
@@ -46,15 +48,14 @@ export default function AppointmentsList (): JSX.Element {
 
   async function fetchDentist (): Promise<void> {
     try {
-      const dentistEmail = 'generic.doctor@clinit_name.se' // get from params or local storage
-      const response = await Api.get(`/dentists/${dentistEmail}`)
+      const response = await Api.get(`/dentists/${dentistEmail()}`)
       const dentistRes = response.data[0]
       setDentist(dentistRes)
       setDentistName(`${dentist()?.firstName} ${dentist()?.lastName}`)
       setDentistLocation(`${dentist()?.clinicStreet}, ${dentist()?.clinicHouseNumber}`)
       setDentistImage(default_doctor) // TODO change to dentist()?.picture when we add image parsing support
     } catch (error) {
-      throw new Error('Error fetching appointments')
+      throw new Error('Error fetching dentist')
     }
   }
 
@@ -81,7 +82,8 @@ export default function AppointmentsList (): JSX.Element {
   const [selectedTime, setSelectedTime] = createSignal<string>('')
   const [showConfirmation, setShowConfirmation] = createSignal<boolean>(false)
   const [selectedAppointment, setSelectedAppointment] = createSignal<Appointment | null>(null)
-  const [dentist, setDentist] = createSignal<Dentist>()
+  const [dentist, setDentist] = createSignal<Registration>()
+  const [dentistEmail, setDentistEmail] = createSignal<string>('')
   const [dentistName, setDentistName] = createSignal<string>()
   const [dentistLocation, setDentistLocation] = createSignal<string>()
   const [dentistImage, setDentistImage] = createSignal<string>()

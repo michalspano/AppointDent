@@ -35,7 +35,7 @@ render(() => <div>
         <Route path="/user-profile" component={UserProfile} />
         <Route path="/map" component={Map} />
         <Route path="/my-bookings" component={MyBookingsPage} />
-        <Route path="/book-appointment" component={AppointmentsList} />
+        <Route path="/book-appointment/:email" component={AppointmentsList} />
       </Routes>
     </Router>
 
