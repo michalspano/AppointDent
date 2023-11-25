@@ -17,7 +17,7 @@ config(); // read .env file
  */
 const port: string = process.env.PORT ?? '3003';
 app.head('/', (req: Request, res: Response) => {
-  res.status(200).end();
+  res.sendStatus(200);
 });
 // Use the routes defined in routes/index.ts.
 app.use('/', router);
