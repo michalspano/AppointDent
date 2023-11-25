@@ -1,11 +1,12 @@
 import { type JSX } from 'solid-js/jsx-runtime'
+import { createSignal } from 'solid-js'
 import './LoginForm.css'
 import logo from '../../assets/logo.png'
 import { A } from '@solidjs/router'
-import { createSignal } from 'solid-js'
 import { Api } from '../../utils/api'
+import { UserType } from '../../utils/types'
 
-export default function LoginForm (): JSX.Element {
+export default function LoginForm (props: { userType: UserType }): JSX.Element {
   const [email, setEmail] = createSignal('')
   const [password, setPassword] = createSignal('')
   const [error, setError] = createSignal<string | null>(null)
@@ -15,16 +16,23 @@ export default function LoginForm (): JSX.Element {
       setError('Please fill in all fields.')
       return
     }
-    Api
-      .post('/dentists/login', { email: email(), password: password() })
+
+    let loginEndpoint = ''
+    if (props.userType === UserType.Dentist) {
+      loginEndpoint = '/dentists/login'
+    } else if (props.userType === UserType.Patient) {
+      loginEndpoint = '/patients/login'
+    }
+
+    Api.post(loginEndpoint, { email: email(), password: password() })
       .then(() => {
-        const isUserDentist = false // replace when we have the object of current user
-        const navLink = isUserDentist ? '/calendar' : '/map'
+        const navLink = props.userType === UserType.Dentist ? '/calendar' : '/map'
         window.location.href = navLink
       })
       .catch((error: any) => {
         console.error('Error during login', error)
       })
+
     setError(null)
   }
 
