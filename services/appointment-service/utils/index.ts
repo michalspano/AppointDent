@@ -12,6 +12,12 @@ import { randomBytes } from 'crypto';
 const TIMEOUT: number = 10000;
 
 /**
+ * @description the session service responds with 0 on a failed session
+ * verification, and 1 on a successful session verification.
+ */
+type SessionResponse = '1' | '0';
+
+/**
  * @description a helper function to convert an unknown object to an
  * Appointment object. This is used when retrieving an appointment from
  * the database (it returns, indeed, an unknown object).
@@ -70,7 +76,7 @@ export const parseBinaryQueryParam = (rawParam: any, fallbackValue: boolean = fa
  * @returns a promise that resolves to the response of the session-service
  * based on the request Id.
  */
-export const verifySession = async (reqId: string, RESPONSE_TOPIC: string): Promise<string> => {
+export const verifySession = async (reqId: string, RESPONSE_TOPIC: string): Promise<SessionResponse> => {
   return await new Promise((resolve, reject) => {
     const timeout = setTimeout(() => {
       client?.unsubscribe(RESPONSE_TOPIC);
@@ -83,7 +89,7 @@ export const verifySession = async (reqId: string, RESPONSE_TOPIC: string): Prom
           clearTimeout(timeout);
           client?.unsubscribe(topic);
           client?.removeListener('message', eventHandler);
-          resolve(message.toString().split('/')[1]);
+          resolve(message.toString().split('/')[1] as SessionResponse);
         }
       }
     };
