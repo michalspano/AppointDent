@@ -1,24 +1,12 @@
-.notification {
-  color: black;
-  font-size: 18px;
-  text-align: left;
-  margin-bottom: 20px;
-  margin-left: 30px;
+.notification-text {
+  @apply text-base text-left mb-5 ml-2 px-4;
+  max-width: 400px;
+  word-wrap: break-word; /* Allow the text to break and wrap */
 }
-
 .notification span {
-  color: grey;
-  font-size: 16px;
-}
-
-.border-line {
-  width: 90%;
-  border-bottom: 1px solid rgb(152, 152, 152);
-  margin: 0 auto;
-  margin-top: 20px;
-  margin: 20px 0 0 0;
+  @apply text-gray-500 text-sm;
 }
 
 .h-full h1 {
-  padding-left: 70px;
+  @apply pl-10;
 }

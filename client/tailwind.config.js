@@ -20,6 +20,7 @@ module.exports = {
       'success': '#8CDB9E',
       'warning': '#ECEE82',
       'error': '#DA1B1B',
+      'gray': {'500': '#a0aec0'}
     },
     extend: {
     }
