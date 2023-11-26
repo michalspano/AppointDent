@@ -19,11 +19,15 @@ function formatDateTime (dateTime: string): string {
 
 export default function Notification (props: NotificationProps): JSX.Element {
   return (
-    <div class="text-base text-left mb-5 ml-2">
-      <img class="w-6 h-6 mr-2" src={alarmIcon} alt="Alarm Icon" />
-      <span class="mr-2">{formatDateTime(props.date)}</span>
-      <div style={{ background: 'none' }}>{props.message}</div>
-      <div class="border-line"></div>
+    <div class="bg-white p-4 rounded-md shadow-md">
+      <div class="flex items-center">
+        <img class="w-6 h-6 mr-2" src={alarmIcon} alt="Alarm Icon" />
+        <span class="text-gray-600 mr-2">{formatDateTime(props.date)}</span>
+      </div>
+      <div class="mt-2 whitespace-normal">
+        {props.message}
+      </div>
+      <div class="border-b border-gray-300 mt-4"></div>
     </div>
   )
 }

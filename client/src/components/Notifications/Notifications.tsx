@@ -8,7 +8,7 @@ export default function Notifications (): JSX.Element {
     {
       id: '1',
       date: new Date().toISOString().slice(0, 16),
-      message: 'Your appointment scheduled for December 17th has been canceled due to unexpected staff scheduling changes'
+      message: 'Your appointment scheduled for December 17th has been canceled due to unexpected staff scheduling changes. Your appointment scheduled for December 17th has been canceled due to unexpected staff scheduling changes'
     },
     {
       id: '2',
@@ -32,8 +32,8 @@ export default function Notifications (): JSX.Element {
   })
 
   return (
-    <div class="h-full w-full flex flex-col justify-start align-left">
-      <h1 class="text-2xl font-bold pl-10 mt-6">Notifications</h1>
+    <div class="h-full w-full flex flex-col justify-start align-left mt-4">
+      <h1 class="text-2xl font-bold pl-10 mt-6 mb-4">Notifications</h1>
       <NotificationsList notifications={notifications()} />
     </div>
   )
