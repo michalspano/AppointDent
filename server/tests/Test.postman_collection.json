@@ -1,10 +1,9 @@
 {
 	"info": {
-		"_postman_id": "d608da14-6872-43a6-852b-ceb230e60ed1",
+		"_postman_id": "9e09f7b8-02d9-4d77-9be1-522b24925b6c",
 		"name": "Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "31133349",
-		"_collection_link": "https://appointdent.postman.co/workspace/AppointDent~3d7b8d88-ecc1-4d83-a513-eb9122453c58/collection/31133267-d608da14-6872-43a6-852b-ceb230e60ed1?action=share&source=collection_link&creator=31133349"
+		"_exporter_id": "31133349"
 	},
 	"item": [
 		{
@@ -218,6 +217,58 @@
 								"v1",
 								"dentists",
 								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /api/session/whois",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Retrieve correct whois data\", function () {",
+									"        var jsonData = pm.response.json();",
+									"        pm.expect(jsonData.email).to.eql(\"dentist@example.com\");",
+									"        pm.expect(jsonData.type).to.eql(\"d\");",
+									"    });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/sessions/whois",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sessions",
+								"whois"
 							]
 						}
 					},
@@ -696,149 +747,752 @@
 					"description": "A sample dentist created for the `appointment-service`."
 				},
 				{
-					"name": "generate-sample-appointments",
+					"name": "POST /",
 					"item": [
 						{
-							"name": "POST /api/appointments",
-							"event": [
+							"name": "check-auth",
+							"item": [
 								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Response code shall be 201\", function () {",
-											"    pm.response.to.have.status(201);",
-											"});",
-											"",
-											"pm.test(\"Response is in JSON format\", function () {",
-											"    pm.response.to.be.json;",
-											"});",
-											"",
-											"// Parse the request and response JSON bodies",
-											"",
-											"var requestJson = JSON.parse(pm.request.body.raw);",
-											"var responseJson = pm.response.json();",
-											"",
-											"// Get the number of keys in the request and response",
-											"var requestKeys = Object.keys(requestJson).length;",
-											"var responseKeys = Object.keys(responseJson).length;",
-											"",
-											"// Compare the number of keys",
-											"// Must be lower by 2, because there's the auto-generated key in the",
-											"// response and patientId is set to NULL automatically.",
-											"pm.test(\"Number of keys in request is lower by 1 than the response\", function () {",
-											"    pm.expect(requestKeys).to.equal(responseKeys - 2);",
-											"});",
-											"",
-											"// Check if the patientId property is set to null",
-											"pm.test(\"Verify patientId is set to null\", function() {",
-											"    pm.expect(responseJson.patientId).to.equal(null);",
-											"});",
-											"",
-											"",
-											"// Set the ID for other tests.",
-											"const appointmentId = pm.response.json().id;",
-											"pm.environment.set(\"appointmentId\", appointmentId);"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"start_timestamp\": 123131312,\n    \"end_timestamp\": 123131987,\n    \"dentistId\": \"{{dentistEmailSample}}\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
+									"name": "POST (empty dentistId)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response code shall be 400\", function () {",
+													"    pm.response.to.have.status(400);",
+													"});",
+													"",
+													"pm.test(\"Response is an object\", function () {",
+													"    pm.expect(pm.response.json()).to.be.an('object');",
+													"});",
+													"",
+													"pm.test(\"Response contains 'message' attribute\", function () {",
+													"    pm.expect(pm.response.json()).to.have.property('message');",
+													"});",
+													"",
+													"pm.test(\"Contains correct response message\", function () {",
+													"    pm.expect(pm.response.json().message).to.equal(\"Bad request: missing session key or email.\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
 										}
-									}
-								},
-								"url": {
-									"raw": "{{host}}/api/v1/appointments",
-									"host": [
-										"{{host}}"
 									],
-									"path": [
-										"api",
-										"v1",
-										"appointments"
-									]
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"start_timestamp\": 123131312,\n    \"end_timestamp\": 123131987\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{host}}/api/v1/appointments",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"appointments"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "POST (invalid session)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response code shall be 401\", function () {",
+													"    pm.response.to.have.status(401);",
+													"});",
+													"",
+													"pm.test(\"Response is an object\", function () {",
+													"    pm.expect(pm.response.json()).to.be.an('object');",
+													"});",
+													"",
+													"pm.test(\"Response contains 'message' attribute\", function () {",
+													"    pm.expect(pm.response.json()).to.have.property('message');",
+													"});",
+													"",
+													"pm.test(\"Contains correct response message\", function () {",
+													"    pm.expect(pm.response.json().message).to.equal(\"Unauthorized: invalid session.\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Cookie",
+												"value": "sessionKey=InvalidSessionKey",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"start_timestamp\": 123131312,\n    \"end_timestamp\": 123131987,\n    \"dentistId\": \"{{dentistEmailSample}}\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{host}}/api/v1/appointments",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"appointments"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "POST (unmatched emails)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response code shall be 401\", function () {",
+													"    pm.response.to.have.status(401);",
+													"});",
+													"",
+													"pm.test(\"Response is an object\", function () {",
+													"    pm.expect(pm.response.json()).to.be.an('object');",
+													"});",
+													"",
+													"pm.test(\"Response contains 'message' attribute\", function () {",
+													"    pm.expect(pm.response.json()).to.have.property('message');",
+													"});",
+													"",
+													"pm.test(\"Contains correct response message\", function () {",
+													"    pm.expect(pm.response.json().message).to.equal(\"Unauthorized: attempt to create an appointment for another dentist.\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"start_timestamp\": 123131312,\n    \"end_timestamp\": 123131987,\n    \"dentistId\": \"{{dentistEmailSample}})8dajsda121.yahoo\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{host}}/api/v1/appointments",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"appointments"
+											]
+										}
+									},
+									"response": []
 								}
-							},
-							"response": []
+							]
 						},
 						{
-							"name": "POST /api/appointments 2",
-							"event": [
+							"name": "check-format",
+							"item": [
 								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Response code shall be 201\", function () {",
-											"    pm.response.to.have.status(201);",
-											"});",
-											"",
-											"pm.test(\"Response is in JSON format\", function () {",
-											"    pm.response.to.be.json;",
-											"});",
-											"",
-											"// Parse the request and response JSON bodies",
-											"",
-											"var requestJson = JSON.parse(pm.request.body.raw);",
-											"var responseJson = pm.response.json();",
-											"",
-											"// Get the number of keys in the request and response",
-											"var requestKeys = Object.keys(requestJson).length;",
-											"var responseKeys = Object.keys(responseJson).length;",
-											"",
-											"// Compare the number of keys",
-											"// Must be lower by 2, because there's the auto-generated key in the",
-											"// response and patientId is set to NULL automatically.",
-											"pm.test(\"Number of keys in request is lower by 1 than the response\", function () {",
-											"    pm.expect(requestKeys).to.equal(responseKeys - 2);",
-											"});",
-											"",
-											"// Check if the patientId property is set to null",
-											"pm.test(\"Verify patientId is set to null\", function() {",
-											"    pm.expect(responseJson.patientId).to.equal(null);",
-											"});",
-											"",
-											"",
-											"// Set the ID for other tests.",
-											"const appointmentId = pm.response.json().id;",
-											"pm.environment.set(\"appointmentId2\", appointmentId);"
-										],
-										"type": "text/javascript"
-									}
+									"name": "POST (malformed fields)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response code shall be 400\", function () {",
+													"    pm.response.to.have.status(400);",
+													"});",
+													"",
+													"pm.test(\"Response is an object\", function () {",
+													"    pm.expect(pm.response.json()).to.be.an('object');",
+													"});",
+													"",
+													"pm.test(\"Response contains 'message' attribute\", function () {",
+													"    pm.expect(pm.response.json()).to.have.property('message');",
+													"});",
+													"",
+													"pm.test(\"Contains correct response message\", function () {",
+													"    pm.expect(pm.response.json().message).to.equal(\"Bad request: invalid appointment object.\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"Start_timest&m\": 123131312, // malformed\n    \"e(d_timest_p\": 123131987,   // malformed\n    \"dentistId\": \"{{dentistEmailSample}}\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:3000/api/v1/appointments",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "3000",
+											"path": [
+												"api",
+												"v1",
+												"appointments"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "POST (missing field)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response code shall be 400\", function () {",
+													"    pm.response.to.have.status(400);",
+													"});",
+													"",
+													"pm.test(\"Response is an object\", function () {",
+													"    pm.expect(pm.response.json()).to.be.an('object');",
+													"});",
+													"",
+													"pm.test(\"Response contains 'message' attribute\", function () {",
+													"    pm.expect(pm.response.json()).to.have.property('message');",
+													"});",
+													"",
+													"pm.test(\"Contains correct response message\", function () {",
+													"    pm.expect(pm.response.json().message).to.equal(\"Bad request: invalid appointment object.\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"start_timestamp\": 123131312,\n    // \"end_timestamp\" is missing!\n    \"dentistId\": \"{{dentistEmailSample}}\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{host}}/api/v1/appointments",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"appointments"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "POST (missing body)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response code shall be 400\", function () {",
+													"    pm.response.to.have.status(400);",
+													"});",
+													"",
+													"pm.test(\"Response is an object\", function () {",
+													"    pm.expect(pm.response.json()).to.be.an('object');",
+													"});",
+													"",
+													"pm.test(\"Response contains 'message' attribute\", function () {",
+													"    pm.expect(pm.response.json()).to.have.property('message');",
+													"});",
+													"",
+													"pm.test(\"Contains correct response message\", function () {",
+													"    pm.expect(pm.response.json().message).to.equal(\"Bad request: missing session key or email.\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    // empty - error\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{host}}/api/v1/appointments",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"appointments"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "POST (invalid field types)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response code shall be 400\", function () {",
+													"    pm.response.to.have.status(400);",
+													"});",
+													"",
+													"pm.test(\"Response is an object\", function () {",
+													"    pm.expect(pm.response.json()).to.be.an('object');",
+													"});",
+													"",
+													"pm.test(\"Response contains 'message' attribute\", function () {",
+													"    pm.expect(pm.response.json()).to.have.property('message');",
+													"});",
+													"",
+													"pm.test(\"Contains correct response message\", function () {",
+													"    pm.expect(pm.response.json().message).to.equal(\"Bad request: invalid appointment object.\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"start_timestam\": 123131312,\n    \"end_timestamp\": {}, // invalid type\n    \"dentistId\": \"{{dentistEmailSample}}\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{host}}/api/v1/appointments",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"appointments"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "POST (disallowed set patientId)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response code shall be 400\", function () {",
+													"    pm.response.to.have.status(400);",
+													"});",
+													"",
+													"pm.test(\"Response is an object\", function () {",
+													"    pm.expect(pm.response.json()).to.be.an('object');",
+													"});",
+													"",
+													"pm.test(\"Response contains 'message' attribute\", function () {",
+													"    pm.expect(pm.response.json()).to.have.property('message');",
+													"});",
+													"",
+													"pm.test(\"Contains correct response message\", function () {",
+													"    pm.expect(pm.response.json().message).to.equal(\"Bad request: invalid appointment object.\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"dentistId\": \"{{dentistEmailSample}}\",\n    \"patienId\": \"1233132312321sdada\" // set automatically - ignored.\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{host}}/api/v1/appointments",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"appointments"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "create-success",
+							"item": [
+								{
+									"name": "POST /api/appointments",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response code shall be 201\", function () {",
+													"    pm.response.to.have.status(201);",
+													"});",
+													"",
+													"pm.test(\"Response is in JSON format\", function () {",
+													"    pm.response.to.be.json;",
+													"});",
+													"",
+													"// Parse the request and response JSON bodies",
+													"",
+													"var requestJson = JSON.parse(pm.request.body.raw);",
+													"var responseJson = pm.response.json();",
+													"",
+													"// Get the number of keys in the request and response",
+													"var requestKeys = Object.keys(requestJson).length;",
+													"var responseKeys = Object.keys(responseJson).length;",
+													"",
+													"// Compare the number of keys",
+													"// Must be lower by 2, because there's the auto-generated key in the",
+													"// response and patientId is set to NULL automatically.",
+													"pm.test(\"Number of keys in request is lower by 1 than the response\", function () {",
+													"    pm.expect(requestKeys).to.equal(responseKeys - 2);",
+													"});",
+													"",
+													"// Check if the patientId property is set to null",
+													"pm.test(\"Verify patientId is set to null\", function() {",
+													"    pm.expect(responseJson.patientId).to.equal(null);",
+													"});",
+													"",
+													"",
+													"// Set the ID for other tests.",
+													"const appointmentId = pm.response.json().id;",
+													"pm.environment.set(\"appointmentId\", appointmentId);"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"start_timestamp\": 123131312,\n    \"end_timestamp\": 123131987,\n    \"dentistId\": \"{{dentistEmailSample}}\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{host}}/api/v1/appointments",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"appointments"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "POST /api/appointments 2",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response code shall be 201\", function () {",
+													"    pm.response.to.have.status(201);",
+													"});",
+													"",
+													"pm.test(\"Response is in JSON format\", function () {",
+													"    pm.response.to.be.json;",
+													"});",
+													"",
+													"// Parse the request and response JSON bodies",
+													"",
+													"var requestJson = JSON.parse(pm.request.body.raw);",
+													"var responseJson = pm.response.json();",
+													"",
+													"// Get the number of keys in the request and response",
+													"var requestKeys = Object.keys(requestJson).length;",
+													"var responseKeys = Object.keys(responseJson).length;",
+													"",
+													"// Compare the number of keys",
+													"// Must be lower by 2, because there's the auto-generated key in the",
+													"// response and patientId is set to NULL automatically.",
+													"pm.test(\"Number of keys in request is lower by 1 than the response\", function () {",
+													"    pm.expect(requestKeys).to.equal(responseKeys - 2);",
+													"});",
+													"",
+													"// Check if the patientId property is set to null",
+													"pm.test(\"Verify patientId is set to null\", function() {",
+													"    pm.expect(responseJson.patientId).to.equal(null);",
+													"});",
+													"",
+													"",
+													"// Set the ID for other tests.",
+													"const appointmentId = pm.response.json().id;",
+													"pm.environment.set(\"appointmentId2\", appointmentId);"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"start_timestamp\": 31231241412,\n    \"end_timestamp\": 312321241412,\n    \"dentistId\": \"{{dentistEmailSample}}\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{host}}/api/v1/appointments",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"appointments"
+											]
+										}
+									},
+									"response": []
 								}
 							],
-							"request": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"start_timestamp\": 31231241412,\n    \"end_timestamp\": 312321241412,\n    \"dentistId\": \"{{dentistEmailSample}}\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
+							"description": "Used in the **subsequent tests**."
+						},
+						{
+							"name": "simulate-for-patient",
+							"item": [
+								{
+									"name": "create-sample-patient",
+									"item": [
+										{
+											"name": "POST/api/patients/register",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Response code shall be 201\", function () {",
+															"    pm.response.to.have.status(201);",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Cookie",
+														"value": "sessionKey=\"\"",
+														"type": "text"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"email\": \"{{patientEmailSample}}\",\n    \"password\": \"complicatedpassword\",\n    \"birthDate\": \"2003\",\n    \"lastName\": \"Sample\",\n    \"firstName\": \"Patient\"\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{host}}/api/v1/patients/register",
+													"host": [
+														"{{host}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"patients",
+														"register"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "POST/api/patients/login",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Response code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});",
+															"",
+															""
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"email\": \"{{patientEmailSample}}\",\n    \"password\": \"complicatedpassword\"\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{host}}/api/v1/patients/login",
+													"host": [
+														"{{host}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"patients",
+														"login"
+													]
+												}
+											},
+											"response": []
 										}
-									}
-								},
-								"url": {
-									"raw": "{{host}}/api/v1/appointments",
-									"host": [
-										"{{host}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"appointments"
 									]
+								},
+								{
+									"name": "POST (disallowed user type)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response code shall be 403\", function () {",
+													"    pm.response.to.have.status(403);",
+													"});",
+													"",
+													"pm.test(\"Response is an object\", function () {",
+													"    pm.expect(pm.response.json()).to.be.an('object');",
+													"});",
+													"",
+													"pm.test(\"Response contains 'message' attribute\", function () {",
+													"    pm.expect(pm.response.json()).to.have.property('message');",
+													"});",
+													"",
+													"pm.test(\"Contains correct response message\", function () {",
+													"    pm.expect(pm.response.json().message).to.equal(\"Forbidden: only dentists can create appointments.\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"start_timestamp\": 123131312,\n    \"end_timestamp\": 123131987,\n    \"dentistId\": \"{{dentistEmailSample}}\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{host}}/api/v1/appointments",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"appointments"
+											]
+										}
+									},
+									"response": []
 								}
-							},
-							"response": []
+							]
 						}
 					],
 					"description": "Generate sample appointments used for the `appointment-service`."
@@ -846,6 +1500,54 @@
 				{
 					"name": "GET /",
 					"item": [
+						{
+							"name": "switch-to-dentist",
+							"item": [
+								{
+									"name": "POST /api/dentists/login",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"email\": \"{{dentistEmailSample}}\",\n  \"password\": \"pass123pass456\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{host}}/api/v1/dentists/login",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"dentists",
+												"login"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"description": "A sample dentist created for the `appointment-service`."
+						},
 						{
 							"name": "GET / (as dentist)",
 							"event": [
@@ -1126,7 +1828,7 @@
 					]
 				},
 				{
-					"name": "BOOKING",
+					"name": "BOOK /",
 					"item": [
 						{
 							"name": "book-as-dentist[fail]",
@@ -1200,56 +1902,8 @@
 							]
 						},
 						{
-							"name": "create-sample-patient",
+							"name": "switch-to-patient",
 							"item": [
-								{
-									"name": "POST/api/patients/register",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"pm.test(\"Response code shall be 201\", function () {",
-													"    pm.response.to.have.status(201);",
-													"});"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Cookie",
-												"value": "sessionKey=\"\"",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"email\": \"{{patientEamilSample}}\",\n    \"password\": \"complicatedpassword\",\n    \"birthDate\": \"2003\",\n    \"lastName\": \"Sample\",\n    \"firstName\": \"Patient\"\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{host}}/api/v1/patients/register",
-											"host": [
-												"{{host}}"
-											],
-											"path": [
-												"api",
-												"v1",
-												"patients",
-												"register"
-											]
-										}
-									},
-									"response": []
-								},
 								{
 									"name": "POST/api/patients/login",
 									"event": [
@@ -1272,7 +1926,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"email\": \"{{patientEamilSample}}\",\n    \"password\": \"complicatedpassword\"\n}",
+											"raw": "{\n    \"email\": \"{{patientEmailSample}}\",\n    \"password\": \"complicatedpassword\"\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -1400,7 +2054,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"email\": \"{{patientEamilSample}}\",\n    \"patientId\": \"12312321\"\n}",
+									"raw": "{\n    \"email\": \"{{patientEmailSample}}\",\n    \"patientId\": \"12312321\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1466,7 +2120,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"email\": \"{{patientEamilSample}})d9sadna\", //malformed\n    \"patientId\": \"12312321\"\n}",
+									"raw": "{\n    \"email\": \"{{patientEmailSample}})d9sadna\", //malformed\n    \"patientId\": \"12312321\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1550,7 +2204,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"email\": \"{{patientEamilSample}}\",\n    \"patientId\": \"12312321\" // make the appointment booked\n}",
+									"raw": "{\n    \"email\": \"{{patientEmailSample}}\",\n    \"patientId\": \"12312321\" // make the appointment booked\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1612,7 +2266,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"email\": \"{{patientEamilSample}}\",\n    \"patientId\": \"12312321\" // make the appointment booked\n}",
+									"raw": "{\n    \"email\": \"{{patientEmailSample}}\",\n    \"patientId\": \"12312321\" // make the appointment booked\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1678,7 +2332,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"email\": \"{{patientEamilSample}}\",\n    \"patientId\": \"12312321\" // make the appointment booked\n}",
+									"raw": "{\n    \"email\": \"{{patientEmailSample}}\",\n    \"patientId\": \"12312321\" // make the appointment booked\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1760,7 +2414,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"email\": \"{{patientEamilSample}}\"\n}",
+									"raw": "{\n    \"email\": \"{{patientEmailSample}}\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1826,7 +2480,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"email\": \"{{patientEamilSample}}\"\n}",
+									"raw": "{\n    \"email\": \"{{patientEmailSample}}\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -2036,58 +2690,6 @@
 								"v1",
 								"patients",
 								"login"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "POST /api/session/whois",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Response code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Retrieve correct whois data\", function () {",
-									"        var jsonData = pm.response.json();",
-									"        pm.expect(jsonData.email).to.eql(\"sophia2043.appleseed@email.com\");",
-									"        pm.expect(jsonData.type).to.eql(\"p\");",
-									"    });",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{host}}/api/v1/sessions/whois",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"sessions",
-								"whois"
 							]
 						}
 					},
