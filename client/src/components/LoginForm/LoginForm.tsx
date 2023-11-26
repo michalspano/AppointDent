@@ -4,35 +4,33 @@ import './LoginForm.css'
 import logo from '../../assets/logo.png'
 import { A } from '@solidjs/router'
 import { Api } from '../../utils/api'
-import { type UserType } from '../../utils/types'
+// import { type UserType } from '../../utils/types'
 
-export default function LoginForm (props: { userType: UserType }): JSX.Element {
+export default function LoginForm (): JSX.Element { // props: { userType: UserType }
   const [email, setEmail] = createSignal('')
   const [password, setPassword] = createSignal('')
   const [error, setError] = createSignal<string | null>(null)
 
-  const login = (): void => {
-    if (email() === '' || password() === '') {
-      setError('Please fill in all fields.')
-      return
-    }
-    Api
-      .post('/dentists/login', { email: email(), password: password() }, { withCredentials: true })
-      .then(() => {
-        Api.get('/sessions/whois', { withCredentials: true }).then((result) => {
-          const isUserDentist: string = result.data.type // replace when we have the object of current user
-          const navLink = isUserDentist === 'd' ? '/calendar' : '/map'
-          window.location.replace(navLink)
-        }).catch((err) => {
-          console.error('Fail whois')
-          console.error(err)
-        })
-      })
-      .catch((error: any) => {
-        console.error('Error during login', error)
-      })
+  const login = async (): Promise<void> => {
+    try {
+      // Attempt to login as a dentist
+      await Api.post('/dentists/login', { email: email(), password: password() }, { withCredentials: true })
 
-    setError(null)
+      // Dentist login successful, redirect to dentist-specific page
+      window.location.replace('/calendar')
+    } catch (dentistError) {
+      try {
+        // If dentist login fails, attempt patient login
+        await Api.post('/patients/login', { email: email(), password: password() }, { withCredentials: true })
+
+        // Patient login successful, redirect to patient-specific page
+        window.location.replace('/map')
+      } catch (patientError) {
+        // Both dentist and patient login failed, handle the error
+        console.error('Error during login', patientError)
+        setError('Login failed. Please check your credentials and try again.')
+      }
+    }
   }
 
   return <>
