@@ -4,29 +4,28 @@ import './LoginForm.css'
 import logo from '../../assets/logo.png'
 import { A } from '@solidjs/router'
 import { Api } from '../../utils/api'
-// import { type UserType } from '../../utils/types'
 
-export default function LoginForm (): JSX.Element { // props: { userType: UserType }
+export default function LoginForm (): JSX.Element {
   const [email, setEmail] = createSignal('')
   const [password, setPassword] = createSignal('')
   const [error, setError] = createSignal<string | null>(null)
 
   const login = async (): Promise<void> => {
     try {
-      // Attempt to login as a dentist
+      // Login as a dentist
       await Api.post('/dentists/login', { email: email(), password: password() }, { withCredentials: true })
 
-      // Dentist login successful, redirect to dentist-specific page
+      // If dentist login is successful, user is redirected to dentist-specific page
       window.location.replace('/calendar')
     } catch (dentistError) {
       try {
-        // If dentist login fails, attempt patient login
+        // If dentist login fails, patient login is attempted
         await Api.post('/patients/login', { email: email(), password: password() }, { withCredentials: true })
 
-        // Patient login successful, redirect to patient-specific page
+        // If patient login successful, user is redirected to patient-specific page
         window.location.replace('/map')
       } catch (patientError) {
-        // Both dentist and patient login failed, handle the error
+        // Error handling of both patient and dentist login fails
         console.error('Error during login', patientError)
         setError('Login failed. Please check your credentials and try again.')
       }

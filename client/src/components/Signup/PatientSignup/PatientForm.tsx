@@ -27,8 +27,6 @@ export default function PatientForm (): JSX.Element {
       return
     }
 
-    console.log('Sending data:', requiredFields)
-
     await Api.post('/patients/register', requiredFields, { responseType: 'json' })
       .then((response) => {
         console.log('Signup successful', response.data)
