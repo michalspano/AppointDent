@@ -27,6 +27,16 @@ export const login = async (req: Request, res: Response): Promise<Response<any, 
   if (request.email === undefined) return res.sendStatus(400);
   if (request.password === undefined) return res.sendStatus(400);
 
+  let result: any;
+  try {
+    result = database.prepare('SELECT email FROM patient WHERE email = ?').get(request.email);
+  } catch (err: Error | unknown) {
+    return res.status(500).json({
+      message: 'Internal server error: fail performing selection.'
+    });
+  }
+  if (result === undefined) return res.sendStatus(404);
+
   const reqId = Math.floor(Math.random() * 1000);
   client.subscribe(RESPONSE_TOPIC); // Subscribe first to ensure we dont miss anything
   client.publish(TOPIC, `${reqId}/${request.email}/${request.password}/*`);
@@ -46,6 +56,7 @@ export const login = async (req: Request, res: Response): Promise<Response<any, 
     return res.sendStatus(200);
   }
 };
+
 /**
  * Wrap the login handler in a sync function for the route handler
  * @param req request

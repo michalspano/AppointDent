@@ -28,17 +28,28 @@ export default function PatientForm (): JSX.Element {
     }
 
     await Api.post('/patients/register', requiredFields, { responseType: 'json' })
-      .then((response) => {
-        console.log('Signup successful', response.data)
+      .then(async () => {
+        await login()
       })
-
       .catch((error: any) => {
-        console.error('Error during sign up', error)
+        setError('Something went wrong, try again.')
         console.log('Server response:', error.response)
       })
-    console.log('Sending request to /patients/register', requiredFields)
 
     setError(null)
+  }
+
+  const login = async (): Promise<void> => {
+    try {
+      await Api.post('/patients/login', { email: email(), password: password() }, { withCredentials: true })
+        .then(() => {
+        // navigate to logged in view
+          window.location.replace('/map')
+        })
+    } catch (error) {
+      setError('Something went wrong, try again.')
+      console.error('Error during login:', error)
+    }
   }
 
   return <>
