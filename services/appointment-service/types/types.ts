@@ -1,4 +1,5 @@
 import type { UUID } from 'crypto';
+import type { Response } from 'express';
 
 /**
  * @description the interface for the appointment object.
@@ -43,3 +44,14 @@ export enum SessionResponse {
   Fail = 0,
   Success = 1
 };
+
+/**
+ * @description the response from the controllers in a Promise
+ * like format that resolves to a Response object. A Response
+ * object is an object that is returned by the express framework
+ * when a request is made to the server. It is similar to a JSON
+ * object, but it has more properties.
+ *
+ * @see https://expressjs.com/en/api.html#res
+ */
+export type AsyncResObj = Promise<Response<any, Record<string, any>>>;

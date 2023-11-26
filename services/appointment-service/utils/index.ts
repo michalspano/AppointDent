@@ -12,6 +12,22 @@ import { type Appointment, SessionResponse, type WhoisResponse, type UserType } 
 const TIMEOUT: number = 10000;
 
 /**
+ * @description an immutable object that contains the MQTT topics
+ * used by the appointment service, mapped to a human-readable
+ * key.
+ */
+export const MQTT_PAIRS: Readonly<Record<string, Record<string, string>>> = Object.freeze({
+  auth: {
+    req: 'AUTHREQ',
+    res: 'AUTHRES'
+  },
+  whois: {
+    req: 'WHOIS',
+    res: 'WHOISRES'
+  }
+});
+
+/**
  * @description a helper function to convert an unknown object to an
  * Appointment object. This is used when retrieving an appointment from
  * the database (it returns, indeed, an unknown object).
