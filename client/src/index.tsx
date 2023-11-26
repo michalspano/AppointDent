@@ -10,6 +10,7 @@ import DentistCalendar from './routes/DentistCalendar.tsx'
 import UserProfile from './routes/UserProfile.tsx'
 import Map from './routes/Map.tsx'
 import MyBookingsPage from './routes/MyBookings.tsx'
+import NotificationsPage from './routes/NotificationsPage.tsx'
 import RouteGuard from './components/RouteGuard.tsx'
 import AppointmentsList from './components/Appointments/AppointmentsList.tsx'
 
@@ -23,6 +24,11 @@ render(() => <div>
         <Route path="/signup" component={Signup} />
         <Route path="/dentist-signup" component={DentistSignup} />
         <Route path="/patient-signup" component={PatientSignup} />
+        <Route path="/calendar" component={DentistCalendar} />
+        <Route path="/user-profile" component={UserProfile} />
+        <Route path="/map" component={Map} />
+        <Route path="/my-bookings" component={MyBookingsPage} />
+        <Route path="/notifications" component={NotificationsPage}/>
         <Route path="/" component={RouteGuard}>
           <Route path="/calendar" component={DentistCalendar} />
           <Route path="/user-profile" component={UserProfile} />
