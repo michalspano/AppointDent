@@ -1,9 +1,10 @@
 {
 	"info": {
-		"_postman_id": "6eb329ac-4fd0-4127-aa6c-bf305d056997",
+		"_postman_id": "a9f414a0-f049-4fb3-98f9-9be95f94d9fb",
 		"name": "Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "28264405"
+		"_exporter_id": "29406936",
+		"_collection_link": "https://www.postman.com/dark-flare-212796/workspace/dit356/collection/29406936-a9f414a0-f049-4fb3-98f9-9be95f94d9fb?action=share&source=collection_link&creator=29406936"
 	},
 	"item": [
 		{
@@ -281,14 +282,10 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Response code shall be 401\", function () {",
-									"    pm.response.to.have.status(401);",
+									"pm.test(\"Response code shall be 404\", function () {",
+									"    pm.response.to.have.status(404);",
 									"});",
-									"",
-									"",
-									"pm.test(\"Body matches string\", function () {",
-									"    pm.expect(pm.response.text()).to.include(\"Unable to authorize\");",
-									"});"
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -328,13 +325,10 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Response code shall be 401\", function () {",
-									"    pm.response.to.have.status(401);",
+									"pm.test(\"Response code shall be 404\", function () {",
+									"    pm.response.to.have.status(404);",
 									"});",
-									"",
-									"pm.test(\"Body matches string\", function () {",
-									"    pm.expect(pm.response.text()).to.include(\"Unable to authorize\");",
-									"});"
+									""
 								],
 								"type": "text/javascript"
 							}

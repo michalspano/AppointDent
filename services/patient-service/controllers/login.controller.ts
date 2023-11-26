@@ -24,15 +24,19 @@ export const loginController = async (req: Request, res: Response): Promise<Resp
     return res.sendStatus(500);
   }
 
-  let result: any;
   try {
-    result = database.prepare('SELECT email FROM patient WHERE email = ?').get(req.body.email);
-  } catch (err: Error | unknown) {
+    const result = database.prepare('SELECT email FROM patients WHERE email = ?').get(req.body.email);
+    console.log(result);
+
+    if (result === undefined) {
+      return res.sendStatus(404);
+    }
+  } catch (err) {
     return res.status(500).json({
-      message: 'Internal server error: fail performing selection.'
+      message: 'Internal server error: failed performing selection.'
     });
   }
-  if (result === undefined) return res.sendStatus(404);
+
   const reqId = Math.floor(Math.random() * 1000);
   client.subscribe(RESPONSE_TOPIC);
   client.publish(TOPIC, `${reqId}/${email}/${password}/*`);

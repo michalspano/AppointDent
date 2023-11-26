@@ -49,19 +49,19 @@ export default function Navbar (): JSX.Element {
                 <a href={logoLink} class="flex flex-shrink-0 items-center">
                     <img class="h-8 w-auto" src={logo} alt="AppointDent" />
                 </a>
-                <div class="hidden sm:ml-6 sm:block">
-                <div class="flex space-x-4">
+                <div class="hidden md:ml-6 ml-2 sm:block">
+                <div class="flex space-x-0">
                     <For each={routes}>{(route, index) =>
-                        <div class="flex row">
-                            <a href={route.href} class="rounded-md px-3 py-2 text-sm font-medium">{route.name}</a>
+                        <div class="flex row mr-0 ">
+                            <a href={route.href} class="rounded-md px-2 md:px-3 py-2 text-sm font-medium">{route.name}</a>
                             {route.name === 'Explore' && <img class="w-6 h-6 mt-1" src={location} alt="Arrow left" />}
-                            {index() === 0 && <div class='border-l h-auto ml-5 bg-white' style="color: white;"/>}
+                            {index() === 0 && <div class='border-l h-auto ml-2 lg:ml-5 bg-white' style="color: white;"/>}
                         </div>
                     }</For>
                 </div>
                 </div>
             </div>
-            <div class="flex items-center pr-2 sm:static sm:inset-auto sm:ml-3 sm:pr-0">
+            <div class="flex items-center pr-0 sm:static sm:inset-auto sm:pr-0">
                 <button onClick={toggleNotification} type="button" class="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none">
                 <span class="absolute -inset-1.5"></span>
                 <span class="sr-only">View notifications</span>
@@ -79,7 +79,7 @@ export default function Navbar (): JSX.Element {
                     </Show>
                 </div>
             </div>
-            <div class="relative ml-3">
+            <div class="relative ml-2 md:ml-4">
                 <div>
                     <button type="button" class="relative flex rounded-full bg-gray-800 text-sm focus:outline-none" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
                     <span class="sr-only">Open user menu</span>
@@ -90,7 +90,7 @@ export default function Navbar (): JSX.Element {
                 </div>
 
                 </div>
-            <div class='ml-4'>
+            <div class='ml-2 md:ml-4'>
                 <button onclick={() => {
                   logout()
                     .catch((error) => {
