@@ -9,12 +9,15 @@ const getAsyncNotifications = async function (req: Request, res: Response): Prom
     });
   }
 
+  // Authorise the user that tries to fetch notifications.
   const authRes = await authoriseUser(req, res);
   if (authRes !== undefined) {
     return authRes;
   }
 
+  // The email of the user that wants to fetch all of their notifications
   const userEmail = req.params.email;
+  // Array of notifications. If the user has no notifications an empty array is sent (in JSON format).
   let notifications: unknown[];
   try {
     notifications = database?.prepare('SELECT * FROM notifications WHERE email = ?').all(userEmail);

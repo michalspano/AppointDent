@@ -11,12 +11,15 @@ const deleteAsyncNotification = async function (req: Request, res: Response): Pr
     });
   }
 
+  // Authorise the user that tries to fetch notifications.
   const authRes = await authoriseUser(req, res);
   if (authRes !== undefined) {
     return authRes;
   }
 
+  // Id for the notification that is to be deleted.
   const notId = req.params.id;
+  // First we get the the notification from the database to see if it exists.
   let notToDelete: unknown;
 
   try {
@@ -35,7 +38,7 @@ const deleteAsyncNotification = async function (req: Request, res: Response): Pr
   }
 
   // Notification is found, process to delete it.
-  const delStmt: Statement = database.prepare('DELETE FROM appointments WHERE id = ?');
+  const delStmt: Statement = database.prepare('DELETE FROM notifications WHERE id = ?');
   try {
     delStmt.run(notId);
   } catch (err) {
@@ -57,12 +60,15 @@ const deleteAsyncAllNotification = async function (req: Request, res: Response):
     });
   }
 
+  // Authorise the user that tries to fetch notifications.
   const authRes = await authoriseUser(req, res);
   if (authRes !== undefined) {
     return authRes;
   }
 
+  // The email of the user that wants to delete all of their notifications
   const userEmail = req.params.email;
+  // Array of notifications belonging to the user
   let notArray: unknown[];
   try {
     notArray = database.prepare('SELECT * FROM notifications where email = ?').all(userEmail);
@@ -79,7 +85,7 @@ const deleteAsyncAllNotification = async function (req: Request, res: Response):
     });
   }
 
-  // User has notifications, process to delete it.
+  // User has notifications, process to delete them.
   const delStmt: Statement = database.prepare('DELETE FROM appointments WHERE email = ?');
   try {
     delStmt.run(userEmail);
@@ -94,6 +100,7 @@ const deleteAsyncAllNotification = async function (req: Request, res: Response):
   return res.sendStatus(204);
 };
 
+// Wrapper functions to ditch the asynchronicity of using MQTT.
 export const deleteAllNotification = function (req: Request, res: Response): void {
   void deleteAsyncAllNotification(req, res);
 };
