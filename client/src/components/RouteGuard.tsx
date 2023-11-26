@@ -31,6 +31,7 @@ export default function RouteGuard (): JSX.Element {
     const authResult = await isAuth()
     if (!authResult) {
       navigate('/', { replace: true })
+      setTimeout(() => { alert('Please log in before using the app.') }, 100)
     }
   })
 
