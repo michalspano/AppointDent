@@ -2,33 +2,42 @@ import { type JSX } from 'solid-js/jsx-runtime'
 import logo from '../../../assets/logo.png'
 import { A } from '@solidjs/router'
 import { createSignal } from 'solid-js'
+import { Api } from '../../../utils/api'
 
 export default function PatientForm (): JSX.Element {
   const today = new Date().toISOString().split('T')[0]
-  const [userEmail, setUserEmail] = createSignal('')
-  const [userPassword, setUserPassword] = createSignal('')
-  const [userFirstName, setUserFirstName] = createSignal('')
-  const [userLastName, setUserLastName] = createSignal('')
-  const [userBirthday, setUserBirthday] = createSignal('')
+  const [email, setEmail] = createSignal('')
+  const [password, setPassword] = createSignal('')
+  const [dateOfBirth, setDateOfBirth] = createSignal('')
+  const [firstName, setFirstName] = createSignal('')
+  const [lastName, setLastName] = createSignal('')
   const [error, setError] = createSignal<string | null>(null)
-  const fields = [
-    userEmail,
-    userPassword,
-    userFirstName,
-    userLastName,
-    userBirthday
-  ]
 
-  const signup = (): void => {
-    if (fields.some((field) => field() === '')) {
+  const signup = async (): Promise<void> => {
+    const requiredFields: any = {
+      email: email(),
+      password: password(),
+      firstName: firstName(),
+      lastName: lastName(),
+      birthDate: dateOfBirth()
+    }
+
+    if (Object.values(requiredFields).some((field) => field === '')) {
       setError('Please fill in all fields.')
       return
     }
-    console.log(userEmail())
-    console.log(userPassword())
-    console.log(userFirstName())
-    console.log(userLastName())
-    console.log(userBirthday())
+
+    await Api.post('/patients/register', requiredFields, { responseType: 'json' })
+      .then((response) => {
+        console.log('Signup successful', response.data)
+      })
+
+      .catch((error: any) => {
+        console.error('Error during sign up', error)
+        console.log('Server response:', error.response)
+      })
+    console.log('Sending request to /patients/register', requiredFields)
+
     setError(null)
   }
 
@@ -44,26 +53,26 @@ export default function PatientForm (): JSX.Element {
           class="input h-12 px-3 py-2 mb-3 border rounded-xl"
           type="text"
           placeholder="Email"
-          onChange={(event) => setUserEmail(event.target.value)}
+          onChange={(event) => setEmail(event.target.value)}
         />
         <input
           class="input h-12 px-3 py-2 mb-3 border rounded-xl"
           type="password"
           placeholder="Password"
-          onChange={(event) => setUserPassword(event.target.value)}
+          onChange={(event) => setPassword(event.target.value)}
         />
           <div class="flex flex-row">
             <input
               class="input h-12 w-full px-3 py-2 mb-3 md:mb-0 mr-2 border rounded-xl"
               type="text"
               placeholder="First name"
-              onChange={(event) => setUserFirstName(event.target.value)}
+              onChange={(event) => setFirstName(event.target.value)}
             />
             <input
               class="input h-12 w-full px-3 py-2 mb-3 border rounded-xl"
               type="text"
               placeholder="Last name"
-              onChange={(event) => setUserLastName(event.target.value)}
+              onChange={(event) => setLastName(event.target.value)}
             />
           </div>
           <input
@@ -71,15 +80,21 @@ export default function PatientForm (): JSX.Element {
               type="date"
               max={today}
               placeholder="Date of birth"
-              onChange={(event) => setUserBirthday(event.target.value)}
+              onChange={(event) => setDateOfBirth(event.target.value)}
             />
         {error() !== null && <p class="text-error">{error()}</p>}
-        <button type="submit" class="log-in-btn h-12 mb-6 bg-secondary rounded-xl text-base" onClick={signup}>
+        <button type="submit" class="log-in-btn h-12 mb-6 bg-secondary rounded-xl text-base"
+        onclick={() => {
+          signup()
+            .catch((error) => {
+              console.error('Error creating account:', error)
+            })
+        }}>
             Create account
             </button>
         <p class="font-extralight">Already have an account?
         <span class="font-medium">
-        <A href="/"> Log in.</A>
+        <A class='text-black' href="/"> Log in.</A>
             </span>
           </p>
         </div>

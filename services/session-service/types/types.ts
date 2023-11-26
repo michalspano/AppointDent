@@ -40,6 +40,11 @@ export interface DeleteUserRequest {
   session_key: string
 }
 
+export interface WhoIsRequestMQTT {
+  reqId: string
+  session_key: string
+}
+
 export interface WhoIsRequest {
   email: string
   type: string

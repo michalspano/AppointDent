@@ -20,4 +20,5 @@ export interface CustomInputProps extends JSX.HTMLAttributes<HTMLInputElement> {
   placeHolder?: string
   inputType: string
   onChange: JSX.ChangeEventHandlerUnion<HTMLInputElement, Event> | undefined
+  disabled: boolean
 }

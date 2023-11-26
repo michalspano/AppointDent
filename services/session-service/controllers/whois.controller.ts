@@ -35,8 +35,16 @@ async function whois (req: Request, res: Response): Promise<Response<any, Record
         message: 'Internal server error: fail performing selection.'
       });
     }
-    if (result === undefined) return res.sendStatus(400);
-    if (result.email === undefined || result.type === undefined) return res.sendStatus(400);
+    if (result === undefined) {
+      return res.status(400).json({
+        message: 'Not logged in'
+      });
+    }
+    if (result.email === undefined || result.type === undefined) {
+      return res.status(400).json({
+        message: 'Not logged in'
+      });
+    } ;
     return res.status(200).json(result);
   } catch (err) {
     console.log(err);

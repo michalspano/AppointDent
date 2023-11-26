@@ -21,6 +21,10 @@ async function geoCodeAddress (address: string): Promise<Place> {
   })
 }
 
+function openAvailableSlots (email: string): void {
+  console.log('pressed')
+  window.location.replace('/book-appointment/' + btoa(email))
+}
 async function addNewDentist (dentist: Dentist, map: leaflet.Map): Promise<void> {
   const dentistCombinedAddress: string = dentist.address.street + ' ' + dentist.address.houseNumber + ' ' + dentist.address.zip + ' ' + dentist.address.city
   geoCodeAddress(dentistCombinedAddress).then((result: Place) => {
@@ -32,9 +36,10 @@ async function addNewDentist (dentist: Dentist, map: leaflet.Map): Promise<void>
       <div class="details"><p>${dentist.name.firstName} ${dentist.name.lastName}</p>
         <p>${dentist.address.street} ${dentist.address.houseNumber}</p>
         <p>${dentist.address.zip} ${dentist.address.city}</p>
-        <button class="showSlots mt-2 px-2 text-white w-full py-1 bg-secondary rounded-xl text-base">See slots</button>
+        <button id="showSlotsButton" value="${dentist.userEmail}" class="showSlots mt-2 px-2 text-white w-full py-1 bg-secondary rounded-xl text-base">See slots</button>
       </div>
     </div>`
+
     // The combined html element that is rendered in the popup
     const combinedEl = `<div class="dentistMarker">${dentistCard}</div>`
     // The map icon
@@ -49,6 +54,18 @@ async function addNewDentist (dentist: Dentist, map: leaflet.Map): Promise<void>
     const pin = leaflet.marker([parseFloat(result.lat), parseFloat(result.lon)], { icon: pinIcon }).addTo(map)
     // Bind the html to be rendered upon interaction with pin
     pin.bindPopup(combinedEl, { className: 'dentist' })
+    /**
+     * We wait until the popup is open, before we attach event handler.
+     */
+    map.on('popupopen', (event) => {
+      const htmlContent = event.popup.getContent() as string | undefined
+      if (typeof htmlContent === 'string' && htmlContent.includes('showSlotsButton')) { // We check if the content contains html
+        const showSlotsButton = document.getElementById('showSlotsButton')
+        showSlotsButton?.addEventListener('click', (e) => {
+          openAvailableSlots((e.target as HTMLInputElement)?.value)
+        })
+      }
+    })
   }).catch((err) => {
     console.error(err)
   })
