@@ -1,3 +1,14 @@
+/**
+ * app.ts - appointments-service
+ *
+ * @description :: The main entry point for the appointments service.
+ * @version     :: 1.0
+ * @access      :: private
+ * @license     :: (MIT) 2023, AppointDent Authors
+ * @status      :: experimental
+ * @deprecated  :: false
+ */
+
 import router from './routes';
 import { config } from 'dotenv';
 import app from './config/config';

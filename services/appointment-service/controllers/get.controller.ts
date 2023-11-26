@@ -1,11 +1,19 @@
+/**
+ * controllers/get.controller.ts
+ *
+ * @description :: GET methods for appointments.
+ * @version     :: 1.0
+ */
+
 import database from '../db/config';
 import { client } from '../mqtt/mqtt';
 import * as utils from '../utils';
 import type { Request, Response } from 'express';
 import { SessionResponse } from '../types/types';
+import type { AsyncResObj } from '../types/types';
 
-const TOPIC: string = 'AUTHREQ';
-const RESPONSE_TOPIC: string = 'AUTHRES';
+const TOPIC: string = utils.MQTT_PAIRS.auth.req;
+const RESPONSE_TOPIC: string = utils.MQTT_PAIRS.auth.res;
 
 /**
  * @description A controller function to get all appointments.
@@ -22,7 +30,7 @@ const RESPONSE_TOPIC: string = 'AUTHRES';
  *
  * @returns Promise that resolves to a response object.
  */
-const getAllAppointments = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
+const getAllAppointments = async (req: Request, res: Response): AsyncResObj => {
   if (database === undefined) {
     return res.status(500).json({
       message: 'Internal server error: database connection failed.'

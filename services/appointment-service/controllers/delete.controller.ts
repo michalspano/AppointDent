@@ -1,3 +1,10 @@
+/**
+ * controllers/delete.controller.ts
+ *
+ * @description :: DELETE methods for appointments.
+ * @version     :: 1.0
+ */
+
 import database from '../db/config';
 import type { Request, Response } from 'express';
 import { type Statement } from 'better-sqlite3';

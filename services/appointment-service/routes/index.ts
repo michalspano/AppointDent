@@ -1,3 +1,10 @@
+/**
+ * routes/index.ts
+ *
+ * @description :: Routes for appointments.
+ * @version     :: 1.0
+ */
+
 import { Router } from 'express';
 import createAppointment from '../controllers/post.controller';
 import editAppointment from '../controllers/patch.controller';

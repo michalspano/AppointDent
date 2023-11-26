@@ -1,14 +1,20 @@
+/**
+ * controllers/patch.controller.ts
+ *
+ * @description :: PATCH method for appointments.
+ * @version     :: 1.0
+ */
+
 import * as utils from '../utils';
 import { client } from '../mqtt/mqtt';
 import database from '../db/config';
 import type Database from 'better-sqlite3';
 import { type Statement } from 'better-sqlite3';
 import type { Request, Response } from 'express';
-import { SessionResponse } from '../types/types';
-import { UserType, type Appointment, type WhoisResponse } from '../types/types';
+import { type AsyncResObj, SessionResponse, UserType, type Appointment, type WhoisResponse } from '../types/types';
 
-const TOPIC: string = 'WHOIS';
-const RESPONSE_TOPIC: string = 'WHOISRES';
+const TOPIC: string = utils.MQTT_PAIRS.whois.req;
+const RESPONSE_TOPIC: string = utils.MQTT_PAIRS.whois.res;
 
 /**
  * @description the controller for the PATCH /appointments/:id route. In
@@ -27,7 +33,7 @@ const RESPONSE_TOPIC: string = 'WHOISRES';
  * @param res response object
  * @returns A promise that resolves to a response object.
  */
-const bookAppointment = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
+const bookAppointment = async (req: Request, res: Response): AsyncResObj => {
   if (database === undefined) {
     return res.status(500).json({
       message: 'Internal server error: database connection failed.'

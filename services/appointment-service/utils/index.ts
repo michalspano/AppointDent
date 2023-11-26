@@ -1,5 +1,8 @@
 /**
- * @description Utility functions for the appointment service.
+ * utils/index.ts
+ *
+ * @description :: Utility functions for the appointment service.
+ * @version     :: 1.0
  */
 
 import { client } from '../mqtt/mqtt';

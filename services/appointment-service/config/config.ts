@@ -1,3 +1,10 @@
+/**
+ * config/config.ts
+ *
+ * @description :: Configures the express app.
+ * @version     :: 1.0
+ */
+
 import cors from 'cors';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';

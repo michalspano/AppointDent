@@ -1,3 +1,10 @@
+/**
+ * types/types.ts
+ *
+ * @description :: Custom types for the appointment service.
+ * @version     :: 1.0
+ */
+
 import type { UUID } from 'crypto';
 import type { Response } from 'express';
 
