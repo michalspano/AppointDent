@@ -1,10 +1,9 @@
 import type { Request, Response } from 'express';
 
 /**
- * Used to login a dentist into the system.
+ * Used to log out a dentist from the system.
  * @param req request
  * @param res response
- * @returns response object
  */
 export const logout = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
   const { sessionKey } = req.cookies; // Get the session key from the cookies.
@@ -16,7 +15,7 @@ export const logout = async (req: Request, res: Response): Promise<Response<any,
   return res.sendStatus(200);
 };
 /**
- * Wrap the login handler in a sync function for the route handler
+ * Wrap the logout handler in a sync function for the route handler
  * @param req request
  * @param res response
  */
