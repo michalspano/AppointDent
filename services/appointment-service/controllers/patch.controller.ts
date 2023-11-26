@@ -1,16 +1,14 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as utils from '../utils';
 import { client } from '../mqtt/mqtt';
 import database from '../db/config';
-import { type Appointment } from '../types/types';
 import type Database from 'better-sqlite3';
 import { type Statement } from 'better-sqlite3';
 import type { Request, Response } from 'express';
-import { destructUnknownToAppointment, parseBinaryQueryParam } from '../utils';
+import { SessionResponse } from '../types/types';
+import { UserType, type Appointment, type WhoisResponse } from '../types/types';
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
-const TOPIC: string = 'AUTHREQ';
-const RESPONSE_TOPIC: string = 'AUTHRES';
+const TOPIC: string = 'WHOIS';
+const RESPONSE_TOPIC: string = 'WHOISRES';
 
 /**
  * @description the controller for the PATCH /appointments/:id route. In
@@ -36,10 +34,52 @@ const bookAppointment = async (req: Request, res: Response): Promise<Response<an
     });
   }
 
-  // Our system should only allow patients to book appointments.
-  // Use the `whois` abstraction provided by the session service to
-  // determine the role (i.e., type) of the user.
+  if (client === undefined) {
+    return res.status(503).json({
+      message: 'Service unavailable: MQTT connection failed.'
+    });
+  }
 
+  const email: string | undefined = req.body.email;
+  const sessionKey: string | undefined = req.cookies.sessionKey;
+
+  if (sessionKey === undefined || email === undefined) {
+    return res.status(400).json({ message: 'Bad request: missing session key or email.' });
+  }
+
+  /* Access the `WHOIS` topic to determine the role of the user.
+   * Furthermore, the email is returned and it needs to be matched
+   * with the provided email in the request body. This way, we don't
+   * need to call the session service twice. */
+  const reqId: string = utils.genReqId();
+  client.publish(TOPIC, `${reqId}/${sessionKey}/*`);
+  client.subscribe(RESPONSE_TOPIC);
+
+  try {
+    const result: WhoisResponse = await utils.whoisByToken(
+      reqId.toString(),
+      RESPONSE_TOPIC
+    );
+    if (result.status !== SessionResponse.Success) {
+      return res.status(401).json({ message: 'Unauthorized: invalid session.' });
+    }
+
+    // Restrict access to patients only.
+    if (result.type !== UserType.Patient) {
+      return res.status(403).json({ message: 'Forbidden: only patients can book appointments.' });
+    }
+
+    // Check if the emails match.
+    if (result.email !== email) {
+      return res.status(401).json({ message: 'Unauthorized: invalid email.' });
+    }
+  } catch (err: Error | unknown) {
+    return res.status(504).json({
+      message: 'Service timeout: unable to verify session.'
+    });
+  }
+
+  // The verification step went well, we can proceed with the booking.
   const id: string = req.params.id;
   let appointment: unknown;
   try {
@@ -60,14 +100,14 @@ const bookAppointment = async (req: Request, res: Response): Promise<Response<an
 
   // In order to access the attributes of the appointment object, we need to
   // convert it to an actual Appointment object.
-  const appointmentObj: Appointment = destructUnknownToAppointment(appointment);
+  const appointmentObj: Appointment = utils.destructUnknownToAppointment(appointment);
 
   // We should not allow to book an already booked appointment.
   // A bad request error is returned. If the query is not given,
   // then the default value (true) is used.
   let toBook: boolean;
   try {
-    toBook = parseBinaryQueryParam(req.query.toBook, true);
+    toBook = utils.parseBinaryQueryParam(req.query.toBook, true);
   } catch (err: Error | unknown) {
     return res.status(400).json({
       message: 'Bad request: invalid query parameter.'

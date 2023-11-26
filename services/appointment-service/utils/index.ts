@@ -2,9 +2,9 @@
  * @description Utility functions for the appointment service.
  */
 
-import { type Appointment, type SessionResponse } from '../types/types';
 import { client } from '../mqtt/mqtt';
 import { randomBytes } from 'crypto';
+import { type Appointment, SessionResponse, type WhoisResponse, type UserType } from '../types/types';
 
 /**
  * @description the default timeout for the MQTT client to wait for a response.
@@ -87,6 +87,60 @@ export const verifySession = async (reqId: string, RESPONSE_TOPIC: string): Prom
           // Convert to enum type SessionResponse.
           const rawMsg: string = message.toString().split('/')[1];
           resolve(parseInt(rawMsg) as SessionResponse);
+        }
+      }
+    };
+    client?.subscribe(RESPONSE_TOPIC);
+    client?.on('message', eventHandler);
+  });
+};
+
+/**
+ * @description helper function that retrieves the email and type of a user
+ * based on the session-service with the status of the session.
+ *
+ * @param reqId the request Id; @see genReqId
+ * @param RESPONSE_TOPIC the response topic to subscribe to
+ *
+ * @returns a promise that resolves the response of the WHOIS topic
+ * @see WhoisResponse (types/types.ts)
+ * @see UserType (types/types.ts)
+ * @see SessionResponse (types/types.ts)
+ */
+export const whoisByToken = async (reqId: string, RESPONSE_TOPIC: string): Promise<WhoisResponse> => {
+  return await new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      client?.unsubscribe(RESPONSE_TOPIC);
+      reject(new Error('MQTT timeout'));
+    }, TIMEOUT);
+
+    const eventHandler = (topic: string, message: Buffer): void => {
+      if (topic === RESPONSE_TOPIC) {
+        if (message.toString().startsWith(`${reqId}/`)) {
+          clearTimeout(timeout);
+          client?.unsubscribe(topic);
+          client?.removeListener('message', eventHandler);
+
+          const rawMsg: string[] = message.toString().split('/');
+
+          /* Successful response looks like this:
+           * -> REQID/EMAIL/TYPE/*
+           * Unsuccessful response looks like this:
+           * -> REQ/0/* */
+          const email: string = rawMsg[1];
+
+          if (email === '0') {
+            resolve({
+              status: SessionResponse.Fail,
+              email: undefined,
+              type: undefined
+            });
+          }
+          resolve({
+            status: SessionResponse.Success,
+            email,
+            type: rawMsg[2] as UserType
+          });
         }
       }
     };
