@@ -48,10 +48,26 @@ export default function DentistForm (): JSX.Element {
       })
   }
 
+  const handleUpload = async (): Promise<string> => {
+    const fileInput = document.querySelector('input[type=file]')
+
+    if (fileInput != null) {
+      const file = fileInput?.files[0]
+      const reader = new FileReader()
+      const baseString = await new Promise<string | ArrayBuffer | null>((resolve) => {
+        reader.onloadend = function () {
+          resolve(reader.result)
+        }
+        reader.readAsDataURL(file)
+      })
+      return baseString as string ?? ''
+    }
+    throw new Error('File input element not found.')
+  }
+
   const login = async (): Promise<void> => {
     try {
       await Api.post('/dentists/login', { email: email(), password: password() }, { withCredentials: true })
-      // navigate to logged in view
         .then(() => {
         // navigate to logged in view
           window.location.replace('/calendar')
@@ -141,7 +157,10 @@ export default function DentistForm (): JSX.Element {
               type="file"
               accept=".jpeg, .jpg, .png"
               placeholder="Upload a profile image"
-              onChange={(event) => setPicture(event.target.value)}
+              // eslint-disable-next-line @typescript-eslint/no-misused-promises
+              onChange={async () => {
+                setPicture(await handleUpload())
+              }}
             />
 
         {error() !== null && <p class="text-error">{error()}</p>}
