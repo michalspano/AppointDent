@@ -164,6 +164,7 @@ export default function DentistCalendar (): JSX.Element {
         }
       })
 
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       setInterval(async () => {
         await fetchAppointments()
         const events = [...slots()]

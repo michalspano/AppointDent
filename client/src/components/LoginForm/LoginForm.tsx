@@ -1,8 +1,8 @@
 import { type JSX } from 'solid-js/jsx-runtime'
+import { createSignal } from 'solid-js'
 import './LoginForm.css'
 import logo from '../../assets/logo.png'
 import { A } from '@solidjs/router'
-import { createSignal } from 'solid-js'
 import { Api } from '../../utils/api'
 
 export default function LoginForm (): JSX.Element {
@@ -10,27 +10,26 @@ export default function LoginForm (): JSX.Element {
   const [password, setPassword] = createSignal('')
   const [error, setError] = createSignal<string | null>(null)
 
-  const login = (): void => {
-    if (email() === '' || password() === '') {
-      setError('Please fill in all fields.')
-      return
+  const login = async (): Promise<void> => {
+    try {
+      // Login as a dentist
+      await Api.post('/dentists/login', { email: email(), password: password() }, { withCredentials: true })
+
+      // If dentist login is successful, user is redirected to dentist-specific page
+      window.location.replace('/calendar')
+    } catch (dentistError) {
+      try {
+        // If dentist login fails, patient login is attempted
+        await Api.post('/patients/login', { email: email(), password: password() }, { withCredentials: true })
+
+        // If patient login successful, user is redirected to patient-specific page
+        window.location.replace('/map')
+      } catch (patientError) {
+        // Error handling of both patient and dentist login fails
+        console.error('Error during login', patientError)
+        setError('Login failed. Please check your credentials and try again.')
+      }
     }
-    Api
-      .post('/dentists/login', { email: email(), password: password() }, { withCredentials: true })
-      .then(() => {
-        Api.get('/sessions/whois', { withCredentials: true }).then((result) => {
-          const isUserDentist: string = result.data.type // replace when we have the object of current user
-          const navLink = isUserDentist === 'd' ? '/calendar' : '/map'
-          window.location.replace(navLink)
-        }).catch((err) => {
-          console.error('Fail whois')
-          console.error(err)
-        })
-      })
-      .catch((error: any) => {
-        console.error('Error during login', error)
-      })
-    setError(null)
   }
 
   return <>
@@ -55,7 +54,12 @@ export default function LoginForm (): JSX.Element {
         />
         {error() !== null && <p class="text-error">{error()}</p>}
         <button type="submit" class="log-in-btn h-12 mb-10 bg-secondary rounded-xl text-base"
-        onClick={login}>
+        onclick={() => {
+          login()
+            .catch((error) => {
+              console.error('Error creating account:', error)
+            })
+        }}>
             Log in
             </button>
         <p class="font-extralight">Not registered yet?
