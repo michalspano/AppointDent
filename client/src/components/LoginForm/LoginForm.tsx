@@ -55,7 +55,12 @@ export default function LoginForm (): JSX.Element { // props: { userType: UserTy
         />
         {error() !== null && <p class="text-error">{error()}</p>}
         <button type="submit" class="log-in-btn h-12 mb-10 bg-secondary rounded-xl text-base"
-        onClick={login}>
+        onclick={() => {
+          login()
+            .catch((error) => {
+              console.error('Error creating account:', error)
+            })
+        }}>
             Log in
             </button>
         <p class="font-extralight">Not registered yet?

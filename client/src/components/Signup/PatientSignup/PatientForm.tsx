@@ -88,9 +88,6 @@ export default function PatientForm (): JSX.Element {
         <button type="submit" class="log-in-btn h-12 mb-6 bg-secondary rounded-xl text-base"
         onclick={() => {
           signup()
-            .then(() => {
-              // Code to execute after successful signup
-            })
             .catch((error) => {
               console.error('Error creating account:', error)
             })
