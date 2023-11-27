@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "cd2954b6-f8dd-46ae-b122-ee5d2c0117ea",
-		"name": "Test 27nov",
+		"_postman_id": "41ff7cad-1bef-4d06-838e-bf5e1f665fd4",
+		"name": "Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "28264405"
+		"_exporter_id": "31133349"
 	},
 	"item": [
 		{
@@ -1000,8 +1000,8 @@
 											"listen": "test",
 											"script": {
 												"exec": [
-													"pm.test(\"Response code shall be 401\", function () {",
-													"    pm.response.to.have.status(401);",
+													"pm.test(\"Response code shall be 403\", function () {",
+													"    pm.response.to.have.status(403);",
 													"});",
 													"",
 													"pm.test(\"Response is an object\", function () {",
@@ -1013,7 +1013,7 @@
 													"});",
 													"",
 													"pm.test(\"Contains correct response message\", function () {",
-													"    pm.expect(pm.response.json().message).to.equal(\"Unauthorized: attempt to create an appointment for another dentist.\");",
+													"    pm.expect(pm.response.json().message).to.equal(\"Forbidden: attempt to create an appointment for another or non-existent dentist account.\");",
 													"});"
 												],
 												"type": "text/javascript"
@@ -1681,7 +1681,7 @@
 					"description": "Generate sample appointments used for the `appointment-service`."
 				},
 				{
-					"name": "GET /",
+					"name": "GET / (unbooked)",
 					"item": [
 						{
 							"name": "switch-to-dentist",
@@ -2011,11 +2011,427 @@
 					]
 				},
 				{
+					"name": "GET /patients/:email",
+					"item": [
+						{
+							"name": "get-as-dentist[fail]",
+							"item": [
+								{
+									"name": "GET /patients/:email (invalid type)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response code shall be 403\", function () {",
+													"    pm.response.to.have.status(403);",
+													"});",
+													"",
+													"pm.test(\"Response is an object\", function () {",
+													"    pm.expect(pm.response.json()).to.be.an('object');",
+													"});",
+													"",
+													"pm.test(\"Response contains 'message' attribute\", function () {",
+													"    pm.expect(pm.response.json()).to.have.property('message');",
+													"});",
+													"",
+													"pm.test(\"Contains correct response message\", function () {",
+													"    pm.expect(pm.response.json().message).to.equal(\"Forbidden: disallowed operation.\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{host}}/api/v1/appointments/patients/:email",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"appointments",
+												"patients",
+												":email"
+											],
+											"variable": [
+												{
+													"key": "email",
+													"value": "{{dentistEmailSample}}"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "switch-to-patient",
+							"item": [
+								{
+									"name": "POST/api/patients/login Copy",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"email\": \"{{patientEmailSample}}\",\n    \"password\": \"complicatedpassword\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{host}}/api/v1/patients/login",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"patients",
+												"login"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "GET (invalid cookie)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response code shall be 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});",
+											"",
+											"pm.test(\"Response is an object\", function () {",
+											"    pm.expect(pm.response.json()).to.be.an('object');",
+											"});",
+											"",
+											"pm.test(\"Response contains 'message' attribute\", function () {",
+											"    pm.expect(pm.response.json()).to.have.property('message');",
+											"});",
+											"",
+											"pm.test(\"Contains correct response message\", function () {",
+											"    pm.expect(pm.response.json().message).to.equal(\"Unauthorized: invalid session.\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Cookie",
+										"value": "sessionKey=f8f2f1fc-80c9-4329-ad89-3551231312312",
+										"description": "An invalid cookie that overwrites the one passed.",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/appointments/patients/:email",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"appointments",
+										"patients",
+										":email"
+									],
+									"variable": [
+										{
+											"key": "email",
+											"value": "{{patientEmailSample}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET (as *empty* patient)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response code shall be 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response is an object\", function () {",
+											"    pm.expect(pm.response.json()).to.be.an('object');",
+											"});",
+											"",
+											"pm.test(\"Response contains 'message' attribute\", function () {",
+											"    pm.expect(pm.response.json()).to.have.property('message');",
+											"});",
+											"",
+											"pm.test(\"Contains correct response message\", function () {",
+											"    pm.expect(pm.response.json().message).to.equal(\"Bad request: missing session key or email.\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/appointments/patients/:email",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"appointments",
+										"patients",
+										":email"
+									],
+									"variable": [
+										{
+											"key": "email",
+											"value": "{{empty}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET (as *invalid* patient)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response code shall be 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});",
+											"",
+											"pm.test(\"Response is an object\", function () {",
+											"    pm.expect(pm.response.json()).to.be.an('object');",
+											"});",
+											"",
+											"pm.test(\"Response contains 'message' attribute\", function () {",
+											"    pm.expect(pm.response.json()).to.have.property('message');",
+											"});",
+											"",
+											"pm.test(\"Contains correct response message\", function () {",
+											"    pm.expect(pm.response.json().message).to.equal(\"Forbidden: attempt to access appointments of other or non-existent patient.\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/appointments/patients/:email",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"appointments",
+										"patients",
+										":email"
+									],
+									"variable": [
+										{
+											"key": "email",
+											"value": "foobar@baz.com"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET (as *other* patient)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response code shall be 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});",
+											"",
+											"pm.test(\"Response is an object\", function () {",
+											"    pm.expect(pm.response.json()).to.be.an('object');",
+											"});",
+											"",
+											"pm.test(\"Response contains 'message' attribute\", function () {",
+											"    pm.expect(pm.response.json()).to.have.property('message');",
+											"});",
+											"",
+											"pm.test(\"Contains correct response message\", function () {",
+											"    pm.expect(pm.response.json().message).to.equal(\"Forbidden: attempt to access appointments of other or non-existent patient.\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/appointments/patients/:email",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"appointments",
+										"patients",
+										":email"
+									],
+									"variable": [
+										{
+											"key": "email",
+											"value": "{{dentistEmailSample2}}"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
 					"name": "BOOK /:id",
 					"item": [
 						{
 							"name": "book-as-dentist[fail]",
 							"item": [
+								{
+									"name": "POST /api/dentists/login",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"email\": \"{{dentistEmailSample}}\",\n  \"password\": \"pass123pass456\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{host}}/api/v1/dentists/login",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"dentists",
+												"login"
+											]
+										}
+									},
+									"response": []
+								},
 								{
 									"name": "BOOK (as dentist, *invalid*)",
 									"event": [
@@ -2088,7 +2504,7 @@
 							"name": "switch-to-patient",
 							"item": [
 								{
-									"name": "POST/api/patients/login",
+									"name": "POST/api/patients/login Copy",
 									"event": [
 										{
 											"listen": "test",
@@ -2165,7 +2581,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"patientId\": \"12312321\"\n}",
+									"raw": "{\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -2237,7 +2653,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"email\": \"{{patientEmailSample}}\",\n    \"patientId\": \"12312321\"\n}",
+									"raw": "{\n    \"patientId\": \"{{patientEmailSample}}\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -2278,8 +2694,8 @@
 									"listen": "test",
 									"script": {
 										"exec": [
-											"pm.test(\"Response code shall be 401\", function () {",
-											"    pm.response.to.have.status(401);",
+											"pm.test(\"Response code shall be 403\", function () {",
+											"    pm.response.to.have.status(403);",
 											"});",
 											"",
 											"pm.test(\"Response is an object\", function () {",
@@ -2291,7 +2707,7 @@
 											"});",
 											"",
 											"pm.test(\"Contains correct response message\", function () {",
-											"    pm.expect(pm.response.json().message).to.equal(\"Unauthorized: invalid email.\");",
+											"    pm.expect(pm.response.json().message).to.equal(\"Forbidden: invalid email.\");",
 											"});"
 										],
 										"type": "text/javascript"
@@ -2303,7 +2719,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"email\": \"{{patientEmailSample}})d9sadna\", //malformed\n    \"patientId\": \"12312321\"\n}",
+									"raw": "{\n    \"patientId\": \"{{patientEmailSample}})d9sadna\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -2387,7 +2803,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"email\": \"{{patientEmailSample}}\",\n    \"patientId\": \"12312321\" // make the appointment booked\n}",
+									"raw": "{\n    \"patientId\": \"{{patientEmailSample}}\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -2422,6 +2838,67 @@
 							"response": []
 						},
 						{
+							"name": "GET (success)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response code shall be 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response is an array of objects\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData).to.be.an('array').that.is.not.empty;",
+											"    jsonData.forEach(function(appointment) {",
+											"        pm.expect(appointment).to.be.an('object').that.has.all.keys('id', 'start_timestamp', 'end_timestamp', 'dentistId', 'patientId');",
+											"        pm.expect(appointment.patientId).to.not.be.null;",
+											"    });",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/appointments/patients/:email",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"appointments",
+										"patients",
+										":email"
+									],
+									"variable": [
+										{
+											"key": "email",
+											"value": "{{patientEmailSample}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
 							"name": "BOOK (invalid appointment)",
 							"event": [
 								{
@@ -2449,7 +2926,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"email\": \"{{patientEmailSample}}\",\n    \"patientId\": \"12312321\" // make the appointment booked\n}",
+									"raw": "{\n    \"patientId\": \"{{patientEmailSample}}\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -2484,7 +2961,7 @@
 							"response": []
 						},
 						{
-							"name": "BOOK (repeated -> fail)",
+							"name": "BOOK (repeated; fail)",
 							"event": [
 								{
 									"listen": "test",
@@ -2515,7 +2992,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"email\": \"{{patientEmailSample}}\",\n    \"patientId\": \"12312321\" // make the appointment booked\n}",
+									"raw": "{\n    \"patientId\": \"{{patientEmailSample}}\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -2597,7 +3074,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"email\": \"{{patientEmailSample}}\"\n}",
+									"raw": "{\n    \"patientId\": \"{{patientEmailSample}}\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -2625,6 +3102,66 @@
 										{
 											"key": "id",
 											"value": "{{appointmentId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET (success; empty)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response code shall be 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response is an array\", function () {",
+											"    pm.expect(pm.response.json()).to.be.an('array');",
+											"});",
+											"",
+											"pm.test(\"Response has 0 items\", function () {",
+											"    pm.expect(pm.response.json()).to.have.lengthOf(0);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/appointments/patients/:email",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"appointments",
+										"patients",
+										":email"
+									],
+									"variable": [
+										{
+											"key": "email",
+											"value": "{{patientEmailSample}}"
 										}
 									]
 								}
@@ -2663,7 +3200,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"email\": \"{{patientEmailSample}}\"\n}",
+									"raw": "{\n    \"patientId\": \"{{patientEmailSample}}\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
