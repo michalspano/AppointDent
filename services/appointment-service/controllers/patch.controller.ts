@@ -87,11 +87,11 @@ const bookAppointment = async (req: Request, res: Response): AsyncResObj => {
 
   // The verification step went well, we can proceed with the booking.
   const id: string = req.params.id;
-  let appointment: unknown;
+  let appointment: Appointment | undefined;
   try {
     appointment = database
       .prepare('SELECT * FROM appointments WHERE id = ?')
-      .get(id);
+      .get(id) as Appointment;
   } catch (err: Error | unknown) {
     return res.status(500).json({
       message: 'Internal server error: query failed.'
@@ -103,10 +103,6 @@ const bookAppointment = async (req: Request, res: Response): AsyncResObj => {
       message: `Appointment with id ${id} not found.`
     });
   }
-
-  // In order to access the attributes of the appointment object, we need to
-  // convert it to an actual Appointment object.
-  const appointmentObj: Appointment = utils.destructUnknownToAppointment(appointment);
 
   // We should not allow to book an already booked appointment.
   // A bad request error is returned. If the query is not given,
@@ -120,14 +116,14 @@ const bookAppointment = async (req: Request, res: Response): AsyncResObj => {
     });
   }
 
-  if (appointmentObj.patientId !== null && toBook) {
+  if (appointment.patientId !== null && toBook) {
     return res.status(400).json({
       message: 'Bad request: appointment is already booked.'
     });
   }
 
   // Update the appointment object with the patientId.
-  appointmentObj.patientId = toBook ? req.body.patientId : null;
+  appointment.patientId = toBook ? req.body.patientId : null;
 
   const stmt: Statement = database.prepare(`
     UPDATE appointments
@@ -136,7 +132,7 @@ const bookAppointment = async (req: Request, res: Response): AsyncResObj => {
   `);
 
   try {
-    const info: Database.RunResult = stmt.run(appointmentObj.patientId, appointmentObj.id);
+    const info: Database.RunResult = stmt.run(appointment.patientId, appointment.id);
     if (info.changes !== 1) {
       return res.status(500).json({ message: 'Internal server error: query malformed.' });
     }
@@ -147,7 +143,7 @@ const bookAppointment = async (req: Request, res: Response): AsyncResObj => {
   }
 
   // All went well, return the patched object.
-  return res.status(200).json(appointmentObj);
+  return res.status(200).json(appointment);
 };
 
 /**
