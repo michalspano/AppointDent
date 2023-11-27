@@ -13,17 +13,20 @@ export default function LoginForm (): JSX.Element {
   const login = async (): Promise<void> => {
     try {
       // Login as a dentist
-      await Api.post('/dentists/login', { email: email(), password: password() }, { withCredentials: true })
-
+      const response = await Api.post('/dentists/login', { email: email(), password: password() }, { withCredentials: true })
+      console.log(response)
       // If dentist login is successful, user is redirected to dentist-specific page
-      window.location.replace('/calendar')
+      if (response.status === 200) {
+        window.location.replace('/calendar')
+      }
     } catch (dentistError) {
       try {
         // If dentist login fails, patient login is attempted
-        await Api.post('/patients/login', { email: email(), password: password() }, { withCredentials: true })
-
-        // If patient login successful, user is redirected to patient-specific page
-        window.location.replace('/map')
+        const response = await Api.post('/patients/login', { email: email(), password: password() }, { withCredentials: true })
+        // If patient login is successful, user is redirected to patient-specific page
+        if (response.status === 200) {
+          window.location.replace('/map')
+        }
       } catch (patientError) {
         // Error handling of both patient and dentist login fails
         console.error('Error during login', patientError)

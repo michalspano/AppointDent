@@ -4,11 +4,13 @@ import { deleteDentistWrapper } from '../controllers/delete.controller';
 import { loginDentistWrapper } from '../controllers/login.controller';
 import { registerDentistWrapper } from '../controllers/register.controller';
 import { updateDentistWrapper } from '../controllers/update.controller';
+import { logoutDentistWrapper } from '../controllers/logout.controller';
 
 const router = Router();
 
 router.post('/register', registerDentistWrapper);
 router.post('/login', loginDentistWrapper);
+router.delete('/logout', logoutDentistWrapper);
 router.get('/login', loginDentistWrapper);
 router.patch('/:email', updateDentistWrapper);
 router.delete('/:email', deleteDentistWrapper);

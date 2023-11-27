@@ -24,6 +24,19 @@ export const loginController = async (req: Request, res: Response): Promise<Resp
     return res.sendStatus(500);
   }
 
+  try {
+    const result = database.prepare('SELECT email FROM patients WHERE email = ?').get(req.body.email);
+    console.log(result);
+
+    if (result === undefined) {
+      return res.sendStatus(404);
+    }
+  } catch (err) {
+    return res.status(500).json({
+      message: 'Internal server error: failed performing selection.'
+    });
+  }
+
   const reqId = Math.floor(Math.random() * 1000);
   client.subscribe(RESPONSE_TOPIC);
   client.publish(TOPIC, `${reqId}/${email}/${password}/*`);
