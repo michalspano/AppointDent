@@ -1,16 +1,11 @@
 {
-    "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": "explicit"
-    },
-    "eslint.validate": [
-        "javascript"
-    ],
-    "cSpell.words": [
-        "appointdent"
-    ],
-    "[go]": {
-        "editor.codeActionsOnSave": {
-            "source.fixAll.eslint": "explicit"
-        }
-    }
+  "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true
+  },
+  "eslint.validate": [
+      "javascript"
+  ],
+  "cSpell.words": [
+      "appointdent"
+  ]
 }
