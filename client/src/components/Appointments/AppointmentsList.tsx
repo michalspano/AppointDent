@@ -152,7 +152,7 @@ export default function AppointmentsList (): JSX.Element {
               <div class='flex flex-no-wrap gap-15'>
                 <Show when={availableDays().length > 0} fallback={<p>No available times exist at the moment.</p>}>
                 {availableDays().map((appointment) => (
-                <div class={`flex m-4 p-4 rounded-lg cursor-pointer font-semibold items-center justify-center shadow ${selectedDate() === appointment.day ? 'bg-primary text-white shadow' : 'shadow'}`} onClick={() => { onDateSelect(appointment) }}>
+                <div class={`flex m-4 p-4 rounded-lg cursor-pointer font-semibold items-center justify-center ${selectedDate() === appointment.day ? 'bg-primary text-white shadow' : 'shadow'}`} onClick={() => { onDateSelect(appointment) }}>
                   <span class="text-md">{formatDate(appointment.day)}</span>
                 </div>
                 ))}
@@ -166,7 +166,7 @@ export default function AppointmentsList (): JSX.Element {
                 {availableTime().length > 0
                   ? <div class="grid grid-cols-3 xs:grid-cols-1 s:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-15 w-11/12">
                   {availableTime().map((appointment: Appointment) => (
-                  <div class={`flex w-35 m-4 h-20 w-38 rounded-lg cursor-pointer font-semibold items-center justify-center shadow ${selectedAppointment() === appointment ? 'bg-primary text-white shadow' : 'shadow'}`} onClick={() => { onTimeSelect(appointment) }}>
+                  <div class={`flex w-35 m-4 h-20 w-38 rounded-lg cursor-pointer font-semibold items-center justify-center ${selectedAppointment() === appointment ? 'bg-primary text-white shadow' : 'shadow'}`} onClick={() => { onTimeSelect(appointment) }}>
                     {formatTimeEntry(appointment)}
                   </div>
                   ))}
