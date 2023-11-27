@@ -3,8 +3,9 @@ import { type Dentist, type Patient } from '../utils/types'
 import PatientProfile from '../components/MyProfile/PatientProfile/PatientProfile'
 import { Api } from '../utils/api'
 import { Show, createEffect, createSignal } from 'solid-js'
+import DentistProfile from '../components/MyProfile/DentistProfile/DentistProfile'
 
-export default function DentistProfilePage (): JSX.Element {
+export default function UserProfile (): JSX.Element {
   createEffect(async () => {
     await getUser()
   })
@@ -14,6 +15,17 @@ export default function DentistProfilePage (): JSX.Element {
     firstName: '',
     lastName: '',
     birthDate: 0
+  })
+  const [dentistUser, setDentistUser] = createSignal<Dentist>({
+    email: '',
+    firstName: '',
+    lastName: '',
+    clinicStreet: '',
+    clinicCity: '',
+    clinicZipCode: 0,
+    clinicHouseNumber: 0,
+    clinicCountry: '',
+    picture: ''
   })
 
   /**
@@ -25,15 +37,34 @@ export default function DentistProfilePage (): JSX.Element {
     return dentistResponse.data
   }
 
-  async function getUser (): Promise<Patient | Dentist | undefined> {
+  async function getUser (): Promise<void> {
     try {
       const currentUser = await getCurrentUser()
       const email: string = currentUser.email
       const type: string = currentUser.type
 
       if (type === 'd') {
+        setIsPatient(false)
         const { data } = await Api.get(`/dentists/${email}`, { withCredentials: true })
-        return data
+        const user: Dentist | undefined = Array.isArray(data) && data.length > 0
+          ? (data[0] as Dentist)
+          : undefined
+
+        console.log(user)
+        if (user !== undefined) {
+          setDentistUser({
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            clinicStreet: user.clinicStreet,
+            clinicCity: user.clinicCity,
+            clinicZipCode: user.clinicZipCode,
+            clinicHouseNumber: user.clinicHouseNumber,
+            clinicCountry: user.clinicCountry,
+            picture: user.picture
+          })
+          console.log(dentistUser())
+        }
       }
 
       if (type === 'p') {
@@ -62,6 +93,7 @@ export default function DentistProfilePage (): JSX.Element {
       when={isPatient()}
       fallback={
         <div class="w-full h-full flex">
+          <DentistProfile dentistProp={dentistUser()} />
         </div>
       }
     >

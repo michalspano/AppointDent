@@ -25,23 +25,14 @@ export interface Patient {
 }
 
 export interface Dentist {
-  userEmail: string
-  password?: string
-  name: {
-    firstName: string
-    lastName: string
-  }
-  session?: {
-    token: string
-    expiry?: number
-  }
-  address: {
-    street: string
-    city: string
-    zip: number
-    houseNumber: string
-    country: string
-  }
+  email: string
+  firstName: string
+  lastName: string
+  clinicStreet: string
+  clinicCity: string
+  clinicZipCode: number
+  clinicHouseNumber: number
+  clinicCountry: string
   picture: string
 }
 

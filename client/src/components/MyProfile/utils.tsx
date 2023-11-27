@@ -9,17 +9,11 @@ import type { Dentist, Patient } from '../../utils/types'
  */
 export function isValidDentist (dentist: Dentist): undefined | string {
   try {
-    if (dentist.address.zip <= 0) {
+    if (dentist.clinicZipCode <= 0) {
       throw new Error('Zip should have a value greater than 0')
     }
 
-    // RegEx expression to check email validity
-    // source: https://www.tutorialspoint.com/how-to-validate-email-address-using-regexp-in-javascript
-    if (dentist.userEmail.match(/^[a-z0-9]+@[a-z]+\.[a-z]{2,3}$/) == null) {
-      throw new Error('Please give a valid email address.')
-    }
-
-    if (dentist.name.firstName === '' || dentist.name.lastName === '') {
+    if (dentist.firstName === '' || dentist.lastName === '') {
       throw new Error('Please write your first and last name.')
     }
   } catch (err) {
