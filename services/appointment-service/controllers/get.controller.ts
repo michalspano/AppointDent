@@ -169,42 +169,104 @@ const getAppointmentsByPatientId = async (req: Request, res: Response): AsyncRes
   return res.status(200).json(result);
 };
 
-// Get all appointments slots that are assigned to a dentist (both booked
-// and non-booked).
-const getAppointmentsByDentistId = (req: Request, res: Response): Response<any, Record<string, any>> => {
+/**
+ * @description a controller function to get all appointments assigned to a dentist.
+ * This endpoint is protected and requires a user to have a valid session. It behaves
+ * differently based on the type of the user. If the user is a patient, they can only
+ * query the unbooked appointments of a dentist. If the user is a dentist, they can
+ * query all appointments of a dentist.
+ *
+ * The `onlyAvailable` flag is used to filter only the unbooked appointments. By default,
+ * only unbooked appointments are returned. However, this flag can fully be utilized by
+ * the dentist only. If a patient attempts to use this flag, it is ignored, and only
+ * unbooked appointments are returned anyway.
+ *
+ * @see whoisByToken
+ * @see WhoisResponse
+ * @see appointmentsByDentistId
+ *
+ * @param req the request object.
+ * @param res the response object.
+ * @returns A promise that resolves to a response object.
+ */
+const getAppointmentsByDentistId = async (req: Request, res: Response): AsyncResObj => {
   if (database === undefined) {
     return res.status(500).json({
       message: 'Internal server error: database connection failed.'
     });
   }
 
-  // TODO: ensure that a valid session is present.
-  // This means that the dentist is logged in and exists in the database.
-  // Ideally, only the unbooked appointments should be made 'visible'
-  // publicly, however, that may be a choice of the dentist. For now,
-  // there's no restriction on the visibility of the appointments in
-  // this regard.
-
-  const dentistEmail: string = req.params.email;
-
-  let result: unknown[];
-
-  // Read the query parameter to filter only the available appointments.
-  // By default, all appointments are returned.
-  let getOnlyAvailable: boolean;
-  try {
-    getOnlyAvailable = utils.parseBinaryQueryParam(req.query.onlyAvailable);
-  } catch (err: Error | unknown) {
-    return res.status(400).json({
-      message: 'Bad request: invalid query parameter.'
+  if (client === undefined) {
+    return res.status(503).json({
+      message: 'Service unavailable: MQTT connection failed.'
     });
   }
 
+  const email: string | undefined = req.body.email;
+  const dentistId: string | undefined = req.params.email;
+  const sessionKey: string | undefined = req.cookies.sessionKey;
+
+  // 'undefined', 'null' are used for testing purposes.
+  // This is because the tests for this endpoint use a query parameter.
+  if (sessionKey === undefined || email === undefined) {
+    return res.status(400).json({ message: 'Bad request: missing session key or email.' });
+  } else if (dentistId === undefined || ['undefined', 'null', ''].includes(dentistId.trim())) {
+    return res.status(400).json({ message: 'Bad request: missing dentist id.' });
+  }
+
+  // Use the `WHOIS` topic to determine the role of the user.
+  // This, in turn, determines whether the user has the required privileges.
+  const TOPIC: string = utils.MQTT_PAIRS.whois.req;
+  const RESPONSE_TOPIC: string = utils.MQTT_PAIRS.whois.res;
+
+  let userType: UserType | undefined;
+  const reqId: string = utils.genReqId();
+  client.publish(TOPIC, `${reqId}/${sessionKey}/*`);
+  client.subscribe(RESPONSE_TOPIC);
+
+  try {
+    const result: WhoisResponse = await utils.whoisByToken(
+      reqId.toString(),
+      RESPONSE_TOPIC
+    );
+
+    if (result.status !== SessionResponse.Success) {
+      return res.status(401).json({ message: 'Unauthorized: invalid session.' });
+    }
+
+    // Store the type of the user for later use.
+    userType = result.type as UserType;
+
+    /* Prevent any attempts where emails do not match.
+     * This means that session is valid, but a dentist is trying to access
+     * appointments of another dentist; patients can bypass this check, because
+     * they can only access unbooked appointments of a dentist anyway. */
+    if (userType === UserType.Dentist && result.email !== dentistId) {
+      return res.status(403).json({ message: 'Forbidden: disallowed operation.' });
+    }
+  } catch (err: Error | unknown) {
+    return res.status(504).json({ message: 'Service timeout: unable to verify session.' });
+  }
+
+  /* Read the query parameter to filter only the available appointments.
+   * By default, only unbooked appointments are returned.
+   * Patients can only query the unbooked appointments of a dentist.
+   * Therefore the query is different for patients and dentists. */
+  let getOnlyAvailable: boolean = true;
+  if (userType !== UserType.Patient) {
+    try {
+      getOnlyAvailable = utils.parseBinaryQueryParam(req.query.onlyAvailable);
+    } catch (err: Error | unknown) {
+      return res.status(400).json({ message: 'Bad request: invalid query parameter.' });
+    }
+  }
+
+  let result: Appointment[];
   try {
     result = database.prepare(`
       SELECT * FROM appointments WHERE dentistId = ?
       ${getOnlyAvailable ? 'AND patientId IS NULL' : ''}
-    `).all(dentistEmail);
+    `).all(dentistId) as Appointment[];
   } catch (err: Error | unknown) {
     return res.status(500).json({
       message: 'Internal server error: fail performing selection.'
