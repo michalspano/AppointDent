@@ -61,7 +61,7 @@ export default function Navbar (): JSX.Element {
                 </div>
                 </div>
             </div>
-                <div class="flex items-center pr-0 sm:static sm:inset-auto ">
+                <div class="flex items-center sm:static sm:inset-auto ">
             <a href="/notifications">
                 <button onClick={toggleNotification} type="button" class="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none">
                     <span class="absolute -inset-1.5"></span>
