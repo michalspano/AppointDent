@@ -8,19 +8,19 @@
 import { Router } from 'express';
 import createAppointment from '../controllers/post.controller';
 import editAppointment from '../controllers/patch.controller';
-import * as getControllers from '../controllers/get.controller';
+import * as GET from '../controllers/get.controller';
 import deleteAppointment from '../controllers/delete.controller';
 
 const router: Router = Router();
 
-router.get('/', getControllers.getAllAppointmentsWrapper);
-router.get('/:id', getControllers.getAppointment);
+router.get('/', GET.allAppointments);
+router.get('/:id', GET.getAppointment);
 router.post('/', createAppointment);
 router.delete('/:id', deleteAppointment);
 router.patch('/:id', editAppointment);
 
 // Relational endpoints.
-router.get('/patients/:email', getControllers.getAppointmentsByPatientId);
-router.get('/dentists/:email', getControllers.getAppointmentsByDentistId);
+router.get('/patients/:email', GET.appointmentsByPatientId);
+router.get('/dentists/:email', GET.getAppointmentsByDentistId);
 
 export default router;

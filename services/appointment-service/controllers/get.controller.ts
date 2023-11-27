@@ -9,14 +9,10 @@ import database from '../db/config';
 import { client } from '../mqtt/mqtt';
 import * as utils from '../utils';
 import type { Request, Response } from 'express';
-import { SessionResponse } from '../types/types';
-import type { AsyncResObj } from '../types/types';
-
-const TOPIC: string = utils.MQTT_PAIRS.auth.req;
-const RESPONSE_TOPIC: string = utils.MQTT_PAIRS.auth.res;
+import { SessionResponse, type AsyncResObj, UserType, type WhoisResponse, type Appointment } from '../types/types';
 
 /**
- * @description A controller function to get all appointments.
+ * @description A controller function to get all unbooked appointments.
  * This function is encapsulated in a wrapper function to resolve the
  * asynchronous nature of the function being wrapped.
  *
@@ -52,6 +48,9 @@ const getAllAppointments = async (req: Request, res: Response): AsyncResObj => {
 
   // To get appointments, the user must be logged in.
   // That means, a valid session must be present.
+  const TOPIC: string = utils.MQTT_PAIRS.auth.req;
+  const RESPONSE_TOPIC: string = utils.MQTT_PAIRS.auth.res;
+
   const reqId: string = utils.genReqId();
   client.publish(TOPIC, `${reqId}/${email}/${sessionKey}/*`);
   client.subscribe(RESPONSE_TOPIC);
@@ -71,9 +70,11 @@ const getAllAppointments = async (req: Request, res: Response): AsyncResObj => {
   }
 
   // Session has been validated, proceed with the request.
-  let result: unknown[];
+  let result: Appointment[];
   try {
-    result = database.prepare('SELECT * FROM appointments WHERE patientId IS NULL').all();
+    result = database.prepare(`
+      SELECT * FROM appointments WHERE patientId IS NULL
+    `).all() as Appointment[];
   } catch (err: Error | unknown) {
     return res.status(500).json({
       message: 'Internal server error: fail performing selection.'
@@ -84,38 +85,82 @@ const getAllAppointments = async (req: Request, res: Response): AsyncResObj => {
 };
 
 /**
- * @description A wrapper function for getAllAppointments to resolve the
- * asynchronous nature of the function being wrapped.
  *
- * @param req A request object.
- * @param res A response object.
+ * @description a controller that is used to get all appointments assigned to a patient.
+ * This route is protected and requires the user to be logged in, be a patient and
+ * access only their own appointments.
  *
- * @see getAllAppointments
+ * @see whoisByToken
+ * @see WhoisResponse
+ * @see getAllAppointmentsWrapper
+ *
+ * @param req the request object.
+ * @param res the response object.
+ * @returns A promise that resolves to a response object.
  */
-export const getAllAppointmentsWrapper = (req: Request, res: Response): void => {
-  void getAllAppointments(req, res);
-};
-
-// Get all appointments slots that are assigned to a patient.
-export const getAppointmentsByPatientId = (req: Request, res: Response): Response<any, Record<string, any>> => {
+const getAppointmentsByPatientId = async (req: Request, res: Response): AsyncResObj => {
   if (database === undefined) {
     return res.status(500).json({
       message: 'Internal server error: database connection failed.'
     });
   }
 
-  // TODO: ensure that a valid session is present.
-  // Advantage: the inherently, a valid session means that the user is logged in
-  // and exists in the database. Therefore, there's no need to make a call to the
-  // patient-service to ensure that the patient exists.
-  // Ensure that the caller of the request is the patient that is being queried.
-  // Don't allow a patient to query another patient's appointments.
+  if (client === undefined) {
+    return res.status(503).json({
+      message: 'Service unavailable: MQTT connection failed.'
+    });
+  }
 
-  const patientEmail: string = req.params.email;
+  const email: string | undefined = req.params.email;
+  const sessionKey: string | undefined = req.cookies.sessionKey;
 
-  let result: unknown[];
+  // 'undefined', 'null' are used for testing purposes.
+  // This is because the tests for this endpoint use a query parameter.
+  if (sessionKey === undefined || email === undefined || ['undefined', 'null', ''].includes(email.trim())) {
+    return res.status(400).json({ message: 'Bad request: missing session key or email.' });
+  }
+
+  // Use the `WHOIS` topic to determine the role of the user.
+  // This, in turn, determines whether the user has the required privileges.
+  const TOPIC: string = utils.MQTT_PAIRS.whois.req;
+  const RESPONSE_TOPIC: string = utils.MQTT_PAIRS.whois.res;
+
+  const reqId: string = utils.genReqId();
+  client.publish(TOPIC, `${reqId}/${sessionKey}/*`);
+  client.subscribe(RESPONSE_TOPIC);
+
   try {
-    result = database.prepare('SELECT * FROM appointments WHERE patientId = ?').all(patientEmail);
+    const result: WhoisResponse = await utils.whoisByToken(
+      reqId.toString(),
+      RESPONSE_TOPIC
+    );
+
+    if (result.status !== SessionResponse.Success) {
+      return res.status(401).json({ message: 'Unauthorized: invalid session.' });
+    }
+
+    // Restrict access to patients only.
+    if (result.type !== UserType.Patient) {
+      return res.status(403).json({ message: 'Forbidden: disallowed operation.' });
+    }
+
+    // Prevent any attempts to access appointments of other patients.
+    // This, furthermore, detects if the patient exists in the database.
+    if (result.email !== email) {
+      return res.status(403).json({
+        message: 'Forbidden: attempt to access appointments of other or non-existent patient.'
+      });
+    }
+  } catch (err: Error | unknown) {
+    return res.status(504).json({ message: 'Service timeout: unable to verify session.' });
+  }
+
+  // Verification successful, proceed with the request.
+  let result: Appointment[];
+  try {
+    result = database.prepare(`
+      SELECT * FROM appointments WHERE patientId = ?
+    `).all(email) as Appointment[];
   } catch (err: Error | unknown) {
     return res.status(500).json({
       message: 'Internal server error: fail performing selection.'
@@ -203,4 +248,22 @@ export const getAppointment = (req: Request, res: Response): Response<any, Recor
   }
 
   return res.status(200).json(appointment);
+};
+
+/** 
+ * @description Wrappers for the controllers.
+ * 
+ * @example
+ * ```
+ * import * as GET from 'path/to/get.controller';
+ * 
+ * GET.allAppointments(req, res); // and the same for the other controllers.
+ * ```
+ */
+export const allAppointments = (req: Request, res: Response): void => {
+  void getAllAppointments(req, res);
+};
+
+export const appointmentsByPatientId = (req: Request, res: Response): void => {
+  void getAppointmentsByPatientId(req, res);
 };
