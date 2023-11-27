@@ -21,10 +21,10 @@ render(() => <div>
     <Router>
       <Routes>
         <Route path="/" component={Login} />
-        <Route path="/" component={RouteGuard}>
         <Route path="/signup" component={Signup} />
         <Route path="/dentist-signup" component={DentistSignup} />
         <Route path="/patient-signup" component={PatientSignup} />
+        <Route path="/" component={RouteGuard}>
         <Route path="/calendar" component={DentistCalendar} />
         <Route path="/user-profile" component={UserProfile} />
         <Route path="/map" component={Map} />

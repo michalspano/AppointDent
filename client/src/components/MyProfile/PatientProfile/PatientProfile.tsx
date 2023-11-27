@@ -49,27 +49,31 @@ export default function DentistProfile (patientProp: PatientProfileProps): JSX.E
           <img class='lg:w-5/6 w-1/5 h-auto lg:rounded-sm rounded-full' src={LoginImage} alt='profile image' />
         </div>
       </div>
-      <div class="lg:w-1/2 w-5/6 h-screen m-8 flex flex-col text-black rounded-sm lg:justify-start justify-start bg-gradient-to-b from-neutral ... lg:px-10 px-5 py-20 lg:py-40 text-sm font-medium">
+      <div class="lg:w-1/2 w-5/6 h-screen m-8 flex flex-col text-black rounded-sm lg:justify-start justify-start bg-gradient-to-b from-neutral ... lg:px-10 px-5 py-20 text-sm font-medium">
         <div class="flex flex-col items-center justify-center">
           <img class="w-40 " src={logo} alt="AppointDent" />
         </div>
           <h1 class="mb-2 mt-4 text-lg">{patient.name.firstName}'s Profile</h1>
           <label class='text-black'>Email</label>
-          <CustomInput value={patient.userEmail} inputType='text' onChange={(event) => { setPatient('userEmail', event.target.value) }} disabled={true}/>
+          <div>
+                      <CustomInput value={patient.userEmail} inputType='text' onChange={(event) => { setPatient('userEmail', event.target.value) }} disabled={true}/>
+          </div>
           <div class="flex flex-row justify-between w-full">
             <div class='flex flex-col w-full mr-2'>
               <label class='text-black'>First name</label>
             <CustomInput class='mr-2' value={patient.name.firstName} inputType='text' onChange={(event) => { setPatient('name', 'firstName', event.target.value) }} disabled={false}/>
             </div>
-            <div class='flex flex-col w-full'>
+            <div class='flex flex-col w-full '>
                <label class='text-black'>Last name</label>
             <CustomInput value={patient.name.lastName} inputType='text' onChange={(event) => { setPatient('name', 'lastName', event.target.value) }} disabled={false}/>
             </div>
           </div>
           <label class='text-black'>Date of birth</label>
-          <CustomInput max={new Date().toISOString().split('T')[0]} value={patient.dateOfBirth.toISOString().split('T')[0]} inputType='date' onChange={(event) => { setPatient('dateOfBirth', new Date(event.target.value)) }} disabled={false}/>
+          <div>
+              <CustomInput class='' max={new Date().toISOString().split('T')[0]} value={patient.dateOfBirth.toISOString().split('T')[0]} inputType='date' onChange={(event) => { setPatient('dateOfBirth', new Date(event.target.value)) }} disabled={true}/>
+          </div>
           {getError() !== null ? <p class="text-error">{(getError() as Error).message}</p> : <></>}
-          <button type="submit" class="log-in-btn h-12 mb-6 bg-secondary rounded-xl text-base" onClick={() => { patchPatient(patient) }}>
+          <button type="submit" class="p-4 bg-secondary rounded-xl text-base" onClick={() => { patchPatient(patient) }}>
              Save changes
           </button>
       </div>
