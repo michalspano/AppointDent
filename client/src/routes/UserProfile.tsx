@@ -50,7 +50,6 @@ export default function UserProfile (): JSX.Element {
           ? (data[0] as Dentist)
           : undefined
 
-        console.log(user)
         if (user !== undefined) {
           setDentistUser({
             email: user.email,
@@ -63,7 +62,6 @@ export default function UserProfile (): JSX.Element {
             clinicCountry: user.clinicCountry,
             picture: user.picture
           })
-          console.log(dentistUser())
         }
       }
 

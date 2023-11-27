@@ -10,9 +10,6 @@ import CustomInput from '../CustomInput'
 import { Api } from '../../../utils/api'
 
 export default function DentistProfile (dentistProp: DentistProfileProps): JSX.Element {
-  // we need a copy, so that the original values do not change
-  // in case a wrong patch is executed, we set the values back to what
-  // they were
   const [dentist, setDentist] = createStore<Dentist>(dentistProp.dentistProp)
   const [proImage, setProImage] = createSignal<string>(dentistProp.dentistProp.picture)
 
@@ -43,9 +40,6 @@ export default function DentistProfile (dentistProp: DentistProfileProps): JSX.E
     throw new Error('File input element not found.')
   }
 
-  // The following method will be called upon saving changes
-  // You can change it however you see fit when you are integrating with the
-  // backend
   const patchDentist = async function patchDentist (patchedDentist: Dentist): Promise<void> {
     const validDentist = isValidDentist(dentist)
     if (validDentist !== undefined) {

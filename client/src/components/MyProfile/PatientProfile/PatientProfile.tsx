@@ -10,18 +10,13 @@ import CustomInput from '../CustomInput'
 import { Api } from '../../../utils/api'
 
 export default function PatientProfile (patientProp: PatientProfileProps): JSX.Element {
-  // we need a copy, so that the original values do not change
-  // in case a wrong patch is executed, we set the values back to what
-  // they were
   const [patient, setPatient] = createStore<Patient>(patientProp.patientProp)
   const [getError, setError] = createSignal<Error | null>(null)
 
   createEffect(async () => {
     setPatient(patientProp.patientProp)
   })
-  // The following method will be called upon saving changes
-  // You can change it however you see fit when you are integrating with the
-  // backend
+
   const patchPatient = async function patchPatient (patchedPatient: Patient): Promise<void> {
     const validPatient = isValidPatient(patient)
     if (validPatient !== undefined) {
