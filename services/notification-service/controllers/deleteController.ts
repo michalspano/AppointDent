@@ -86,7 +86,7 @@ const deleteAsyncAllNotification = async function (req: Request, res: Response):
   }
 
   // User has notifications, process to delete them.
-  const delStmt: Statement = database.prepare('DELETE FROM appointments WHERE email = ?');
+  const delStmt: Statement = database.prepare('DELETE FROM notifications WHERE email = ?');
   try {
     delStmt.run(userEmail);
   } catch (err) {

@@ -5,5 +5,5 @@ import { deleteAllNotification, deleteNotification } from '../controllers/delete
 export const router = Router();
 
 router.get('/:email', getNotifications);
-router.delete('/:id', deleteNotification);
+router.delete('/:email/:id', deleteNotification);
 router.delete('/:email', deleteAllNotification);

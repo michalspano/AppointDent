@@ -24,7 +24,7 @@ export const authoriseUser = async function (req: Request, res: Response): Promi
   let authRes: string;
 
   if (sessionKey === undefined) {
-    return res.status(401).json({ message: 'did not found sessionKey.' });
+    return res.status(401).json({ message: 'Did not find sessionKey.' });
   }
 
   // We make use of an id to only handle response messages that have this Id
@@ -44,7 +44,7 @@ export const authoriseUser = async function (req: Request, res: Response): Promi
 
   // 0 indicates unauthorised access.
   if (authRes === '0') {
-    return res.status(401).json({ message: 'session was wrong.' });
+    return res.status(401).json({ message: 'Session was wrong.' });
   }
   return undefined;
 };
