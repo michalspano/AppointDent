@@ -22,7 +22,7 @@ import { SessionResponse, type AsyncResObj, UserType, type WhoisResponse, type A
  *
  * @see verifySession
  * @see SessionResponse
- * @see getAllAppointmentsWrapper
+ * @see allAppointments
  *
  * @returns Promise that resolves to a response object.
  */
@@ -85,14 +85,13 @@ const getAllAppointments = async (req: Request, res: Response): AsyncResObj => {
 };
 
 /**
- *
  * @description a controller that is used to get all appointments assigned to a patient.
  * This route is protected and requires the user to be logged in, be a patient and
  * access only their own appointments.
  *
  * @see whoisByToken
  * @see WhoisResponse
- * @see getAllAppointmentsWrapper
+ * @see allAppointments
  *
  * @param req the request object.
  * @param res the response object.
@@ -172,7 +171,7 @@ const getAppointmentsByPatientId = async (req: Request, res: Response): AsyncRes
 
 // Get all appointments slots that are assigned to a dentist (both booked
 // and non-booked).
-export const getAppointmentsByDentistId = (req: Request, res: Response): Response<any, Record<string, any>> => {
+const getAppointmentsByDentistId = (req: Request, res: Response): Response<any, Record<string, any>> => {
   if (database === undefined) {
     return res.status(500).json({
       message: 'Internal server error: database connection failed.'
@@ -215,20 +214,65 @@ export const getAppointmentsByDentistId = (req: Request, res: Response): Respons
   return res.status(200).json(result);
 };
 
-// Get an appointment by id.
-// The appointment ID has hashed anyway, so only having the valid session
-// is enough to ensure that the user is authorized to access the appointment.
-// Moral question: what's the probability that a user can guess the appointment
-// ID? The answer should be: very low.
-export const getAppointment = (req: Request, res: Response): Response<any, Record<string, any>> => {
+/**
+ * @description a controller function that is used to get an appointment by its id.
+ * This endpoint is only protected by an active session key. The id of an appointment
+ * is hashed and is not visible to the user. Therefore, the user cannot access an
+ * appointment that they are not allowed to access (unless they guess the id, which
+ * is highly unlikely).
+ *
+ * @see verifySession
+ * @see SessionResponse
+ * @see getAppointment
+ *
+ * @param req The request object.
+ * @param res The response object.
+ * @returns Promise that resolves to a response object.
+ */
+const getAppointment = async (req: Request, res: Response): AsyncResObj => {
   if (database === undefined) {
     return res.status(500).json({
       message: 'Internal server error: database connection failed.'
     });
   }
 
-  // TODO: ensure that a valid session is present.
+  if (client === undefined) {
+    return res.status(503).json({
+      message: 'Service unavailable: MQTT connection failed.'
+    });
+  }
 
+  const email: string | undefined = req.body.email;
+  const sessionKey: string | undefined = req.cookies.sessionKey;
+
+  if (sessionKey === undefined || email === undefined) {
+    return res.status(400).json({ message: 'Bad request: missing session key or email.' });
+  }
+
+  // To get the appointment, the user must be logged in.
+  // That means, a valid session must be present.
+  const TOPIC: string = utils.MQTT_PAIRS.auth.req;
+  const RESPONSE_TOPIC: string = utils.MQTT_PAIRS.auth.res;
+
+  const reqId: string = utils.genReqId();
+  client.publish(TOPIC, `${reqId}/${email}/${sessionKey}/*`);
+  client.subscribe(RESPONSE_TOPIC);
+
+  try {
+    const result: SessionResponse = await utils.verifySession(
+      reqId.toString(),
+      RESPONSE_TOPIC
+    ) as SessionResponse;
+    if (result !== SessionResponse.Success) {
+      return res.status(401).json({ message: 'Unauthorized: invalid session.' });
+    }
+  } catch (err: Error | unknown) {
+    return res.status(504).json({
+      message: 'Service timeout: unable to verify session.'
+    });
+  }
+
+  // Verification successful, proceed with the request.
   const id: string = req.params.id;
   let appointment: unknown;
   try {
@@ -241,29 +285,46 @@ export const getAppointment = (req: Request, res: Response): Response<any, Recor
     });
   }
 
+  // Resource not found.
   if (appointment === undefined) {
-    return res.status(404).json({
-      message: `Appointment with id ${id} not found.`
-    });
+    return res.status(404).json({ message: 'Not found.' });
   }
 
   return res.status(200).json(appointment);
 };
 
-/** 
+/**
  * @description Wrappers for the controllers.
- * 
+ *
  * @example
  * ```
- * import * as GET from 'path/to/get.controller';
- * 
+ * import GET from 'path/to/get.controller';
+ *
  * GET.allAppointments(req, res); // and the same for the other controllers.
  * ```
+ * @note the `GET` object is exported as default, so it can be imported
+ * as any name (such as getControllers).
  */
-export const allAppointments = (req: Request, res: Response): void => {
+const allAppointments = (req: Request, res: Response): void => {
   void getAllAppointments(req, res);
 };
 
-export const appointmentsByPatientId = (req: Request, res: Response): void => {
+const appointmentsByPatientId = (req: Request, res: Response): void => {
   void getAppointmentsByPatientId(req, res);
+};
+
+const appointmentsByDentistId = (req: Request, res: Response): void => {
+  void getAppointmentsByDentistId(req, res);
+};
+
+const appointment = (req: Request, res: Response): void => {
+  void getAppointment(req, res);
+};
+
+// Export the controllers.
+export default {
+  allAppointments,
+  appointmentsByPatientId,
+  appointmentsByDentistId,
+  appointment
 };
