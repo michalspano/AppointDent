@@ -2,7 +2,6 @@
 
 CREATE TABLE IF NOT EXISTS dentists (
     email VARCHAR(64) PRIMARY KEY NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
     firstName VARCHAR(64) NOT NULL,
     lastName VARCHAR(64) NOT NULL,
     clinicCountry VARCHAR NOT NULL,

@@ -19,7 +19,6 @@ export const register = async (req: Request, res: Response): Promise<Response<an
    */
   const request: RegisterRequest = {
     email: req.body.email,
-    password: req.body.password,
     firstName: req.body.firstName,
     lastName: req.body.lastName,
     clinicCountry: req.body.clinicCountry,
@@ -29,6 +28,9 @@ export const register = async (req: Request, res: Response): Promise<Response<an
     clinicZipCode: req.body.clinicZipCode,
     picture: req.body.picture
   };
+
+  if (req.body.password === undefined) return res.status(400).json({ message: 'Password missing' });
+
   /**
    * Check if any fields are missing
    */
@@ -66,9 +68,10 @@ export const register = async (req: Request, res: Response): Promise<Response<an
     query = database.prepare(`
     INSERT INTO dentists 
     (${fieldsToUpdate.join(', ')})
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
   } catch (err) {
+    console.log(err);
     return res.status(400).json({ message: 'Invalid input' });
   }
 
@@ -82,7 +85,7 @@ export const register = async (req: Request, res: Response): Promise<Response<an
    */
   const reqId = Math.floor(Math.random() * 1000); // Generates a random integer between 0 and 999
   client.subscribe(RESPONSE_TOPIC);
-  client.publish(TOPIC, `${reqId}/${request.email}/${request.password}/d/*`); // REQID/USERID/SECRET/type/* d for dentist
+  client.publish(TOPIC, `${reqId}/${request.email}/${req.body.password}/d/*`); // REQID/USERID/SECRET/type/* d for dentist
   try {
     const mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
     if (mqttResult === '0') {

@@ -1,10 +1,9 @@
 {
 	"info": {
-		"_postman_id": "a9f414a0-f049-4fb3-98f9-9be95f94d9fb",
-		"name": "Test",
+		"_postman_id": "cd2954b6-f8dd-46ae-b122-ee5d2c0117ea",
+		"name": "Test 27nov",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "29406936",
-		"_collection_link": "https://www.postman.com/dark-flare-212796/workspace/dit356/collection/29406936-a9f414a0-f049-4fb3-98f9-9be95f94d9fb?action=share&source=collection_link&creator=29406936"
+		"_exporter_id": "28264405"
 	},
 	"item": [
 		{
@@ -20,7 +19,6 @@
 									"pm.test(\"Response code is 201\", function () {",
 									"    pm.response.to.have.status(201);",
 									"});",
-									"pm.environment.set('sessionCookie', pm.cookies.get('sessionKey'));",
 									""
 								],
 								"type": "text/javascript"
@@ -69,6 +67,9 @@
 							}
 						}
 					],
+					"protocolProfileBehavior": {
+						"disableCookies": true
+					},
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -150,7 +151,8 @@
 						}
 					],
 					"protocolProfileBehavior": {
-						"disableBodyPruning": true
+						"disableBodyPruning": true,
+						"disableCookies": true
 					},
 					"request": {
 						"method": "GET",
@@ -640,6 +642,97 @@
 								"v1",
 								"dentists",
 								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /api/dentists/logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/dentists/logout",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dentists",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST fail /api/session/whois FAIL",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/sessions/whois",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sessions",
+								"whois"
 							]
 						}
 					},
@@ -1998,8 +2091,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Response code is 401\", function(){",
-									"    pm.response.to.have.status(401);",
+									"pm.test(\"Response code is 400\", function(){",
+									"    pm.response.to.have.status(400);",
 									"})",
 									""
 								],
@@ -2007,6 +2100,9 @@
 							}
 						}
 					],
+					"protocolProfileBehavior": {
+						"disableCookies": true
+					},
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -2032,8 +2128,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Response code is 401\", function(){",
-									"    pm.response.to.have.status(401);",
+									"pm.test(\"Response code is 400\", function(){",
+									"    pm.response.to.have.status(400);",
 									"})",
 									"",
 									""
@@ -2043,7 +2139,8 @@
 						}
 					],
 					"protocolProfileBehavior": {
-						"disableBodyPruning": true
+						"disableBodyPruning": true,
+						"disableCookies": true
 					},
 					"request": {
 						"method": "GET",
@@ -2073,7 +2170,7 @@
 					"response": []
 				},
 				{
-					"name": "POST fail /api/session/whois",
+					"name": "GET fail /api/session/whois",
 					"event": [
 						{
 							"listen": "test",
@@ -2089,7 +2186,8 @@
 						}
 					],
 					"protocolProfileBehavior": {
-						"disableBodyPruning": true
+						"disableBodyPruning": true,
+						"disableCookies": true
 					},
 					"request": {
 						"method": "GET",
@@ -2379,6 +2477,97 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "POST /api/patients/logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/patients/logout",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"patients",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST fail /api/session/whois FAIL",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/sessions/whois",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sessions",
+								"whois"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -2400,6 +2589,9 @@
 							}
 						}
 					],
+					"protocolProfileBehavior": {
+						"disableCookies": true
+					},
 					"request": {
 						"method": "GET",
 						"header": [],
