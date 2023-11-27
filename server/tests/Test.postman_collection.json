@@ -2385,6 +2385,345 @@
 					]
 				},
 				{
+					"name": "GET /:id",
+					"item": [
+						{
+							"name": "GET (invalid cookie)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response code shall be 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});",
+											"",
+											"pm.test(\"Response is an object\", function () {",
+											"    pm.expect(pm.response.json()).to.be.an('object');",
+											"});",
+											"",
+											"pm.test(\"Response contains 'message' attribute\", function () {",
+											"    pm.expect(pm.response.json()).to.have.property('message');",
+											"});",
+											"",
+											"pm.test(\"Contains correct response message\", function () {",
+											"    pm.expect(pm.response.json().message).to.equal(\"Unauthorized: invalid session.\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Cookie",
+										"value": "sessionKey=f8f2f1fc-80c9-4329-ad89-3551231312312",
+										"description": "An invalid cookie that overwrites the one passed.",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"{{patientEmailSample}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/appointments/:id",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"appointments",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{appointmentId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET (as *empty* patient)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response code shall be 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response is an object\", function () {",
+											"    pm.expect(pm.response.json()).to.be.an('object');",
+											"});",
+											"",
+											"pm.test(\"Response contains 'message' attribute\", function () {",
+											"    pm.expect(pm.response.json()).to.have.property('message');",
+											"});",
+											"",
+											"pm.test(\"Contains correct response message\", function () {",
+											"    pm.expect(pm.response.json().message).to.equal(\"Bad request: missing session key or email.\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/appointments/:id",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"appointments",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{appointmentId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET (as *invalid* patient)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response code shall be 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});",
+											"",
+											"pm.test(\"Response is an object\", function () {",
+											"    pm.expect(pm.response.json()).to.be.an('object');",
+											"});",
+											"",
+											"pm.test(\"Response contains 'message' attribute\", function () {",
+											"    pm.expect(pm.response.json()).to.have.property('message');",
+											"});",
+											"",
+											"pm.test(\"Contains correct response message\", function () {",
+											"    pm.expect(pm.response.json().message).to.equal(\"Unauthorized: invalid session.\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"{{patientEmailSample}})@*#das\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/appointments/:id",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"appointments",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{appointmentId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET (not found)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response code shall be 404\", function () {",
+											"    pm.response.to.have.status(404);",
+											"});",
+											"",
+											"pm.test(\"Response is an object\", function () {",
+											"    pm.expect(pm.response.json()).to.be.an('object');",
+											"});",
+											"",
+											"pm.test(\"Response contains 'message' attribute\", function () {",
+											"    pm.expect(pm.response.json()).to.have.property('message');",
+											"});",
+											"",
+											"pm.test(\"Contains correct response message\", function () {",
+											"    pm.expect(pm.response.json().message).to.equal(\"Not found.\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"{{patientEmailSample}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/appointments/:id",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"appointments",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{appointmentId}}_128319ess"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET (success)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response code shall be 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response is in JSON format\", function () {",
+											"    pm.response.to.be.json;",
+											"});",
+											"",
+											"pm.test(\"Response contains the 'id' attribute\", function () {",
+											"    pm.expect(pm.response.json()).to.have.property('id');",
+											"});",
+											"",
+											"pm.test(\"Response contains the 'start_timestamp' attribute\", function () {",
+											"    pm.expect(pm.response.json()).to.have.property('start_timestamp');",
+											"});",
+											"",
+											"pm.test(\"Response contains the 'end_timestamp' attribute\", function () {",
+											"    pm.expect(pm.response.json()).to.have.property('end_timestamp');",
+											"});",
+											"",
+											"pm.test(\"Response contains the 'dentistId' attribute\", function () {",
+											"    pm.expect(pm.response.json()).to.have.property('dentistId');",
+											"});",
+											"",
+											"pm.test(\"Response contains the 'patientId' attribute\", function () {",
+											"    pm.expect(pm.response.json()).to.have.property('patientId');",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"{{patientEmailSample}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/appointments/:id",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"appointments",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{appointmentId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
 					"name": "BOOK /:id",
 					"item": [
 						{
