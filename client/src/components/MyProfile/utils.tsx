@@ -36,11 +36,7 @@ export function isValidDentist (dentist: Dentist): undefined | string {
  */
 export function isValidPatient (patient: Patient): undefined | string {
   try {
-    if (patient.userEmail.match(/^[a-z0-9]+@[a-z]+\.[a-z]{2,3}$/) == null) {
-      throw new Error('Please give a valid email address.')
-    }
-
-    if (patient.name.firstName === '' || patient.name.lastName === '') {
+    if (patient.firstName === '' || patient.lastName === '') {
       throw new Error('Please write your first and last name.')
     }
   } catch (err) {
