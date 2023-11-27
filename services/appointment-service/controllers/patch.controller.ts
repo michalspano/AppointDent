@@ -12,6 +12,7 @@ import type Database from 'better-sqlite3';
 import { type Statement } from 'better-sqlite3';
 import type { Request, Response } from 'express';
 import { type AsyncResObj, SessionResponse, UserType, type Appointment, type WhoisResponse } from '../types/types';
+import { type UUID } from 'crypto';
 
 const TOPIC: string = utils.MQTT_PAIRS.whois.req;
 const RESPONSE_TOPIC: string = utils.MQTT_PAIRS.whois.res;
@@ -46,7 +47,7 @@ const bookAppointment = async (req: Request, res: Response): AsyncResObj => {
     });
   }
 
-  const email: string | undefined = req.body.email;
+  const email: string | undefined = req.body.patientId; // what the db uses
   const sessionKey: string | undefined = req.cookies.sessionKey;
 
   if (sessionKey === undefined || email === undefined) {
@@ -76,8 +77,9 @@ const bookAppointment = async (req: Request, res: Response): AsyncResObj => {
     }
 
     // Check if the emails match.
+    // This case also handles when a non-existent email is provided.
     if (result.email !== email) {
-      return res.status(401).json({ message: 'Unauthorized: invalid email.' });
+      return res.status(403).json({ message: 'Forbidden: invalid email.' });
     }
   } catch (err: Error | unknown) {
     return res.status(504).json({
@@ -123,7 +125,7 @@ const bookAppointment = async (req: Request, res: Response): AsyncResObj => {
   }
 
   // Update the appointment object with the patientId.
-  appointment.patientId = toBook ? req.body.patientId : null;
+  appointment.patientId = toBook ? email as UUID : null;
 
   const stmt: Statement = database.prepare(`
     UPDATE appointments

@@ -73,8 +73,8 @@ const createAppointment = async (req: Request, res: Response): AsyncResObj => {
     /* This means that a dentist is trying to create an appointment for another dentist.
      * This sort of behavior is not allowed. */
     if (result.email !== email) {
-      return res.status(401).json({
-        message: 'Unauthorized: attempt to create an appointment for another dentist.'
+      return res.status(403).json({
+        message: 'Forbidden: attempt to create an appointment for another or non-existent dentist account.'
       });
     }
   } catch (err: Error | unknown) {
