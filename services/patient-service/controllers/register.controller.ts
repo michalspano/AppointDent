@@ -42,11 +42,12 @@ export const registerController = async (req: Request, res: Response): Promise<R
   // To insert user into the database
     const query = database.prepare(`
     INSERT INTO patients 
-    (email, password, birthDate, lastName, firstName) 
-    VALUES (?, ?, ?, ?, ?)
+    (email, birthDate, lastName, firstName) 
+    VALUES (?, ?, ?, ?)
   `);
-    query.run(email, password, birthDate, lastName, firstName);
+    query.run(email, birthDate, lastName, firstName);
   } catch (err) {
+    console.log(err);
     return res.sendStatus(400);
   }
 
