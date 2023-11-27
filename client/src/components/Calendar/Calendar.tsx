@@ -46,12 +46,20 @@ export default function DentistCalendar (): JSX.Element {
   }
 
   /**
+   * Get the current logged in user's email.
+   * @returns Current user email (string)
+   */
+  async function getCurrentUser (): Promise<string> {
+    const dentistResponse = await Api.get('sessions/whois', { withCredentials: true })
+    return dentistResponse.data.email
+  }
+
+  /**
  * Fetch all of the appointments from a dentist to the calendar.
  */
   async function fetchAppointments (): Promise<void> {
     try {
-      const dentistResponse = await Api.get('sessions/whois', { withCredentials: true })
-      const dentistEmail = dentistResponse.data.email
+      const dentistEmail = await getCurrentUser()
       const response = await Api.get(`/appointments/dentists/${dentistEmail}`)
       const appointments = response.data
       const formattedAppointments = appointments.map((appointment: any) => ({
@@ -80,7 +88,7 @@ export default function DentistCalendar (): JSX.Element {
       const formattedAppointment = {
         start_timestamp: startTimestamp,
         end_timestamp: endTimestamp,
-        dentistId: 'dentist@gmail.com' // Will be replaced with actual dentist email from local storage
+        dentistId: await getCurrentUser()// Will be replaced with actual dentist email from local storage
       }
       await Api.post('/appointments', formattedAppointment)
         .then(() => {

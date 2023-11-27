@@ -1,5 +1,7 @@
 import express, { type Express, type Request } from 'express';
+import morgan from 'morgan';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
 const app: Express = express();
 interface CorsOptions {
@@ -27,6 +29,10 @@ const corsOptionsSetter = function (req: Request, corsCallback: (err: any, optio
 };
 app.use(cors(corsOptionsSetter));
 app.use(express.json()); // for parsing application/json
+app.use(morgan('dev'));
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
 const port: string = process.env.PORT ?? '3004';
 
 export { app, port };
