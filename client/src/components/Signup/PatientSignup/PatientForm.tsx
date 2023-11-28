@@ -3,9 +3,11 @@ import logo from '../../../assets/logo.png'
 import { A } from '@solidjs/router'
 import { createSignal } from 'solid-js'
 import { Api } from '../../../utils/api'
+import { validateUserInfo } from '../utils'
 
 export default function PatientForm (): JSX.Element {
-  const today = new Date().toISOString().split('T')[0]
+  const oneTimeStampDay: number = 24 * 60 * 60 * 1000
+  const yesterday = new Date(Date.now() - oneTimeStampDay).toISOString().split('T')[0]
   const [email, setEmail] = createSignal('')
   const [password, setPassword] = createSignal('')
   const [dateOfBirth, setDateOfBirth] = createSignal('')
@@ -24,6 +26,11 @@ export default function PatientForm (): JSX.Element {
 
     if (Object.values(requiredFields).some((field) => field === '')) {
       setError('Please fill in all fields.')
+      return
+    }
+
+    if (validateUserInfo(requiredFields) !== undefined) {
+      setError(validateUserInfo(requiredFields) as string)
       return
     }
 
@@ -89,7 +96,7 @@ export default function PatientForm (): JSX.Element {
           <input
               class="input h-12 w-full px-3 py-2 mb-6 border rounded-xl"
               type="date"
-              max={today}
+              max={yesterday}
               placeholder="Date of birth"
               onChange={(event) => setDateOfBirth(event.target.value)}
             />
