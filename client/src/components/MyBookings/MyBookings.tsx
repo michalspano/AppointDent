@@ -42,7 +42,7 @@ export default function MyBookings (): JSX.Element {
       const response = await Api.get(`
         /appointments/patients/${patientEmail}`, {
         withCredentials: true
-        }) // Replace with the actual patient id
+      }) // Replace with the actual patient id
       const appointmentsData = response.data
 
       const formattedAppointments = await Promise.all(
@@ -85,7 +85,8 @@ export default function MyBookings (): JSX.Element {
       try {
         // This could be extracted into a separate function or a state variable.
         // So that it doesn't have to be redundantly.
-        const patientEmail = await Api.get('/sessions/whois', { withCredentials: true })
+        const patientResponse = await Api.get('/sessions/whois', { withCredentials: true })
+        const patientEmail = patientResponse.data.email
         await Api.patch(`
           /appointments/${id}?patientId=${patientEmail}&toBook=false`, {
           withCredentials: true
