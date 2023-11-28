@@ -4,7 +4,7 @@ import { Api } from '../../utils/api'
 import type { Appointment, Registration } from '../../utils/types'
 import BookingConfirmationPopup from './BookingConfirmation'
 import { useParams } from '@solidjs/router'
-export default function AppointmentsList(): JSX.Element {
+export default function AppointmentsList (): JSX.Element {
   createEffect(async () => {
     const params = useParams<{ email: string }>()
     setDentistEmail(atob(params.email))
@@ -16,7 +16,7 @@ export default function AppointmentsList(): JSX.Element {
     }, 5000)
   })
 
-  async function fetchAppointments(): Promise<void> {
+  async function fetchAppointments (): Promise<void> {
     try {
       const patientResponse = await Api.get('sessions/whois', {
         withCredentials: true
@@ -56,7 +56,7 @@ export default function AppointmentsList(): JSX.Element {
     }
   }
 
-  async function fetchDentist(): Promise<void> {
+  async function fetchDentist (): Promise<void> {
     try {
       const response = await Api.get(`/dentists/${dentistEmail()}`)
       const dentistRes = response.data[0]
@@ -69,7 +69,7 @@ export default function AppointmentsList(): JSX.Element {
     }
   }
 
-  async function bookAppointment(appointment: Appointment): Promise<void> {
+  async function bookAppointment (appointment: Appointment): Promise<void> {
     const appointmentId = appointment.id
     const patientResponse = await Api.get('sessions/whois', {
       withCredentials: true

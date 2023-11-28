@@ -8,7 +8,7 @@ import { type EventContentArg, type EventClickArg } from '@fullcalendar/core'
 import ConfirmationPopup from './DeleteConfirmation'
 import { Api } from '../../utils/api'
 
-export default function DentistCalendar(): JSX.Element {
+export default function DentistCalendar (): JSX.Element {
   const [showForm, setShowForm] = createSignal<boolean>(false)
   const [showConfirmation, setShowConfirmation] = createSignal<boolean>(false)
   const [selectedEventId, setSelectedEventId] = createSignal<string | null>(null)
@@ -21,7 +21,7 @@ export default function DentistCalendar(): JSX.Element {
     end: ''
   })
 
-  async function handleFormSubmit(): Promise<void> {
+  async function handleFormSubmit (): Promise<void> {
     try {
       await addAppointment(newAppointment())
     } catch (error) {
@@ -34,7 +34,7 @@ export default function DentistCalendar(): JSX.Element {
  * @param dateString - A date in string format.
  * @returns A date in number format.
  */
-  function parseDateStringToInteger(dateString: string): number {
+  function parseDateStringToInteger (dateString: string): number {
     // Parse the date string into a Date object
     const date = new Date(dateString)
     // Get the timestamp in milliseconds
@@ -49,7 +49,7 @@ export default function DentistCalendar(): JSX.Element {
    * Get the current logged in user's email.
    * @returns Current user email (string)
    */
-  async function getCurrentUser(): Promise<string> {
+  async function getCurrentUser (): Promise<string> {
     const dentistResponse = await Api.get('sessions/whois', { withCredentials: true })
     return dentistResponse.data.email
   }
@@ -57,7 +57,7 @@ export default function DentistCalendar(): JSX.Element {
   /**
  * Fetch all of the appointments from a dentist to the calendar.
  */
-  async function fetchAppointments(): Promise<void> {
+  async function fetchAppointments (): Promise<void> {
     try {
       const dentistEmail = await getCurrentUser()
       const response = await Api.get(`/appointments/dentists/${dentistEmail}?userId=${dentistEmail}`, {
@@ -82,7 +82,7 @@ export default function DentistCalendar(): JSX.Element {
  * Adds a new appointment to the database and updates the calendar.
  * @param {Appointment} appointment - The appointment to be added.
  */
-  async function addAppointment(appointment: Appointment): Promise<void> {
+  async function addAppointment (appointment: Appointment): Promise<void> {
     try {
       // Parse start and end times to integer
       const startTimestamp = parseDateStringToInteger(newAppointment().start)
@@ -115,7 +115,7 @@ export default function DentistCalendar(): JSX.Element {
  * Deletes the selected appointment and updates calendar.
  * @param appointmentId - The id of the appointment to be removed.
  */
-  async function deleteAppointment(appointmentId: string): Promise<void> {
+  async function deleteAppointment (appointmentId: string): Promise<void> {
     try {
       const dentistEmail = await getCurrentUser()
       await Api.delete(`/appointments/${appointmentId}?dentistId=${dentistEmail}`, {
