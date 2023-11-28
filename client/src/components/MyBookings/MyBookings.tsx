@@ -39,10 +39,8 @@ export default function MyBookings (): JSX.Element {
     try {
       const patientResponse = await Api.get('/sessions/whois', { withCredentials: true })
       const patientEmail = patientResponse.data.email
-      const response = await Api.get(`
-        /appointments/patients/${patientEmail}`, {
-        withCredentials: true
-      }) // Replace with the actual patient id
+      const requestURL: string = `/appointments/patients/${patientEmail}`
+      const response = await Api.get(requestURL, { withCredentials: true })
       const appointmentsData = response.data
 
       const formattedAppointments = await Promise.all(
@@ -87,10 +85,8 @@ export default function MyBookings (): JSX.Element {
         // So that it doesn't have to be redundantly.
         const patientResponse = await Api.get('/sessions/whois', { withCredentials: true })
         const patientEmail = patientResponse.data.email
-        await Api.patch(`
-          /appointments/${id}?patientId=${patientEmail}&toBook=false`, {
-          withCredentials: true
-        })
+        const requestURL: string = `/appointments/${id}?patientId=${patientEmail}&toBook=false`
+        await Api.patch(requestURL, { withCredentials: true })
       } catch (err) {
         throw new Error(`Error cancelling appointment with ID ${id}`)
       }

@@ -24,11 +24,8 @@ export default function AppointmentsList (): JSX.Element {
       const patientEmail = patientResponse.data.email
 
       // Obtain all available appointments for the dentist
-      const response = await Api.get(`
-        /appointments/dentists/${dentistEmail()}
-        ?userId=${patientEmail}&onlyAvailable=true`, {
-        withCredentials: true
-      })
+      const requestURL: string = `/appointments/dentists/${dentistEmail()}?userId=${patientEmail}&onlyAvailable=true`
+      const response = await Api.get(requestURL, { withCredentials: true })
       const appointments = response.data
       const formattedAppointments = appointments.map((appointment: any) => ({
         id: appointment.id,
@@ -76,15 +73,13 @@ export default function AppointmentsList (): JSX.Element {
     })
     const patientEmail = patientResponse.data.email
     try {
-      await Api.patch(`
-        /appointments/${appointmentId}
-        ?patientId=${patientEmail}&toBook=true`, {
-        withCredentials: true
-      }).then(() => {
+      const requestURL: string = `/appointments/${appointmentId}?patientId=${patientEmail}&toBook=true`
+      await Api.patch(requestURL, { withCredentials: true }
+      ).then(() => {
         console.log('Appointment booked successfully.')
       })
     } catch (error) {
-      throw new Error('Error creating appointment')
+      throw new Error('Error booking appointment')
     }
   }
 

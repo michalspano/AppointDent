@@ -60,9 +60,8 @@ export default function DentistCalendar (): JSX.Element {
   async function fetchAppointments (): Promise<void> {
     try {
       const dentistEmail = await getCurrentUser()
-      const response = await Api.get(`/appointments/dentists/${dentistEmail}?userId=${dentistEmail}`, {
-        withCredentials: true
-      })
+      const requestURL: string = `/appointments/dentists/${dentistEmail}?userId=${dentistEmail}`
+      const response = await Api.get(requestURL, { withCredentials: true })
       const appointments = response.data
       const formattedAppointments = appointments.map((appointment: any) => ({
         id: appointment.id,
@@ -92,9 +91,8 @@ export default function DentistCalendar (): JSX.Element {
         end_timestamp: endTimestamp,
         dentistId: await getCurrentUser()// Will be replaced with actual dentist email from local storage
       }
-      await Api.post('/appointments', formattedAppointment, {
-        withCredentials: true
-      }).then(() => {
+      await Api.post('/appointments', formattedAppointment, { withCredentials: true }
+      ).then(() => {
         calendarRef.current?.addEvent(appointment)
       })
     } catch (error) {
@@ -118,9 +116,9 @@ export default function DentistCalendar (): JSX.Element {
   async function deleteAppointment (appointmentId: string): Promise<void> {
     try {
       const dentistEmail = await getCurrentUser()
-      await Api.delete(`/appointments/${appointmentId}?dentistId=${dentistEmail}`, {
-        withCredentials: true
-      }).then(() => {
+      const requestURL: string = `/appointments/${appointmentId}?dentistId=${dentistEmail}`
+      await Api.delete(requestURL, { withCredentials: true }
+      ).then(() => {
         calendarRef.current?.getEventById(appointmentId)?.remove()
         console.log('Appointment deleted successfully')
       })
