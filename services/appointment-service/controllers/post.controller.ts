@@ -1,15 +1,87 @@
+/**
+ * controllers/post.controller.ts
+ *
+ * @description :: POST method for appointments.
+ * @version     :: 1.0
+ */
+
 import { randomUUID } from 'crypto';
+import { client } from '../mqtt/mqtt';
+import * as utils from '../utils';
 import database from '../db/config';
 import { type Statement } from 'better-sqlite3';
-import { type Appointment } from '../types/types';
 import type { Request, Response } from 'express';
+import { SessionResponse, type AsyncResObj, UserType, type Appointment, type WhoisResponse } from '../types/types';
 
-// Create a new appointment.
-const createAppointment = (req: Request, res: Response): Response<any, Record<string, any>> => {
+const TOPIC: string = utils.MQTT_PAIRS.whois.req;
+const RESPONSE_TOPIC: string = utils.MQTT_PAIRS.whois.res;
+
+/**
+ * @description the controller that creates an appointment.
+ * This controller is protected by the session service. It can only be accessed
+ * when a dentist is logged in and has a valid session. Furthermore, the dentist
+ * can create an appointment only for themselves.
+ *
+ * @param req the request object
+ * @param res the response object
+ * @returns Asynchronous response JSON-like object.
+ *
+ * @see whoisByToken
+ * @see AsyncResObj
+ */
+const createAppointment = async (req: Request, res: Response): AsyncResObj => {
   if (database === undefined) {
     return res.status(500).json({ message: 'Internal server error: database connection failed.' });
   }
 
+  if (client === undefined) {
+    return res.status(503).json({
+      message: 'Service unavailable: MQTT connection failed.'
+    });
+  }
+
+  const email: string | undefined = req.body.dentistId; // what the db uses
+  const sessionKey: string | undefined = req.cookies.sessionKey;
+
+  if (sessionKey === undefined || email === undefined) {
+    return res.status(400).json({ message: 'Bad request: missing session key or email.' });
+  }
+
+  // Use the `WHOIS` topic to determine the role of the user.
+  // This, in turn, determines whether the user is allowed to create an appointment.
+  const reqId: string = utils.genReqId();
+  client.publish(TOPIC, `${reqId}/${sessionKey}/*`);
+  client.subscribe(RESPONSE_TOPIC);
+
+  try {
+    const result: WhoisResponse = await utils.whoisByToken(
+      reqId.toString(),
+      RESPONSE_TOPIC
+    );
+
+    if (result.status !== SessionResponse.Success) {
+      return res.status(401).json({ message: 'Unauthorized: invalid session.' });
+    }
+
+    // Restrict access to dentists only.
+    if (result.type !== UserType.Dentist) {
+      return res.status(403).json({
+        message: 'Forbidden: only dentists can create appointments.'
+      });
+    }
+
+    /* This means that a dentist is trying to create an appointment for another dentist.
+     * This sort of behavior is not allowed. */
+    if (result.email !== email) {
+      return res.status(403).json({
+        message: 'Forbidden: attempt to create an appointment for another or non-existent dentist account.'
+      });
+    }
+  } catch (err: Error | unknown) {
+    return res.status(504).json({ message: 'Service timeout: unable to verify session.' });
+  }
+
+  // All went well, proceed with creating the appointment.
   const appointment: Appointment = {
     id: randomUUID(),
     start_timestamp: req.body.start_timestamp,
@@ -38,4 +110,14 @@ const createAppointment = (req: Request, res: Response): Response<any, Record<st
   return res.status(201).json(appointment);
 };
 
-export default createAppointment;
+/**
+ * @description a wrapper function for the createAppointment function.
+ *
+ * @param req a request object
+ * @param res a response object
+ */
+const createAppointmentWrapper = (req: Request, res: Response): void => {
+  void createAppointment(req, res);
+};
+
+export default createAppointmentWrapper;
