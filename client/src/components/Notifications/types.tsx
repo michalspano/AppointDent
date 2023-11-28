@@ -1,5 +1,5 @@
 export interface NotificationData {
   id: string
-  date: string
+  timestamp: number
   message: string
 }

@@ -5,7 +5,8 @@ import { type NotificationData } from './types'
 
 interface NotificationProps extends NotificationData {}
 
-function formatDateTime (dateTime: string): string {
+// Function to format the timstamp into a localised date and time string value
+function formatDateTime (timestamp: number): string {
   const options: Intl.DateTimeFormatOptions = {
     weekday: 'long',
     year: 'numeric',
@@ -14,20 +15,22 @@ function formatDateTime (dateTime: string): string {
     hour: '2-digit',
     minute: '2-digit'
   }
-  return new Date(dateTime).toLocaleString(undefined, options)
+  const formatedTimestamp = new Date(timestamp * 1000).toISOString().slice(0, 16)
+  return new Date(formatedTimestamp).toLocaleDateString('sv-SE', options)
 }
 
+// Define the notification component
 export default function Notification (props: NotificationProps): JSX.Element {
   return (
-    <div class="bg-white p-4 rounded-md shadow-md">
+    <div class="bg-white p-4 rounded-md shadow-md mt-6">
       <div class="flex items-center">
         <img class="w-6 h-6 mr-2" src={alarmIcon} alt="Alarm Icon" />
-        <span class="text-gray-600 mr-2">{formatDateTime(props.date)}</span>
+        <span class="text-gray-600 mr-2 date-time">{formatDateTime(props.timestamp)}</span>
       </div>
       <div class="mt-2 whitespace-normal">
         {props.message}
       </div>
-      <div class="border-b border-gray-300 mt-4"></div>
+      <div class="border-b border-gray-300 mt-4 border-line"></div>
     </div>
   )
 }
