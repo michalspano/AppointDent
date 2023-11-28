@@ -18,17 +18,10 @@ export interface Place {
 }
 
 export interface Patient {
-  userEmail: string
-  password?: string
-  name: {
-    firstName: string
-    lastName: string
-  }
-  dateOfBirth: Date
-  session?: {
-    token: string
-    expiry?: Date
-  }
+  email: string
+  firstName: string
+  lastName: string
+  birthDate: number
 }
 
 export interface Dentist {
