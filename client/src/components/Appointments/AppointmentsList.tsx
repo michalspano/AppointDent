@@ -18,7 +18,16 @@ export default function AppointmentsList (): JSX.Element {
 
   async function fetchAppointments (): Promise<void> {
     try {
-      const response = await Api.get(`/appointments/dentists/${dentistEmail()}?onlyAvailable=true`)
+      const patientResponse = await Api.get('sessions/whois', {
+        withCredentials: true
+      })
+      const patientEmail = patientResponse.data.email
+
+      // Obtain all available appointments for the dentist
+      const response = await Api.get(`
+        /appointments/dentists/${dentistEmail()}
+        ?userId=${patientEmail}&onlyAvailable=true`)
+
       const appointments = response.data
       const formattedAppointments = appointments.map((appointment: any) => ({
         id: appointment.id,
@@ -61,11 +70,15 @@ export default function AppointmentsList (): JSX.Element {
 
   async function bookAppointment (appointment: Appointment): Promise<void> {
     const appointmentId = appointment.id
-    const patientResponse = await Api.get('sessions/whois', { withCredentials: true })
+    const patientResponse = await Api.get('sessions/whois', {
+      withCredentials: true
+    })
     const patientEmail = patientResponse.data.email
     try {
-      await Api.patch(`/appointments/${appointmentId}?toBook=true`, { patientId: patientEmail }).then(() => {
-        console.log('Appointment created successfully')
+      await Api.patch(`
+        /appointments/${appointmentId}
+        ?patientId=${patientEmail}&toBook=true`).then(() => {
+        console.log('Appointment booked successfully.')
       })
     } catch (error) {
       throw new Error('Error creating appointment')

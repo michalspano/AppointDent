@@ -60,7 +60,7 @@ export default function DentistCalendar (): JSX.Element {
   async function fetchAppointments (): Promise<void> {
     try {
       const dentistEmail = await getCurrentUser()
-      const response = await Api.get(`/appointments/dentists/${dentistEmail}`)
+      const response = await Api.get(`/appointments/dentists/${dentistEmail}?userId=${dentistEmail}`)
       const appointments = response.data
       const formattedAppointments = appointments.map((appointment: any) => ({
         id: appointment.id,
@@ -114,7 +114,8 @@ export default function DentistCalendar (): JSX.Element {
  */
   async function deleteAppointment (appointmentId: string): Promise<void> {
     try {
-      await Api.delete(`/appointments/${appointmentId}`).then(() => {
+      const dentistEmail = await getCurrentUser()
+      await Api.delete(`/appointments/${appointmentId}?dentistId=${dentistEmail}`).then(() => {
         calendarRef.current?.getEventById(appointmentId)?.remove()
         console.log('Appointment deleted successfully')
       })
