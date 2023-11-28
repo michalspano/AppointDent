@@ -86,7 +86,7 @@ export default function MyBookings (): JSX.Element {
         const patientResponse = await Api.get('/sessions/whois', { withCredentials: true })
         const patientEmail = patientResponse.data.email
         const requestURL: string = `/appointments/${id}?patientId=${patientEmail}&toBook=false`
-        await Api.patch(requestURL, { withCredentials: true })
+        await Api.patch(requestURL, {}, { withCredentials: true })
       } catch (err) {
         throw new Error(`Error cancelling appointment with ID ${id}`)
       }

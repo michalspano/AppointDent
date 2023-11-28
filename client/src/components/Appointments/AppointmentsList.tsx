@@ -74,7 +74,7 @@ export default function AppointmentsList (): JSX.Element {
     const patientEmail = patientResponse.data.email
     try {
       const requestURL: string = `/appointments/${appointmentId}?patientId=${patientEmail}&toBook=true`
-      await Api.patch(requestURL, { withCredentials: true }
+      await Api.patch(requestURL, {}, { withCredentials: true }
       ).then(() => {
         console.log('Appointment booked successfully.')
       })
