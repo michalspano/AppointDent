@@ -4,7 +4,7 @@ import { Api } from '../../utils/api'
 import type { Appointment, Registration } from '../../utils/types'
 import BookingConfirmationPopup from './BookingConfirmation'
 import { useParams } from '@solidjs/router'
-export default function AppointmentsList (): JSX.Element {
+export default function AppointmentsList(): JSX.Element {
   createEffect(async () => {
     const params = useParams<{ email: string }>()
     setDentistEmail(atob(params.email))
@@ -16,7 +16,7 @@ export default function AppointmentsList (): JSX.Element {
     }, 5000)
   })
 
-  async function fetchAppointments (): Promise<void> {
+  async function fetchAppointments(): Promise<void> {
     try {
       const patientResponse = await Api.get('sessions/whois', {
         withCredentials: true
@@ -26,8 +26,9 @@ export default function AppointmentsList (): JSX.Element {
       // Obtain all available appointments for the dentist
       const response = await Api.get(`
         /appointments/dentists/${dentistEmail()}
-        ?userId=${patientEmail}&onlyAvailable=true`)
-
+        ?userId=${patientEmail}&onlyAvailable=true`, {
+        withCredentials: true
+      })
       const appointments = response.data
       const formattedAppointments = appointments.map((appointment: any) => ({
         id: appointment.id,
@@ -55,7 +56,7 @@ export default function AppointmentsList (): JSX.Element {
     }
   }
 
-  async function fetchDentist (): Promise<void> {
+  async function fetchDentist(): Promise<void> {
     try {
       const response = await Api.get(`/dentists/${dentistEmail()}`)
       const dentistRes = response.data[0]
@@ -68,7 +69,7 @@ export default function AppointmentsList (): JSX.Element {
     }
   }
 
-  async function bookAppointment (appointment: Appointment): Promise<void> {
+  async function bookAppointment(appointment: Appointment): Promise<void> {
     const appointmentId = appointment.id
     const patientResponse = await Api.get('sessions/whois', {
       withCredentials: true
@@ -77,7 +78,9 @@ export default function AppointmentsList (): JSX.Element {
     try {
       await Api.patch(`
         /appointments/${appointmentId}
-        ?patientId=${patientEmail}&toBook=true`).then(() => {
+        ?patientId=${patientEmail}&toBook=true`, {
+        withCredentials: true
+      }).then(() => {
         console.log('Appointment booked successfully.')
       })
     } catch (error) {
@@ -139,64 +142,64 @@ export default function AppointmentsList (): JSX.Element {
       console.error('Please select a date and time slot before booking.')
     }
   }
-  onCleanup(() => {})
+  onCleanup(() => { })
 
   return (
-      <div class="h-full w-full flex flex-col justify-center items-center lg:justify-start lg:items-start overflow-hidden">
-        <div class='w-full flex justify-start m-10'>
-          <h1 class='text-2xl font-bold pl-10'>Available Slots</h1>
-        </div>
-        <div class='flex flex-col lg:flex-row justify-start m-6 lg:ml-20 max-w-md md:max-w-full lg:max-w-full'>
-          <div class='flex flex-col justify-start sm:items-center lg:w-2/5'>
-            <div class="shadow p-4 rounded-lg">
-              <img class='rounded-lg lg:11/12 sm:w-6/12 mx-auto' src={dentistImage()} alt="Dentist image" />
-              <div class='flex-col text-center mt-4 text-lg'>
-                <p class='font-semibold text-black'><span class="font-normal">Dentist:</span> {dentistName()}</p>
-                <p class='mt-2 text-black'>Location: <strong>{dentistLocation()}</strong></p>
-              </div>
+    <div class="h-full w-full flex flex-col justify-center items-center lg:justify-start lg:items-start overflow-hidden">
+      <div class='w-full flex justify-start m-10'>
+        <h1 class='text-2xl font-bold pl-10'>Available Slots</h1>
+      </div>
+      <div class='flex flex-col lg:flex-row justify-start m-6 lg:ml-20 max-w-md md:max-w-full lg:max-w-full'>
+        <div class='flex flex-col justify-start sm:items-center lg:w-2/5'>
+          <div class="shadow p-4 rounded-lg">
+            <img class='rounded-lg lg:11/12 sm:w-6/12 mx-auto' src={dentistImage()} alt="Dentist image" />
+            <div class='flex-col text-center mt-4 text-lg'>
+              <p class='font-semibold text-black'><span class="font-normal">Dentist:</span> {dentistName()}</p>
+              <p class='mt-2 text-black'>Location: <strong>{dentistLocation()}</strong></p>
             </div>
-
           </div>
-          <div>
-            <div class="m-6 lg:ml-10 mt-0">
-              <h3 class='desc text-xl text-slate-500 xs:mt-8 md:mt-0 font-semibold'>Please, select your preferred date and time to schedule your appointment.</h3>
-              <h3 class='text-lg mt-10 font-medium'>Select Date</h3>
-              <div class="overflow-x-scroll max-w-lg">
+
+        </div>
+        <div>
+          <div class="m-6 lg:ml-10 mt-0">
+            <h3 class='desc text-xl text-slate-500 xs:mt-8 md:mt-0 font-semibold'>Please, select your preferred date and time to schedule your appointment.</h3>
+            <h3 class='text-lg mt-10 font-medium'>Select Date</h3>
+            <div class="overflow-x-scroll max-w-lg">
               <div class='flex flex-no-wrap gap-15'>
                 <Show when={availableDays().length > 0} fallback={<p>No available times exist at the moment.</p>}>
-                {availableDays().map((appointment) => (
-                <div class={`flex m-4 p-4 rounded-lg cursor-pointer font-semibold items-center justify-center ${selectedDate() === appointment.day ? 'bg-primary text-white shadow' : 'shadow'}`} onClick={() => { onDateSelect(appointment) }}>
-                  <span class="text-md">{formatDate(appointment.day)}</span>
-                </div>
-                ))}
+                  {availableDays().map((appointment) => (
+                    <div class={`flex m-4 p-4 rounded-lg cursor-pointer font-semibold items-center justify-center ${selectedDate() === appointment.day ? 'bg-primary text-white shadow' : 'shadow'}`} onClick={() => { onDateSelect(appointment) }}>
+                      <span class="text-md">{formatDate(appointment.day)}</span>
+                    </div>
+                  ))}
                 </Show>
 
               </div>
-              </div>
-              {(selectedDate() !== '') && (
+            </div>
+            {(selectedDate() !== '') && (
               <div class='w-full'>
                 <h3 class='text-lg mt-6 font-medium'>Select Time</h3>
                 {availableTime().length > 0
                   ? <div class="grid grid-cols-3 xs:grid-cols-1 s:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-15 w-11/12">
-                  {availableTime().map((appointment: Appointment) => (
-                  <div class={`flex w-35 m-4 h-20 w-38 rounded-lg cursor-pointer font-semibold items-center justify-center ${selectedAppointment() === appointment ? 'bg-primary text-white shadow' : 'shadow'}`} onClick={() => { onTimeSelect(appointment) }}>
-                    {formatTimeEntry(appointment)}
+                    {availableTime().map((appointment: Appointment) => (
+                      <div class={`flex w-35 m-4 h-20 w-38 rounded-lg cursor-pointer font-semibold items-center justify-center ${selectedAppointment() === appointment ? 'bg-primary text-white shadow' : 'shadow'}`} onClick={() => { onTimeSelect(appointment) }}>
+                        {formatTimeEntry(appointment)}
+                      </div>
+                    ))}
                   </div>
-                  ))}
-                </div>
                   : <p>No available time slots for the selected date.</p>}
               </div>
-              )}
-              {(selectedDate() !== '') && (selectedTime() !== '') && (
+            )}
+            {(selectedDate() !== '') && (selectedTime() !== '') && (
               <button class='bg-secondary rounded-lg text-white p-4 mr-3 mt-6 ml-4 text-black px-8' onClick={onBookAppointment}>
                 Book Appointment
               </button>
-              )}
-            </div>
+            )}
           </div>
         </div>
-        {showConfirmation() && dentistName() !== null && dentistLocation() !== null && (
-          <BookingConfirmationPopup
+      </div>
+      {showConfirmation() && dentistName() !== null && dentistLocation() !== null && (
+        <BookingConfirmationPopup
           onConfirm={() => {
             const appointment = selectedAppointment()
             if (appointment !== null) {
@@ -217,8 +220,8 @@ export default function AppointmentsList (): JSX.Element {
           location={dentistLocation()}
           date={`${formatDate(selectedDate())} at ${formatTimeEntry(selectedAppointment())}`}
         />
-        )}
+      )}
 
-      </div>
+    </div>
   )
 }
