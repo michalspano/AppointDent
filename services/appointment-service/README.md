@@ -17,13 +17,16 @@ $ npm install
 - `config/`: configuration files for the service.
 - `db/`: database connection, configuration and schema definitions.
 - `controllers/`: communication middleware between the service and other components of the system.
+- `mqtt/`: MQTT client configuration and message definitions.
+- `types/`: Additional TypeScript type definitions.
+- `utils/`: Additional utility functions defined for the service.
 - `routes/`: routing definitions based on the middleware of the service.
 - `public/`: static files for the service.
 - `dist/`: the build folder for the service.
 
 ## Available Scripts
 
-In the `services/<SERVICE_NAME>` subdirectory, you can run:
+In the `services/appointment-service` subdirectory, you can run:
 
 ### `npm run dev`
 

@@ -28,11 +28,11 @@ export interface Dentist {
   email: string
   firstName: string
   lastName: string
-  clinicStreet: string
-  clinicCity: string
-  clinicZipCode: number
-  clinicHouseNumber: number
   clinicCountry: string
+  clinicCity: string
+  clinicStreet: string
+  clinicHouseNumber: string
+  clinicZipCode: number
   picture: string
 }
 

@@ -20,3 +20,13 @@
     height: 100vh;
     width: 100%;
 }
+.marker-cluster{
+    background-color: #12878D;
+    color:white;
+    font-weight: 600;
+    font-size: 1rem;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    border-radius: 30px !important;
+}

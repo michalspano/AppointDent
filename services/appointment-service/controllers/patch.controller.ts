@@ -1,22 +1,21 @@
+/**
+ * controllers/patch.controller.ts
+ *
+ * @description :: PATCH method for appointments.
+ * @version     :: 1.0
+ */
+
+import * as utils from '../utils';
+import { client } from '../mqtt/mqtt';
 import database from '../db/config';
-import { type Appointment } from '../types/types';
 import type Database from 'better-sqlite3';
 import { type Statement } from 'better-sqlite3';
-import { destructUnknownToAppointment, parseBinaryQueryParam } from '../utils';
 import type { Request, Response } from 'express';
+import { type AsyncResObj, SessionResponse, UserType, type Appointment, type WhoisResponse } from '../types/types';
+import { type UUID } from 'crypto';
 
-/*
- * Note: this is a note for the developer that takes on the continued
- * issue related to this controller. Basically, the type of the user
- * is not explicitly defined. Instead, how to determine the type of the
- * user is based on the following (supposing we extract the ID from the
- * session cookie):
- * - query the dentist-service to determine if the user exists in the
- *  dentist database. If so, then the user is a dentist.
- * - query the patient-service to determine if the user exists in the
- * patient database. If so, then the user is a patient.
- * Otherwise, the user is not authorized and an appropriate error should
- * be returned. */
+const TOPIC: string = utils.MQTT_PAIRS.whois.req;
+const RESPONSE_TOPIC: string = utils.MQTT_PAIRS.whois.res;
 
 /**
  * @description the controller for the PATCH /appointments/:id route. In
@@ -28,29 +27,73 @@ import type { Request, Response } from 'express';
  * patients, hence patientId is null. If the appointment is booked, then
  * patientId is not null.
  *
+ * @see verifySession
+ * @see genReqId
+ *
  * @param req request object
  * @param res response object
- * @returns TODO: this is subject to change, hence edit this comment.
+ * @returns A promise that resolves to a response object.
  */
-const bookAppointment = (req: Request, res: Response): Response<any, Record<string, any>> => {
+const bookAppointment = async (req: Request, res: Response): AsyncResObj => {
   if (database === undefined) {
     return res.status(500).json({
       message: 'Internal server error: database connection failed.'
     });
   }
 
-  // TODO: properly handle the session and ensure that the route is protected.
-  // Use MQTT and the session-service.
+  if (client === undefined) {
+    return res.status(503).json({
+      message: 'Service unavailable: MQTT connection failed.'
+    });
+  }
 
-  // TODO: determine the type of the user based on the request (see above comments
-  // for the explanation).
+  const email: string | undefined = req.body.patientId; // what the db uses
+  const sessionKey: string | undefined = req.cookies.sessionKey;
 
+  if (sessionKey === undefined || email === undefined) {
+    return res.status(400).json({ message: 'Bad request: missing session key or email.' });
+  }
+
+  /* Access the `WHOIS` topic to determine the role of the user.
+   * Furthermore, the email is returned and it needs to be matched
+   * with the provided email in the request body. This way, we don't
+   * need to call the session service twice. */
+  const reqId: string = utils.genReqId();
+  client.publish(TOPIC, `${reqId}/${sessionKey}/*`);
+  client.subscribe(RESPONSE_TOPIC);
+
+  try {
+    const result: WhoisResponse = await utils.whoisByToken(
+      reqId.toString(),
+      RESPONSE_TOPIC
+    );
+    if (result.status !== SessionResponse.Success) {
+      return res.status(401).json({ message: 'Unauthorized: invalid session.' });
+    }
+
+    // Restrict access to patients only.
+    if (result.type !== UserType.Patient) {
+      return res.status(403).json({ message: 'Forbidden: only patients can book appointments.' });
+    }
+
+    // Check if the emails match.
+    // This case also handles when a non-existent email is provided.
+    if (result.email !== email) {
+      return res.status(403).json({ message: 'Forbidden: invalid email.' });
+    }
+  } catch (err: Error | unknown) {
+    return res.status(504).json({
+      message: 'Service timeout: unable to verify session.'
+    });
+  }
+
+  // The verification step went well, we can proceed with the booking.
   const id: string = req.params.id;
-  let appointment: unknown;
+  let appointment: Appointment | undefined;
   try {
     appointment = database
       .prepare('SELECT * FROM appointments WHERE id = ?')
-      .get(id);
+      .get(id) as Appointment;
   } catch (err: Error | unknown) {
     return res.status(500).json({
       message: 'Internal server error: query failed.'
@@ -63,30 +106,26 @@ const bookAppointment = (req: Request, res: Response): Response<any, Record<stri
     });
   }
 
-  // In order to access the attributes of the appointment object, we need to
-  // convert it to an actual Appointment object.
-  const appointmentObj: Appointment = destructUnknownToAppointment(appointment);
-
   // We should not allow to book an already booked appointment.
   // A bad request error is returned. If the query is not given,
   // then the default value (true) is used.
   let toBook: boolean;
   try {
-    toBook = parseBinaryQueryParam(req.query.toBook, true);
+    toBook = utils.parseBinaryQueryParam(req.query.toBook, true);
   } catch (err: Error | unknown) {
     return res.status(400).json({
       message: 'Bad request: invalid query parameter.'
     });
   }
 
-  if (appointmentObj.patientId !== null && toBook) {
+  if (appointment.patientId !== null && toBook) {
     return res.status(400).json({
       message: 'Bad request: appointment is already booked.'
     });
   }
 
   // Update the appointment object with the patientId.
-  appointmentObj.patientId = toBook ? req.body.patientId : null;
+  appointment.patientId = toBook ? email as UUID : null;
 
   const stmt: Statement = database.prepare(`
     UPDATE appointments
@@ -95,7 +134,7 @@ const bookAppointment = (req: Request, res: Response): Response<any, Record<stri
   `);
 
   try {
-    const info: Database.RunResult = stmt.run(appointmentObj.patientId, appointmentObj.id);
+    const info: Database.RunResult = stmt.run(appointment.patientId, appointment.id);
     if (info.changes !== 1) {
       return res.status(500).json({ message: 'Internal server error: query malformed.' });
     }
@@ -106,7 +145,17 @@ const bookAppointment = (req: Request, res: Response): Response<any, Record<stri
   }
 
   // All went well, return the patched object.
-  return res.status(200).json(appointmentObj);
+  return res.status(200).json(appointment);
 };
 
-export default bookAppointment;
+/**
+ * @description a wrapper function for the bookAppointment function.
+ *
+ * @param req a request object
+ * @param res a response object
+ */
+const bookAppointmentWrapper = (req: Request, res: Response): void => {
+  void bookAppointment(req, res);
+};
+
+export default bookAppointmentWrapper;
