@@ -12,7 +12,7 @@ The solution is based on a distributed system that combines various architectura
 
 ## Deployment Diagram
 
-![DeploymentDiagram](./docs/assets/DeploymentDiagram.png)
+![DeploymentDiagram](./docs/diagrams/DeploymentDiagram.png)
 
 ## Pre-Requirements
 
