@@ -11,7 +11,7 @@ export const logout = async (req: Request, res: Response): Promise<Response<any,
     return res.status(400).json({ message: 'No active session' });
   }
 
-  res.clearCookie('sessionKey', { path: '/' });
+  res.clearCookie('sessionKey');
   return res.sendStatus(200);
 };
 /**
