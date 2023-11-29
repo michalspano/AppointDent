@@ -30,8 +30,8 @@ export default function AppointmentsList (): JSX.Element {
       const formattedAppointments = appointments.map((appointment: any) => ({
         id: appointment.id,
         title: appointment.patientId !== null ? appointment.patientId : '',
-        start: new Date(appointment.start_timestamp * 1000).toISOString().slice(0, 16),
-        end: new Date(appointment.end_timestamp * 1000).toISOString().slice(0, 16)
+        start: new Date(appointment.start_timestamp * 1000).toLocaleString('sv-SE'),
+        end: new Date(appointment.end_timestamp * 1000).toLocaleString('sv-SE')
       }))
 
       const groupedAppointments = formattedAppointments.reduce((acc: any, appointment: any) => {
