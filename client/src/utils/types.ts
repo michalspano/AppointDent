@@ -31,7 +31,7 @@ export interface Dentist {
   clinicCountry: string
   clinicCity: string
   clinicStreet: string
-  clinicHouseNumber: string
+  clinicHouseNumber: number
   clinicZipCode: number
   picture: string
 }
