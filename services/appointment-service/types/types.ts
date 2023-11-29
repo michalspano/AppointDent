@@ -29,7 +29,8 @@ export interface Appointment {
  */
 export enum UserType {
   Dentist = 'd',
-  Patient = 'p'
+  Patient = 'p',
+  Admin = 'a' // this abstraction is still WIP
 };
 
 /**
