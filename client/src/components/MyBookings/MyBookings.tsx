@@ -20,7 +20,7 @@ export default function MyBookings (): JSX.Element {
  */
   const fetchDentist = async (dentistId: string): Promise<any> => {
     try {
-      const dentistResponse = await Api.get(`dentists/${dentistId}`)
+      const dentistResponse = await Api.get(`/dentists/${dentistId}`)
       const dentistData = dentistResponse.data[0]
       return {
         address: `${dentistData.clinicStreet} ${dentistData.clinicHouseNumber}, ${dentistData.clinicCity}`,
@@ -37,9 +37,10 @@ export default function MyBookings (): JSX.Element {
    */
   const fetchAppointments = async (): Promise<void> => {
     try {
-      const patientResponse = await Api.get('sessions/whois', { withCredentials: true })
+      const patientResponse = await Api.get('/sessions/whois', { withCredentials: true })
       const patientEmail = patientResponse.data.email
-      const response = await Api.get(`appointments/patients/${patientEmail}`) // Replace with the actual patient id
+      const requestURL: string = `/appointments/patients/${patientEmail}`
+      const response = await Api.get(requestURL, { withCredentials: true })
       const appointmentsData = response.data
 
       const formattedAppointments = await Promise.all(
@@ -80,7 +81,12 @@ export default function MyBookings (): JSX.Element {
   const handleCancelBooking = async (id: string): Promise<void> => {
     try {
       try {
-        await Api.patch(`appointments/${id}?toBook=false`)
+        // This could be extracted into a separate function or a state variable.
+        // So that it doesn't have to be redundantly.
+        const patientResponse = await Api.get('/sessions/whois', { withCredentials: true })
+        const patientEmail = patientResponse.data.email
+        const requestURL: string = `/appointments/${id}?patientId=${patientEmail}&toBook=false`
+        await Api.patch(requestURL, {}, { withCredentials: true })
       } catch (err) {
         throw new Error(`Error cancelling appointment with ID ${id}`)
       }

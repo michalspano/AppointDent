@@ -60,7 +60,8 @@ export default function DentistCalendar (): JSX.Element {
   async function fetchAppointments (): Promise<void> {
     try {
       const dentistEmail = await getCurrentUser()
-      const response = await Api.get(`/appointments/dentists/${dentistEmail}`)
+      const requestURL: string = `/appointments/dentists/${dentistEmail}?userId=${dentistEmail}`
+      const response = await Api.get(requestURL, { withCredentials: true })
       const appointments = response.data
       const formattedAppointments = appointments.map((appointment: any) => ({
         id: appointment.id,
@@ -90,10 +91,10 @@ export default function DentistCalendar (): JSX.Element {
         end_timestamp: endTimestamp,
         dentistId: await getCurrentUser()// Will be replaced with actual dentist email from local storage
       }
-      await Api.post('/appointments', formattedAppointment)
-        .then(() => {
-          calendarRef.current?.addEvent(appointment)
-        })
+      await Api.post('/appointments', formattedAppointment, { withCredentials: true }
+      ).then(() => {
+        calendarRef.current?.addEvent(appointment)
+      })
     } catch (error) {
       throw new Error('Something went wrong, try again.')
     }
@@ -114,7 +115,10 @@ export default function DentistCalendar (): JSX.Element {
  */
   async function deleteAppointment (appointmentId: string): Promise<void> {
     try {
-      await Api.delete(`/appointments/${appointmentId}`).then(() => {
+      const dentistEmail = await getCurrentUser()
+      const requestURL: string = `/appointments/${appointmentId}?dentistId=${dentistEmail}`
+      await Api.delete(requestURL, { withCredentials: true }
+      ).then(() => {
         calendarRef.current?.getEventById(appointmentId)?.remove()
         console.log('Appointment deleted successfully')
       })
@@ -226,7 +230,7 @@ export default function DentistCalendar (): JSX.Element {
               />
             </div>
             <div class='flex flex-row mt-3'>
-            <button
+              <button
                 class='bg-secondary rounded text-white p-2 mr-3'
                 type='button'
                 onClick={() => {
@@ -243,9 +247,9 @@ export default function DentistCalendar (): JSX.Element {
               >
                 Cancel
               </button>
-               <button class='bg-secondary rounded text-white p-2 ' type='submit'>
-              Add Event
-            </button>
+              <button class='bg-secondary rounded text-white p-2 ' type='submit'>
+                Add Event
+              </button>
             </div>
 
           </form>
@@ -253,7 +257,7 @@ export default function DentistCalendar (): JSX.Element {
       </div>
 
       {showConfirmation() && (
-          <ConfirmationPopup
+        <ConfirmationPopup
           onConfirm={() => {
             const eventId = selectedEventId()
             if (eventId !== null) {

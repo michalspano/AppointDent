@@ -159,3 +159,23 @@ export const whoisByToken = async (reqId: string, RESPONSE_TOPIC: string): Promi
 export const genReqId = (n: number = 64): string => {
   return randomBytes(n).toString('hex');
 };
+
+/**
+ * @description an enumeration of keywords that are forbidden as
+ * user identifiers.
+ */
+enum ForbiddenIds {
+  TEST, UNDEFINED, NULL, EMPTY
+  // add more...
+};
+
+/**
+ * @description helper function that detects whether an id is forbidden.
+ *
+ * @param id the id to check
+ * @returns a boolean value
+ */
+export const isForbiddenId = (id: string): boolean => {
+  if (id === undefined) return true;
+  return Object.values(ForbiddenIds).includes(id.toUpperCase().trim()) || id === '';
+};

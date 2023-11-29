@@ -6,9 +6,9 @@
  */
 
 import { Router } from 'express';
+import GET from '../controllers/get.controller';
 import createAppointment from '../controllers/post.controller';
 import editAppointment from '../controllers/patch.controller';
-import GET from '../controllers/get.controller';
 import deleteAppointment from '../controllers/delete.controller';
 
 const router: Router = Router();
