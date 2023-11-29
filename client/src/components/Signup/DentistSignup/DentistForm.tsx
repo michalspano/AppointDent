@@ -4,6 +4,7 @@ import { A } from '@solidjs/router'
 import { createSignal } from 'solid-js'
 import { Api } from '../../../utils/api'
 import type { Registration } from '../../../utils/types'
+import { validateAddress, validateUserInfo } from '../utils'
 
 export default function DentistForm (): JSX.Element {
   const [email, setEmail] = createSignal('')
@@ -18,7 +19,7 @@ export default function DentistForm (): JSX.Element {
   const [picture, setPicture] = createSignal('')
   const [error, setError] = createSignal<string | null>(null)
 
-  const signUp = (): void => {
+  const signUp = async (): Promise<void> => {
     const registrationData: Registration = {
       email: email(),
       password: password(),
@@ -35,17 +36,28 @@ export default function DentistForm (): JSX.Element {
       setError('Please fill in all fields.')
       return
     }
+    if (validateUserInfo(registrationData) !== undefined) {
+      setError(validateUserInfo(registrationData) as string)
+      return
+    }
+    const addressValidation = await validateAddress(registrationData)
+    if (addressValidation !== undefined) {
+      setError(addressValidation)
+      return
+    }
     Api
       .post('/dentists/register', registrationData)
       .then(async () => {
-        // enable automatic login when user registers
+      // enable automatic login when user registers
         await login()
-      })
-
-      .catch((error: any) => {
+      }).catch((error: any) => {
         setError('Something went wrong, try again.')
         console.error('Error during sign up', error)
       })
+  }
+
+  const signUpWrapper = (): void => {
+    void signUp()
   }
 
   const handleUpload = async (): Promise<string> => {
@@ -164,7 +176,7 @@ export default function DentistForm (): JSX.Element {
             />
 
         {error() !== null && <p class="text-error">{error()}</p>}
-        <button type="submit" class="log-in-btn h-12 mb-6 bg-secondary rounded-xl text-base" onclick={signUp} >
+        <button type="submit" class="log-in-btn h-12 mb-6 bg-secondary rounded-xl text-base" onclick={signUpWrapper} >
             Create account
             </button>
         <p class="font-extralight">Already have an account?
