@@ -8,12 +8,12 @@
     "start": "node dist/app.js",
     "dev": "concurrently --kill-others-on-failure \"npx tsc --watch\" \"nodemon -q dist/app.js\"",
     "test": "echo \"This type of test is not yet defined\"; exit 0",
-    "test:integration": "npm run dropdb:services && npm run newman-server",
-    "dropdb:services": "npm run dropdb --prefix ../services/session-service && npm run dropdb --prefix ../services/appointment-service && npm run dropdb --prefix ../services/dentist-service && npm run dropdb --prefix ../services/notification-service && npm run dropdb --prefix ../services/patient-service",
+    "test:integration": "cross-env CUSTOM_DB_APPOINTMENTS=db/appointments-test.db CUSTOM_DB_ADMINS=db/admins-test.db CUSTOM_DB_DENTISTS=db/dentists-test.db CUSTOM_DB_NOTIFICATIONS=db/notifications-test.db CUSTOM_DB_PATIENTS=db/patients-test.db CUSTOM_DB_SESSIONS=db/sessions-test.db run-p dropdb:services newman-server",
+    "dropdb:services": "npm run dropdb --prefix ../services/session-service && npm run dropdb --prefix ../services/appointment-service && npm run dropdb --prefix ../services/dentist-service && npm run dropdb --prefix ../services/notification-service && npm run dropdb --prefix ../services/patient-service && npm run dropdb --prefix ../services/admin-service",
     "start-broker": "dotenv -- npm run broker",
     "broker": "node dist/mqtt/broker.js",
     "newman-server": "run-p --race start-broker start newman-wait",
-    "newman-wait": "wait-on http://localhost:3000/ http://localhost:3002 http://localhost:3003 http://localhost:3004 http://localhost:3005 && npm run newman",
+    "newman-wait": "wait-on http://localhost:3000/ http://localhost:3002 http://localhost:3003 http://localhost:3004 http://localhost:3005 http://localhost:3006 && npm run newman",
     "newman": "newman run tests/Test.postman_collection.json -e tests/Test.postman_environment.json",
     "lint": "eslint **/*.ts",
     "lint:fix": "eslint **/*.ts --fix"
@@ -23,6 +23,7 @@
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "http-proxy": "^1.18.1",
