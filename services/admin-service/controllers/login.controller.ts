@@ -3,9 +3,6 @@ import database from '../db/config';
 import { client } from '../mqtt/mqtt';
 import { getServiceResponse } from './helper';
 
-const TOPIC = 'CREATESESSION';
-const RESPONSE_TOPIC = 'SESSION';
-
 // admin credentials
 const adminEmail = 'admin@gmail.com';
 const adminPassword = 'password';
@@ -30,61 +27,23 @@ export const login = async (req: Request, res: Response): Promise<Response<any, 
   if (request.email === undefined) return res.sendStatus(400);
   if (request.password === undefined) return res.sendStatus(400);
 
-  const performAdminLogin = async (): Promise<boolean> => {
-    const result = database?.prepare('SELECT email FROM admins WHERE email = ?').get(request.email);
-    if (result === undefined) {
-      return await insertAdminCredentials();
-    }
-    return true;
-  };
-
-  const insertAdminCredentials = async (): Promise<boolean> => {
-    const query = database?.prepare(`
-      INSERT INTO admins (email) VALUES (?)
-    `);
-    query?.run(adminEmail);
-
-    const TOPIC = 'INSERTUSER';
-    const RESPONSE_TOPIC = 'INSERTUSERRES';
-
-    // To generate a random reqId
-    const reqId = Math.floor(Math.random() * 1000);
-
-    // To publish registration information to MQTT topic
-    client?.subscribe(RESPONSE_TOPIC);
-    client?.publish(TOPIC, `${reqId}/${adminEmail}/${adminPassword}/a/*`); // a for admin type
-
-    try {
-    // To wait for MQTT response
-      const mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
-      return mqttResult === '1';
-    } catch (error) {
-      console.error('Error in registerController:', error);
-    }
-    return false;
-  };
-
-  const loginAdmin = (): LoginRequest => {
-    return database?.prepare('SELECT email FROM admins WHERE email = ?').get(request.email) as LoginRequest;
-  };
-
+  // Perform checks for credentials validity
   try {
-    // To handle unsuccessful authorization
-    if (!await performAdminLogin()) {
-      console.log(performAdminLogin());
-      return res.sendStatus(401);
-    }
-    if (loginAdmin() === undefined) {
-      return res.status(400).json({ message: 'Invalid input' });
+    if (!await performAdminLogin(request.email)) { // To handle unsuccessful authorization
+      return res.status(401).json({ message: 'Invalid input' });
     }
   } catch (err) {
+    console.log(err);
     return res.status(500).json({
       message: 'Internal server error: failed performing admin login.'
     });
   }
 
+  // Create session when checked that credentials are valid
+  const TOPIC = 'CREATESESSION';
+  const RESPONSE_TOPIC = 'SESSION';
   const reqId = Math.floor(Math.random() * 1000);
-  client.subscribe(RESPONSE_TOPIC); // Subscribe first to ensure we dont miss anything
+  client.subscribe(RESPONSE_TOPIC); // Subscribe first to ensure we don't miss anything
   client.publish(TOPIC, `${reqId}/${request.email}/${request.password}/*`);
   let mqttResult;
   try {
@@ -101,6 +60,43 @@ export const login = async (req: Request, res: Response): Promise<Response<any, 
     res.cookie('sessionKey', mqttResult, { httpOnly: true });
     return res.sendStatus(200);
   }
+};
+
+const performAdminLogin = async (email: string): Promise<boolean> => {
+  // Check if admin is already in the database
+  const existingAdmin = database?.prepare('SELECT email FROM admins WHERE email = ?').get(email) as { email: string } | undefined;
+  const dbEmptyResult = database?.prepare('SELECT COUNT(*) as count FROM admins').get() as { count: number };
+
+  if (existingAdmin != null) { // the only admin that can be inserted in the db is the one with correct credentials
+    return true;
+  } else if (dbEmptyResult.count === 0) {
+    return await insertAdminCredentials();
+  }
+  return false;
+};
+
+// If db was wiped and there are no admin credentials yet
+const insertAdminCredentials = async (): Promise<boolean> => {
+  const query = database?.prepare(`
+      INSERT INTO admins (email) VALUES (?)
+    `);
+  query?.run(adminEmail);
+
+  const TOPIC = 'INSERTUSER';
+  const RESPONSE_TOPIC = 'INSERTUSERRES';
+  const reqId = Math.floor(Math.random() * 1000);
+
+  // insert admin to sessions microservice
+  client?.subscribe(RESPONSE_TOPIC);
+  client?.publish(TOPIC, `${reqId}/${adminEmail}/${adminPassword}/a/*`); // a for admin type
+
+  try {
+    const mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
+    return mqttResult === '1'; // return if insertion to sessions is successful
+  } catch (error) {
+    console.error('Error in registerController:', error);
+  }
+  return false;
 };
 
 /**
