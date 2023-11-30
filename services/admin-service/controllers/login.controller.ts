@@ -30,10 +30,8 @@ export const login = async (req: Request, res: Response): Promise<Response<any, 
   if (request.email === undefined) return res.sendStatus(400);
   if (request.password === undefined) return res.sendStatus(400);
 
-  const email = req.body.email;
-
   const performAdminLogin = async (): Promise<boolean> => {
-    const result = database?.prepare('SELECT email FROM admins WHERE email = ?').get(email);
+    const result = database?.prepare('SELECT email FROM admins WHERE email = ?').get(request.email);
     if (result === undefined) {
       return await insertAdminCredentials();
     }
@@ -42,9 +40,9 @@ export const login = async (req: Request, res: Response): Promise<Response<any, 
 
   const insertAdminCredentials = async (): Promise<boolean> => {
     const query = database?.prepare(`
-      INSERT INTO admins (email, pass) VALUES (?, ?)
+      INSERT INTO admins (email) VALUES (?)
     `);
-    query?.run(adminEmail, adminPassword);
+    query?.run(adminEmail);
 
     const TOPIC = 'INSERTUSER';
     const RESPONSE_TOPIC = 'INSERTUSERRES';
@@ -67,7 +65,7 @@ export const login = async (req: Request, res: Response): Promise<Response<any, 
   };
 
   const loginAdmin = (): LoginRequest => {
-    return database?.prepare('SELECT email FROM admins WHERE email = ?').get(email) as LoginRequest;
+    return database?.prepare('SELECT email FROM admins WHERE email = ?').get(request.email) as LoginRequest;
   };
 
   try {
