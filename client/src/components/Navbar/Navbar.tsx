@@ -1,16 +1,12 @@
 import { type JSX } from 'solid-js/jsx-runtime'
 import './Navbar.css'
 import logo from '../../assets/logo.png'
-import { For, Show } from 'solid-js'
+import { For, Show, createEffect, createSignal } from 'solid-js'
 import { patientRoutes } from './routes'
 import { fadeIn, fadeOut, hamburger, notify, slideIn, slideOut, toggleHamburger, toggleNotification } from './animation'
 import location from '../../assets/location.png'
 import { Api } from '../../utils/api'
 import profile from '../../assets/profile.png'
-
-const isUserDentist = false // should be extended with getting current user entity when we have it on BE
-const routes = isUserDentist ? null : patientRoutes
-const logoLink = isUserDentist ? '/calendar' : '/map'
 
 const logout = async (): Promise <void> => {
   try {
@@ -25,6 +21,20 @@ const logout = async (): Promise <void> => {
     }
   }
 }
+
+const isUserDentist = async (): Promise<boolean> => {
+  const response = await Api.get('sessions/whois', { withCredentials: true })
+  return response.data.type === 'd' // dentist type is "d" and patient is "p"
+}
+
+createEffect(async () => {
+  const isDentist = await isUserDentist()
+  !isDentist && setRoutes(patientRoutes)
+  isDentist ? setLogoLink('/calendar') : setLogoLink('/map')
+})
+
+const [routes, setRoutes] = createSignal<any[]>()
+const [logoLink, setLogoLink] = createSignal<string>('')
 
 export default function Navbar (): JSX.Element {
   return <>
@@ -46,12 +56,12 @@ export default function Navbar (): JSX.Element {
                 </button>
             </div>
             <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-                <a href={logoLink} class="flex flex-shrink-0 items-center">
+                <a href={logoLink()} class="flex flex-shrink-0 items-center">
                     <img class="h-8 w-auto" src={logo} alt="AppointDent" />
                 </a>
                 <div class="hidden md:ml-6 ml-2 sm:block">
                 <div class="flex ">
-                    <For each={routes}>{(route, index) =>
+                    <For each={routes()}>{(route, index) =>
                         <div class="flex row">
                             <a href={route.href} class="rounded-md px-2 md:px-3 py-2 text-sm font-medium">{route.name}</a>
                             {route.name === 'Explore' && <img class="w-6 h-6 mt-1" src={location} alt="Arrow left" />}
@@ -109,7 +119,7 @@ export default function Navbar (): JSX.Element {
                 <div class={ slideIn() ? 'slide-in-element bg-primary zUnder' : slideOut() ? 'slide-out-element bg-primary zUnder' : 'bg-primary zUnder' }>
                     <div id="">
                         <div class="space-y-1 px-2 pb-3 pt-2">
-                        <For each={routes}>{(route) =>
+                        <For each={routes()}>{(route) =>
                                 <a href={route.href} class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">{route.name}</a>
 
                             }</For>
