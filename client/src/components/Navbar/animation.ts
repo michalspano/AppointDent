@@ -1,4 +1,4 @@
-import { createSignal } from 'solid-js'
+import { createSignal, onCleanup } from 'solid-js'
 
 export const [notify, setNotify] = createSignal(false) // Opens notification modal
 export const [hamburger, setHamburger] = createSignal(false) // Opens the hamburger menu on mobile
@@ -40,3 +40,12 @@ export function toggleHamburger (): void {
     setHamburger(true)
   }
 }
+
+onCleanup(() => {
+  setNotify(false)
+  setHamburger(false)
+  setFadeOut(false)
+  setFadeIn(false)
+  setSlideOut(false)
+  setSlideIn(false)
+})

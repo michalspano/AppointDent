@@ -1,7 +1,7 @@
 import { type JSX } from 'solid-js/jsx-runtime'
 import './Navbar.css'
 import logo from '../../assets/logo.png'
-import { For, Show } from 'solid-js'
+import { For, Show, createSignal } from 'solid-js'
 import { patientRoutes } from './routes'
 import { fadeIn, fadeOut, hamburger, notify, slideIn, slideOut, toggleHamburger, toggleNotification } from './animation'
 import location from '../../assets/location.png'
@@ -27,6 +27,13 @@ const logout = async (): Promise <void> => {
 }
 
 export default function Navbar (): JSX.Element {
+  const [notificationCount, setNotificationCount] = createSignal<number>(0)
+
+  const handleNotificationClick = (): void => {
+    console.log('Notification count before reset:', notificationCount())
+    setNotificationCount(0)
+    toggleNotification()
+  }
   return <>
     <nav class="bg-primary text-white zAbove">
         <div class="mx-auto px-2 sm:px-6 lg:px-8">
@@ -63,8 +70,12 @@ export default function Navbar (): JSX.Element {
             </div>
                 <div class="flex items-center sm:static sm:inset-auto ">
             <a href="/notifications">
-                <button onClick={toggleNotification} type="button" class="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none">
-                    <span class="absolute -inset-1.5"></span>
+                <button onClick={handleNotificationClick} type="button" class="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none">
+                <span class="absolute -inset-1.5 bg-red-500 rounded-full text-white px-2 py-1 notification-counter">
+        {notificationCount() > 0 && (
+            <span class="text-xs font-bold">{notificationCount()}</span>
+        )}
+    </span>
                     <span class="sr-only">View notifications</span>
                     <svg class="h-6 w-6 notification" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />

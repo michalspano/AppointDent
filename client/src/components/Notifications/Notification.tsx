@@ -1,4 +1,4 @@
-import { type JSX } from 'solid-js'
+import { type JSX, createEffect, createSignal } from 'solid-js'
 import './Notification.css'
 import alarmIcon from '../../assets/alarm_icon.svg'
 import { type NotificationData } from './types'
@@ -21,6 +21,13 @@ function formatDateTime (timestamp: number): string {
 
 // Define the notification component
 export default function Notification (props: NotificationProps): JSX.Element {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [notificationCount, setNotificationCount] = createSignal<number>(0)
+  createEffect(() => {
+    // Increment your notification count here
+    console.log('Incrementing notification count...')
+    setNotificationCount((prevCount) => prevCount + 1)
+  })
   return (
     <div class="bg-white p-4 rounded-md shadow-md mt-6">
       <div class="flex items-center">

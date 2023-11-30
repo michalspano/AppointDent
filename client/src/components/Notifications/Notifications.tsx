@@ -5,8 +5,11 @@ import { Api } from '../../utils/api'
 
 export default function Notifications (): JSX.Element {
   const [notifications, setNotifications] = createSignal<NotificationData[]>([])
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [notificationCount, setNotificationCount] = createSignal<number>(0)
 
   createEffect(async () => {
+    console.log('Notification count (notifications):', notificationCount())
     await fetchNotifications()
   })
 
@@ -31,6 +34,7 @@ export default function Notifications (): JSX.Element {
 
       // Update the notifications signal with the fetched data
       setNotifications(notificationData)
+      setNotificationCount(notificationData.length)
     } catch (error) {
       // Handle errors during the notification fetching proces
       console.error('Error fetching or setting notifications:', error)
