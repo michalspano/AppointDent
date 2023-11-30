@@ -13,7 +13,7 @@ export default function Map (): JSX.Element {
 
   const isPatient = async (): Promise<boolean> => {
     try {
-      const response: WhoisResponse = await Api.get('/sessions/whois', { withCredentials: true })
+      const response: WhoisResponse = (await Api.get('/sessions/whois', { withCredentials: true })).data
       if (response.type === UserType.Patient) {
         return true
       } else {
