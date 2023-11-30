@@ -9,7 +9,7 @@
     "dev": "concurrently --kill-others-on-failure \"npx tsc --watch\" \"nodemon -q dist/app.js\"",
     "test": "echo \"This type of test is not yet defined\"; exit 0",
     "test:integration": "npm run dropdb:services && npm run newman-server",
-    "dropdb:services": "npm run dropdb --prefix ../services/session-service && npm run dropdb --prefix ../services/appointment-service && npm run dropdb --prefix ../services/dentist-service && npm run dropdb --prefix ../services/notification-service && npm run dropdb --prefix ../services/patient-service",
+    "dropdb:services": "npm run dropdb --prefix ../services/admin-service && npm run dropdb --prefix ../services/session-service && npm run dropdb --prefix ../services/appointment-service && npm run dropdb --prefix ../services/dentist-service && npm run dropdb --prefix ../services/notification-service && npm run dropdb --prefix ../services/patient-service",
     "start-broker": "dotenv -- npm run broker",
     "broker": "node dist/mqtt/broker.js",
     "newman-server": "run-p --race start-broker start newman-wait",

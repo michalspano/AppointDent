@@ -61,7 +61,7 @@ export function routeProxy (req: Request, res: Response, next: NextFunction): vo
     clientHash
   };
 
-  void axios.post(DATA_COLLECTOR_API + '/request', analyticsEntry);
+  void axios.post(DATA_COLLECTOR_API + '/requests', analyticsEntry);
   const service = pathParts[1];
   const target: httpProxy | undefined = proxies[service];
 

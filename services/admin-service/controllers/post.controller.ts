@@ -36,7 +36,7 @@ async function addAnalyticsData (req: Request, res: Response): Promise<Response<
   } catch (err: Error | unknown) {
     return res.status(400).json({ message: 'Bad request: invalid analytics object.' });
   }
-  return res.sendStatus(201);
+  return res.status(201).json(request);
 };
 
 export function addRequest (req: Request, res: Response): void {
