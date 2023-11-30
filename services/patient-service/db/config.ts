@@ -23,11 +23,6 @@ const DB_FILE: string = process.env.CUSTOM_DB_PATIENTS ?? './db/patients.db';
  */
 const schemaFilePath: string = './db/schema.sql';
 
-/* Verify that DB_FILE exists. If not, create it (just an empty file).
- * This eliminates the error that occurs when the database file does not exist
- * on the local machine. */
-if (!fs.existsSync(DB_FILE)) fs.writeFileSync(DB_FILE, '');
-
 /**
  * @description the database instance with the options and the local
  * .db file.
