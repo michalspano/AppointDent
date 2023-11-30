@@ -1,7 +1,21 @@
 import { type NextFunction, type Request, type Response } from 'express';
 import httpProxy from 'http-proxy';
+import axios from 'axios';
+import * as crypto from 'crypto';
+
 type ProxyMap = Record<string, httpProxy>;
 type ProxyTargets = Record<string, string>;
+interface AnalyticsData {
+  method: string
+  path: string
+  agent: string
+  clientHash: string
+  [key: string]: string | number | undefined
+
+}
+
+const DATA_COLLECTOR_API = 'http://localhost:3006';
+
 /**
  * Supposing that the services may be deployed to remote destinations (that are not localhost),
  * we will need, in the future, to enable these urls to be modified.
@@ -34,7 +48,20 @@ function constructProxies (targets: ProxyTargets): ProxyMap {
 
 export function routeProxy (req: Request, res: Response, next: NextFunction): void {
   const pathParts = req.url.split('/'); // Use req.url to include query string if necessary.
+  const clientCookie = req.cookies.sessionKey;
+  let clientHash: string = '';
+  if (clientCookie !== undefined) {
+    clientHash = crypto.createHash('sha256').update(clientCookie).digest('hex');
+  }
 
+  const analyticsEntry: AnalyticsData = {
+    method: req.method,
+    path: req.path,
+    agent: req.get('User-Agent') as string,
+    clientHash
+  };
+
+  void axios.post(DATA_COLLECTOR_API + '/request', analyticsEntry);
   const service = pathParts[1];
   const target: httpProxy | undefined = proxies[service];
 

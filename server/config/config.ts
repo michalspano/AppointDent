@@ -1,6 +1,7 @@
 import cors from 'cors';
 import morgan from 'morgan';
 import express, { type Express, type Request } from 'express';
+import cookieParser from 'cookie-parser';
 
 const app: Express = express();
 
@@ -30,5 +31,6 @@ const corsOptionsSetter = function (req: Request, corsCallback: (err: any, optio
   corsCallback(null, corsOptions);
 };
 app.use(cors(corsOptionsSetter));
+app.use(cookieParser()); // Add cookie parser.
 
 export default app;

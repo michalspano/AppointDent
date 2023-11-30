@@ -59,7 +59,7 @@ const getAllAppointments = async (req: Request, res: Response): AsyncResObj => {
     const result: SessionResponse = await utils.verifySession(
       reqId.toString(),
       RESPONSE_TOPIC
-    ) as SessionResponse;
+    );
     if (result !== SessionResponse.Success) {
       return res.status(401).json({ message: 'Unauthorized: invalid session.' });
     }
@@ -324,7 +324,7 @@ const getAppointment = async (req: Request, res: Response): AsyncResObj => {
     const result: SessionResponse = await utils.verifySession(
       reqId.toString(),
       RESPONSE_TOPIC
-    ) as SessionResponse;
+    );
     if (result !== SessionResponse.Success) {
       return res.status(401).json({ message: 'Unauthorized: invalid session.' });
     }
