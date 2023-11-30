@@ -3,11 +3,34 @@ import default_doctor from '../../assets/default_doctor.jpg'
 import { Api } from '../../utils/api'
 import type { Appointment, Registration } from '../../utils/types'
 import BookingConfirmationPopup from './BookingConfirmation'
-import { useParams } from '@solidjs/router'
+import { useParams, useNavigate } from '@solidjs/router'
+
 export default function AppointmentsList (): JSX.Element {
+  const navigate = useNavigate()
+
+  const isPatient = async (): Promise<boolean> => {
+    return await Api.get('/sessions/whois', { withCredentials: true })
+      .then((result) => {
+        if (result.data.type === 'd') {
+          return false
+        } else if (result.data.type === 'p') {
+          return true
+        }
+        return false
+      })
+      .catch((error: any) => {
+        console.error('Error getting user role', error)
+        return false
+      })
+  }
+
   createEffect(async () => {
     const params = useParams<{ email: string }>()
     setDentistEmail(atob(params.email))
+    const authResult = await isPatient()
+    if (!authResult) {
+      navigate('/calendar', { replace: true })
+    }
     await fetchAppointments()
     await fetchDentist()
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
