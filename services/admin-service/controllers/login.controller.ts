@@ -6,6 +6,9 @@ import { getServiceResponse } from './helper';
 const TOPIC = 'CREATESESSION';
 const RESPONSE_TOPIC = 'SESSION';
 
+// admin credentials
+const adminEmail = 'admin@gmail.com';
+const adminPassword = 'password';
 interface LoginRequest {
   email: string
   password: string
@@ -26,6 +29,61 @@ export const login = async (req: Request, res: Response): Promise<Response<any, 
   }
   if (request.email === undefined) return res.sendStatus(400);
   if (request.password === undefined) return res.sendStatus(400);
+
+  const email = req.body.email;
+
+  const performAdminLogin = async (): Promise<boolean> => {
+    const result = database?.prepare('SELECT email FROM admins WHERE email = ?').get(email);
+    if (result === undefined) {
+      return await insertAdminCredentials();
+    }
+    return true;
+  };
+
+  const insertAdminCredentials = async (): Promise<boolean> => {
+    const query = database?.prepare(`
+      INSERT INTO admins (email, pass) VALUES (?, ?)
+    `);
+    query?.run(adminEmail, adminPassword);
+
+    const TOPIC = 'INSERTUSER';
+    const RESPONSE_TOPIC = 'INSERTUSERRES';
+
+    // To generate a random reqId
+    const reqId = Math.floor(Math.random() * 1000);
+
+    // To publish registration information to MQTT topic
+    client?.subscribe(RESPONSE_TOPIC);
+    client?.publish(TOPIC, `${reqId}/${adminEmail}/${adminPassword}/a/*`); // a for admin type
+
+    try {
+    // To wait for MQTT response
+      const mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
+      return mqttResult === '1';
+    } catch (error) {
+      console.error('Error in registerController:', error);
+    }
+    return false;
+  };
+
+  const loginAdmin = (): LoginRequest => {
+    return database?.prepare('SELECT email FROM admins WHERE email = ?').get(email) as LoginRequest;
+  };
+
+  try {
+    // To handle unsuccessful authorization
+    if (!await performAdminLogin()) {
+      console.log(performAdminLogin());
+      return res.sendStatus(401);
+    }
+    if (loginAdmin() === undefined) {
+      return res.status(400).json({ message: 'Invalid input' });
+    }
+  } catch (err) {
+    return res.status(500).json({
+      message: 'Internal server error: failed performing admin login.'
+    });
+  }
 
   const reqId = Math.floor(Math.random() * 1000);
   client.subscribe(RESPONSE_TOPIC); // Subscribe first to ensure we dont miss anything
