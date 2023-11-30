@@ -6,7 +6,7 @@ import type { Database as DatabaseType } from 'better-sqlite3';
  * @description the options for the database connection.
  */
 const options: object = Object.freeze({
-  fileMustExist: true
+  verbose: console.log
   // TODO: add more options
 });
 
@@ -16,7 +16,7 @@ const options: object = Object.freeze({
  * DB_FILE is set to a custom path (typically <service>-test.db).
  * This way, we can seamlessly switch which local .db file is used.
  */
-const DB_FILE: string = process.env.CUSTOM_DB_PATH ?? './db/notifications.db';
+const DB_FILE: string = process.env.CUSTOM_DB_NOTIFICATIONS ?? './db/notifications.db';
 
 /**
  * @description the path to the schema file.
