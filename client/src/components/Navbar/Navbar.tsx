@@ -27,12 +27,13 @@ const logout = async (): Promise <void> => {
 }
 
 export default function Navbar (): JSX.Element {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [notificationCount, setNotificationCount] = createSignal<number>(0)
 
   const handleNotificationClick = (): void => {
     console.log('Notification button clicked')
     console.log('Notification count before reset:', notificationCount())
-    setNotificationCount(0)
+    // setNotificationCount(0)
     console.log('Notification count reset to 0')
     toggleNotification()
   }
@@ -73,8 +74,8 @@ export default function Navbar (): JSX.Element {
                 <div class="flex items-center sm:static sm:inset-auto ">
             <a href="/notifications">
                 <button onClick={handleNotificationClick} type="button" class="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none">
-                <div class='notification_circle'>
-                <span class="notification-counter">2</span>
+                <div class='notification-container'>
+                <span class="notification-counter">{notificationCount()}</span>
                 </div>
                     <span class="sr-only">View notifications</span>
                     <svg class="h-6 w-6 notification" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
