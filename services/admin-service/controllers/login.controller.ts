@@ -48,9 +48,6 @@ export const login = async (req: Request, res: Response): Promise<Response<any, 
   let mqttResult;
   try {
     mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
-    if (mqttResult === '0') {
-      return res.status(401).json({ message: 'Unable to authorize' });
-    }
   } catch (error) {
     return res.status(504).json({ message: 'Service Timeout' });
   }
