@@ -29,6 +29,7 @@ const userType = async (): Promise<string> => {
 
 createEffect(async () => {
   const type = await userType()
+  setType(type)
   switch (type) {
     case 'd':
       setLogoLink('/calendar')
@@ -50,6 +51,7 @@ createEffect(async () => {
 
 const [routes, setRoutes] = createSignal<any[]>()
 const [logoLink, setLogoLink] = createSignal<string>('')
+const [type, setType] = createSignal<string>('')
 
 export default function Navbar (): JSX.Element {
   return <>
@@ -110,9 +112,11 @@ export default function Navbar (): JSX.Element {
                 <div>
                     <button type="button" class="relative flex rounded-full bg-gray-800 text-sm focus:outline-none" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
                     <span class="sr-only">Open user menu</span>
+                    {type() !== 'a' &&
                     <a href="/user-profile">
                         <img class="h-8 w-8 rounded-full" src={profile} alt=""></img>
                     </a>
+                    }
                     </button>
                 </div>
 
