@@ -8,33 +8,50 @@ import location from '../../assets/location.png'
 import { Api } from '../../utils/api'
 import profile from '../../assets/profile.png'
 
-const logout = async (): Promise <void> => {
-  try {
-    await Api.delete('/dentists/logout', { withCredentials: true })
-    window.location.replace('/')
-  } catch (error) {
+const logout = async (): Promise<void> => {
+  const endpoints = ['/dentists/logout', '/patients/logout', '/admins/logout']
+
+  for (const endpoint of endpoints) {
     try {
-      await Api.delete('/patients/logout', { withCredentials: true })
+      await Api.delete(endpoint, { withCredentials: true })
       window.location.replace('/')
+      return // If logout is successful, exit the function
     } catch (error) {
-      console.error('Error during logout', error)
+      console.error(`Error during logout from ${endpoint}`, error)
     }
   }
 }
 
-const isUserDentist = async (): Promise<boolean> => {
+const userType = async (): Promise<string> => {
   const response = await Api.get('sessions/whois', { withCredentials: true })
-  return response.data.type === 'd' // dentist type is "d" and patient is "p"
+  return response.data.type
 }
 
 createEffect(async () => {
-  const isDentist = await isUserDentist()
-  !isDentist && setRoutes(patientRoutes)
-  isDentist ? setLogoLink('/calendar') : setLogoLink('/map')
+  const type = await userType()
+  setType(type)
+  switch (type) {
+    case 'd':
+      setLogoLink('/calendar')
+      break
+
+    case 'p':
+      setRoutes(patientRoutes)
+      setLogoLink('/map')
+      break
+
+    case 'a':
+      setLogoLink('/notifications') // TODO: replace with admin dashboard when it's added on FE
+      break
+
+    default:
+      break
+  }
 })
 
 const [routes, setRoutes] = createSignal<any[]>()
 const [logoLink, setLogoLink] = createSignal<string>('')
+const [type, setType] = createSignal<string>('')
 
 export default function Navbar (): JSX.Element {
   return <>
@@ -95,9 +112,11 @@ export default function Navbar (): JSX.Element {
                 <div>
                     <button type="button" class="relative flex rounded-full bg-gray-800 text-sm focus:outline-none" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
                     <span class="sr-only">Open user menu</span>
+                    {type() !== 'a' &&
                     <a href="/user-profile">
                         <img class="h-8 w-8 rounded-full" src={profile} alt=""></img>
                     </a>
+                    }
                     </button>
                 </div>
 
