@@ -34,7 +34,9 @@ export default function Notifications (): JSX.Element {
 
       // Update the notifications signal with the fetched data
       setNotifications(notificationData)
-      setNotificationCount(notificationData.length)
+      const newNotificationCount = notificationData.length
+      setNotificationCount(newNotificationCount)
+      console.log('Counter: ', newNotificationCount)
     } catch (error) {
       // Handle errors during the notification fetching proces
       console.error('Error fetching or setting notifications:', error)
