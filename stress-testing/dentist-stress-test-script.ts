@@ -1,6 +1,7 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 
+
 export let options = {
   stages: [
     { duration: '1m', target: 100 }, // Ramp up to 100 virtual users in 1 minute
@@ -11,17 +12,17 @@ export let options = {
 };
 
 // Array to store registered emails
-let registeredEmails: string[] = [];
+let registeredEmails: any[] = [];
 
 // Function to generate a unique email address for each virtual user
-function generateUniqueEmail(userId: number) :string {
+function generateUniqueEmail(userId: number) {
     const timestamp = Date.now();
     return `test${userId}_${timestamp}@example.com`;
 }
 
 // Function to simulate user registration
-function registerUser(userId) {
-  let payload = {
+function registerDentist(userId: number) {
+  let payload= {
     email: generateUniqueEmail(userId),
     firstName: 'Dentist',
     lastName: 'Doe',
@@ -39,10 +40,10 @@ function registerUser(userId) {
   };
 
   // Make a POST request to your registration endpoint
-  let res = http.post('http://localhost:3000/api/v1/dentists/register', JSON.stringify(payload), { headers: headers });
+  let res = http.post('http://localhost:3000/api/v1/dentists/register', JSON.stringify(payload)!, { headers: headers });
 
   // Check for expected status codes
-  check(res, {
+  check(res!, {
     'Status is 201': (r) => r.status === 201,
     'Status is not 401': (r) => r.status !== 401,
   });
@@ -55,7 +56,7 @@ function registerUser(userId) {
 }
 
 // Function to simulate user login
-function loginUser(userId) {
+function loginDentist() {
   // Use a randomly selected registered email for login
   let emailIndex = Math.floor(Math.random() * registeredEmails.length);
   let loginEmail = registeredEmails[emailIndex];
@@ -82,13 +83,59 @@ function loginUser(userId) {
   sleep(Math.random() * 3); // Sleep for a random duration between 0 and 3 seconds
 }
 
+// Function to simulate getting all dentists
+function getAllDentists() {
+  let headers = {
+    'Content-Type': 'application/json',
+  };
+
+  // Make a POST request to your login endpoint
+  let res = http.get('http://localhost:3000/api/v1/dentists', { headers: headers });
+
+  // Check for expected status codes
+  check(res, {
+    'Status is 200': (r) => r.status === 200,
+    'Status is not 401': (r) => r.status !== 401,
+  });
+
+  // Simulate user think time
+  sleep(Math.random() * 3); // Sleep for a random duration between 0 and 3 seconds
+}
+
+// Function to simulate getting a dentist
+function getDentist() {
+  // Use a randomly selected registered email for login
+  let emailIndex = Math.floor(Math.random() * registeredEmails.length);
+  let loginEmail = registeredEmails[emailIndex];
+
+  let headers = {
+    'Content-Type': 'application/json',
+  };
+
+  // Make a POST request to your login endpoint
+  let res = http.get(`http://localhost:3000/api/v1/dentists/${loginEmail}`, { headers: headers });
+
+  // Check for expected status codes
+  check(res, {
+    'Status is 200': (r) => r.status === 200,
+    'Status is not 401': (r) => r.status !== 401,
+  });
+
+  // Simulate user think time
+  sleep(Math.random() * 3); // Sleep for a random duration between 0 and 3 seconds
+}
+
+
 export default function () {
   // Get the virtual user ID (VU) from the context
   const userId: number = __VU;
 
-  // Simulate user registration
-  registerUser(userId);
+  // Simulate dentist registration
+  registerDentist(userId);
 
-  // Simulate user login
-  loginUser(userId);
+  // Simulate dentist login
+  loginDentist();
+
+  // Simulate getting all dentists
+  getAllDentists();
 }

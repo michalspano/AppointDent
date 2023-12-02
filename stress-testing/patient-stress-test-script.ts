@@ -11,16 +11,16 @@ export let options = {
 };
 
 // Array to store registered emails
-let registeredEmails: string[] = [];
+let registeredEmails: any = [];
 
 // Function to generate a unique email address for each virtual user
-function generateUniqueEmail(userId: number) :string {
+function generateUniqueEmail(userId: any) {
     const timestamp = Date.now();
     return `test${userId}_${timestamp}@example.com`;
 }
 
 // Function to simulate user registration
-function registerUser(userId) {
+function registerUser(userId: number) {
   let payload = {
     email: generateUniqueEmail(userId),
     firstName: 'Patient',
@@ -51,7 +51,7 @@ function registerUser(userId) {
 }
 
 // Function to simulate user login
-function loginUser(userId) {
+function loginUser() {
   // Use a randomly selected registered email for login
   let emailIndex = Math.floor(Math.random() * registeredEmails.length);
   let loginEmail = registeredEmails[emailIndex];
@@ -80,11 +80,11 @@ function loginUser(userId) {
 
 export default function () {
   // Get the virtual user ID (VU) from the context
-  const userId: number = __VU;
+  const userId = __VU;
 
   // Simulate user registration
   registerUser(userId);
 
   // Simulate user login
-  loginUser(userId);
+  loginUser();
 }
