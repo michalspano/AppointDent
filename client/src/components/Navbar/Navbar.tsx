@@ -1,7 +1,7 @@
 import { type JSX } from 'solid-js/jsx-runtime'
 import './Navbar.css'
 import logo from '../../assets/logo.png'
-import { For, Show, createEffect, createSignal } from 'solid-js'
+import { For, Show, createEffect, createSignal, onCleanup } from 'solid-js'
 import { patientRoutes } from './routes'
 import { fadeIn, fadeOut, hamburger, notify, slideIn, slideOut, toggleHamburger, toggleNotification } from './animation'
 import location from '../../assets/location.png'
@@ -52,20 +52,46 @@ createEffect(async () => {
 const [routes, setRoutes] = createSignal<any[]>()
 const [logoLink, setLogoLink] = createSignal<string>('')
 const [type, setType] = createSignal<string>('')
+const [notificationCount, setNotificationCount] = createSignal(0)
+const [showNotificationDot, setShowNotificationDot] = createSignal(false)
+
+const fetchNotificationCount = async (): Promise<void> => {
+  try {
+    const currentCount = localStorage.getItem('notificationsCount')
+    const parsedCurrentCount = currentCount !== null ? (parseInt(currentCount, 10)) : 0 // Convert to number, default to 0 if not a valid number
+
+    const notificationResponse = await Api.get('sessions/whois', { withCredentials: true })
+    const userEmail = notificationResponse.data.email
+    const response = await Api.get(`notifications/${userEmail}`, { withCredentials: true })
+    const count = response.data.length
+    localStorage.setItem('notificationsCount', count)
+
+    const temp = (count - parsedCurrentCount)
+
+    const counter = localStorage.getItem('counter')
+    const parsedCounter = counter !== null ? (parseInt(counter, 10)) : 0
+
+    const totalCounter = temp + parsedCounter
+    localStorage.setItem('counter', totalCounter.toString())
+    setNotificationCount(totalCounter)
+    setShowNotificationDot(totalCounter > 0)
+  } catch (error) {
+    console.error('Error fetching notification count:', error)
+  }
+}
+
+createEffect(async () => {
+  await fetchNotificationCount()
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  setInterval(async () => {
+    await fetchNotificationCount()
+  }, 10000)
+  onCleanup(() => {})
+})
 
 export default function Navbar (): JSX.Element {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [notificationCount, setNotificationCount] = createSignal<number>(0)
-
-  const handleNotificationClick = (): void => {
-    console.log('Notification button clicked')
-    console.log('Notification count before reset:', notificationCount())
-    // setNotificationCount(0)
-    console.log('Notification count reset to 0')
-    toggleNotification()
-  }
   return <>
-    <nav class="bg-primary text-white zAbove">
+  <nav class="bg-primary text-white zAbove">
         <div class="mx-auto px-2 sm:px-6 lg:px-8">
             <div class="relative flex h-16 items-center justify-between">
             <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
@@ -100,14 +126,17 @@ export default function Navbar (): JSX.Element {
             </div>
                 <div class="flex items-center sm:static sm:inset-auto ">
             <a href="/notifications">
-                <button onClick={handleNotificationClick} type="button" class="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none">
-                <div class='notification-container'>
-                <span class="notification-counter">{notificationCount()}</span>
-                </div>
+                <button onClick={toggleNotification} type="button" class="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none">
+                    <span class="absolute -inset-1.5"></span>
                     <span class="sr-only">View notifications</span>
                     <svg class="h-6 w-6 notification" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
                     </svg>
+                    {showNotificationDot() && (
+                  <div class="notification-container">
+                    <div class="notification-counter">{notificationCount()}</div>
+                  </div>
+                    )}
                 </button>
             </a>
             <div class="inset-y-0 right-0 absolute top-10">
