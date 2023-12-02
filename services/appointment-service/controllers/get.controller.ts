@@ -39,10 +39,10 @@ const getAllAppointments = async (req: Request, res: Response): AsyncResObj => {
     });
   }
 
-  const email: string | undefined = req.body.email;
+  const email: string | undefined = req.query.userId as string;
   const sessionKey: string | undefined = req.cookies.sessionKey;
 
-  if (sessionKey === undefined || email === undefined) {
+  if (sessionKey === undefined || utils.isForbiddenId(email)) {
     return res.status(400).json({ message: 'Bad request: missing session key or email.' });
   }
 
@@ -202,13 +202,13 @@ const getAppointmentsByDentistId = async (req: Request, res: Response): AsyncRes
     });
   }
 
-  const email: string | undefined = req.body.email;
   const dentistId: string | undefined = req.params.email;
+  const email: string | undefined = req.query.userId as string;
   const sessionKey: string | undefined = req.cookies.sessionKey;
 
   // 'undefined', 'null' are used for testing purposes.
   // This is because the tests for this endpoint use a query parameter.
-  if (sessionKey === undefined || email === undefined) {
+  if (sessionKey === undefined || utils.isForbiddenId(email)) {
     return res.status(400).json({ message: 'Bad request: missing session key or email.' });
   } else if (dentistId === undefined || ['undefined', 'null', ''].includes(dentistId.trim())) {
     return res.status(400).json({ message: 'Bad request: missing dentist id.' });
@@ -304,10 +304,10 @@ const getAppointment = async (req: Request, res: Response): AsyncResObj => {
     });
   }
 
-  const email: string | undefined = req.body.email;
+  const email: string | undefined = req.query.userId as string;
   const sessionKey: string | undefined = req.cookies.sessionKey;
 
-  if (sessionKey === undefined || email === undefined) {
+  if (sessionKey === undefined || utils.isForbiddenId(email)) {
     return res.status(400).json({ message: 'Bad request: missing session key or email.' });
   }
 

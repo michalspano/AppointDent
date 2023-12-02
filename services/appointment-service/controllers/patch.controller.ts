@@ -47,10 +47,11 @@ const bookAppointment = async (req: Request, res: Response): AsyncResObj => {
     });
   }
 
-  const email: string | undefined = req.body.patientId; // what the db uses
+  // Implies that the request expects only a patient.
+  const email: string | undefined = req.query.patientId as string;
   const sessionKey: string | undefined = req.cookies.sessionKey;
 
-  if (sessionKey === undefined || email === undefined) {
+  if (sessionKey === undefined || utils.isForbiddenId(email)) {
     return res.status(400).json({ message: 'Bad request: missing session key or email.' });
   }
 

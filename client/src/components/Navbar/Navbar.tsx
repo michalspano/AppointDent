@@ -1,30 +1,57 @@
 import { type JSX } from 'solid-js/jsx-runtime'
 import './Navbar.css'
 import logo from '../../assets/logo.png'
-import { For, Show, createSignal } from 'solid-js'
+import { For, Show, createEffect, createSignal } from 'solid-js'
 import { patientRoutes } from './routes'
 import { fadeIn, fadeOut, hamburger, notify, slideIn, slideOut, toggleHamburger, toggleNotification } from './animation'
 import location from '../../assets/location.png'
 import { Api } from '../../utils/api'
 import profile from '../../assets/profile.png'
 
-const isUserDentist = false // should be extended with getting current user entity when we have it on BE
-const routes = isUserDentist ? null : patientRoutes
-const logoLink = isUserDentist ? '/calendar' : '/map'
+const logout = async (): Promise<void> => {
+  const endpoints = ['/dentists/logout', '/patients/logout', '/admins/logout']
 
-const logout = async (): Promise <void> => {
-  try {
-    await Api.delete('/dentists/logout', { withCredentials: true })
-    window.location.replace('/')
-  } catch (error) {
+  for (const endpoint of endpoints) {
     try {
-      await Api.delete('/patients/logout', { withCredentials: true })
+      await Api.delete(endpoint, { withCredentials: true })
       window.location.replace('/')
+      return // If logout is successful, exit the function
     } catch (error) {
-      console.error('Error during logout', error)
+      console.error(`Error during logout from ${endpoint}`, error)
     }
   }
 }
+
+const userType = async (): Promise<string> => {
+  const response = await Api.get('sessions/whois', { withCredentials: true })
+  return response.data.type
+}
+
+createEffect(async () => {
+  const type = await userType()
+  setType(type)
+  switch (type) {
+    case 'd':
+      setLogoLink('/calendar')
+      break
+
+    case 'p':
+      setRoutes(patientRoutes)
+      setLogoLink('/map')
+      break
+
+    case 'a':
+      setLogoLink('/notifications') // TODO: replace with admin dashboard when it's added on FE
+      break
+
+    default:
+      break
+  }
+})
+
+const [routes, setRoutes] = createSignal<any[]>()
+const [logoLink, setLogoLink] = createSignal<string>('')
+const [type, setType] = createSignal<string>('')
 
 export default function Navbar (): JSX.Element {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -56,12 +83,12 @@ export default function Navbar (): JSX.Element {
                 </button>
             </div>
             <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-                <a href={logoLink} class="flex flex-shrink-0 items-center">
+                <a href={logoLink()} class="flex flex-shrink-0 items-center">
                     <img class="h-8 w-auto" src={logo} alt="AppointDent" />
                 </a>
                 <div class="hidden md:ml-6 ml-2 sm:block">
                 <div class="flex ">
-                    <For each={routes}>{(route, index) =>
+                    <For each={routes()}>{(route, index) =>
                         <div class="flex row">
                             <a href={route.href} class="rounded-md px-2 md:px-3 py-2 text-sm font-medium">{route.name}</a>
                             {route.name === 'Explore' && <img class="w-6 h-6 mt-1" src={location} alt="Arrow left" />}
@@ -97,9 +124,11 @@ export default function Navbar (): JSX.Element {
                 <div>
                     <button type="button" class="relative flex rounded-full bg-gray-800 text-sm focus:outline-none" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
                     <span class="sr-only">Open user menu</span>
+                    {type() !== 'a' &&
                     <a href="/user-profile">
                         <img class="h-8 w-8 rounded-full" src={profile} alt=""></img>
                     </a>
+                    }
                     </button>
                 </div>
 
@@ -121,7 +150,7 @@ export default function Navbar (): JSX.Element {
                 <div class={ slideIn() ? 'slide-in-element bg-primary zUnder' : slideOut() ? 'slide-out-element bg-primary zUnder' : 'bg-primary zUnder' }>
                     <div id="">
                         <div class="space-y-1 px-2 pb-3 pt-2">
-                        <For each={routes}>{(route) =>
+                        <For each={routes()}>{(route) =>
                                 <a href={route.href} class="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">{route.name}</a>
 
                             }</For>

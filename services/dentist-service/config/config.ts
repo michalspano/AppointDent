@@ -26,7 +26,7 @@ const corsOptionsSetter = function (req: Request, corsCallback: (err: any, optio
   corsCallback(null, corsOptions);
 };
 app.use(cors(corsOptionsSetter));
-app.use(express.json()); // for parsing application/json
+app.use(express.json({ limit: '10mb' }));
 const port: string = process.env.PORT ?? '3005';
 
 export { app, port };

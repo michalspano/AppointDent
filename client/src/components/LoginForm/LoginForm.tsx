@@ -28,9 +28,17 @@ export default function LoginForm (): JSX.Element {
           window.location.replace('/map')
         }
       } catch (patientError) {
-        // Error handling of both patient and dentist login fails
-        console.error('Error during login', patientError)
-        setError('Login failed. Please check your credentials and try again.')
+        try {
+        // If dentist and patient login fails, admin login is attempted
+          const response = await Api.post('/admins/login', { email: email(), password: password() }, { withCredentials: true })
+          // If admin login is successful, user is redirected to admin-specific page
+          if (response.status === 200) {
+            window.location.replace('/notifications') // TODO: add the admin route when we have it
+          }
+        } catch (error) { // Error handling of both patient and dentist login fails
+          console.error('Error during login', error)
+          setError('Login failed. Please check your credentials and try again.')
+        }
       }
     }
   }

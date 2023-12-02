@@ -41,10 +41,11 @@ export const deleteAppointment = async (req: Request, res: Response): AsyncResOb
     });
   }
 
-  const email: string | undefined = req.body.email;
+  // This way we indicate to the client that the request expects only a dentist.
+  const email: string | undefined = req.query.dentistId as string;
   const sessionKey: string | undefined = req.cookies.sessionKey;
 
-  if (sessionKey === undefined || email === undefined) {
+  if (sessionKey === undefined || utils.isForbiddenId(email)) {
     return res.status(400).json({ message: 'Bad request: missing session key or email.' });
   }
 

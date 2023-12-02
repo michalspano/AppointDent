@@ -1,9 +1,10 @@
 {
 	"info": {
-		"_postman_id": "41ff7cad-1bef-4d06-838e-bf5e1f665fd4",
+		"_postman_id": "3c480ab8-1025-4145-a439-b1ee623bbb64",
 		"name": "Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "31133349"
+		"_exporter_id": "31133267",
+		"_collection_link": "https://appointdent.postman.co/workspace/AppointDent~3d7b8d88-ecc1-4d83-a513-eb9122453c58/collection/31133267-3c480ab8-1025-4145-a439-b1ee623bbb64?action=share&source=collection_link&creator=31133267"
 	},
 	"item": [
 		{
@@ -1766,30 +1767,25 @@
 									}
 								}
 							],
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
 							"request": {
 								"method": "GET",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"email\": \"{{dentistEmailSample}}\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
-									"raw": "{{host}}/api/v1/appointments",
+									"raw": "{{host}}/api/v1/appointments/?userId={{dentistEmailSample}}",
 									"host": [
 										"{{host}}"
 									],
 									"path": [
 										"api",
 										"v1",
-										"appointments"
+										"appointments",
+										""
+									],
+									"query": [
+										{
+											"key": "userId",
+											"value": "{{dentistEmailSample}}"
+										}
 									]
 								}
 							},
@@ -1822,30 +1818,25 @@
 									}
 								}
 							],
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
 							"request": {
 								"method": "GET",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{ }",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
-									"raw": "{{host}}/api/v1/appointments",
+									"raw": "{{host}}/api/v1/appointments/?userId={{empty}}",
 									"host": [
 										"{{host}}"
 									],
 									"path": [
 										"api",
 										"v1",
-										"appointments"
+										"appointments",
+										""
+									],
+									"query": [
+										{
+											"key": "userId",
+											"value": "{{empty}}"
+										}
 									]
 								}
 							},
@@ -1878,9 +1869,6 @@
 									}
 								}
 							],
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
 							"request": {
 								"method": "GET",
 								"header": [
@@ -1891,24 +1879,22 @@
 										"type": "text"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"email\": \"{{dentistEmailSample}}\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
-									"raw": "{{host}}/api/v1/appointments",
+									"raw": "{{host}}/api/v1/appointments/?userId={{dentistEmailSample}}",
 									"host": [
 										"{{host}}"
 									],
 									"path": [
 										"api",
 										"v1",
-										"appointments"
+										"appointments",
+										""
+									],
+									"query": [
+										{
+											"key": "userId",
+											"value": "{{dentistEmailSample}}"
+										}
 									]
 								}
 							},
@@ -1941,30 +1927,25 @@
 									}
 								}
 							],
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
 							"request": {
 								"method": "GET",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"email\": \"{{dentistEmailSample}}_DSADA\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
-									"raw": "{{host}}/api/v1/appointments",
+									"raw": "{{host}}/api/v1/appointments/?userId={{dentistEmailSample}}@!%23%26das",
 									"host": [
 										"{{host}}"
 									],
 									"path": [
 										"api",
 										"v1",
-										"appointments"
+										"appointments",
+										""
+									],
+									"query": [
+										{
+											"key": "userId",
+											"value": "{{dentistEmailSample}}@!%23%26das"
+										}
 									]
 								}
 							},
@@ -2146,9 +2127,6 @@
 									}
 								}
 							],
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
 							"request": {
 								"method": "GET",
 								"header": [
@@ -2159,15 +2137,6 @@
 										"type": "text"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": "",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
 									"raw": "{{host}}/api/v1/appointments/patients/:email",
 									"host": [
@@ -2217,21 +2186,9 @@
 									}
 								}
 							],
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
 							"request": {
 								"method": "GET",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
 									"raw": "{{host}}/api/v1/appointments/patients/:email",
 									"host": [
@@ -2281,21 +2238,9 @@
 									}
 								}
 							],
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
 							"request": {
 								"method": "GET",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
 									"raw": "{{host}}/api/v1/appointments/patients/:email",
 									"host": [
@@ -2345,21 +2290,9 @@
 									}
 								}
 							],
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
 							"request": {
 								"method": "GET",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
 									"raw": "{{host}}/api/v1/appointments/patients/:email",
 									"host": [
@@ -2466,23 +2399,11 @@
 											}
 										}
 									],
-									"protocolProfileBehavior": {
-										"disableBodyPruning": true
-									},
 									"request": {
 										"method": "GET",
 										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"email\": \"{{patientEmailSample}}\"\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
 										"url": {
-											"raw": "{{host}}/api/v1/appointments/dentists/:email",
+											"raw": "{{host}}/api/v1/appointments/dentists/:email?userId={{patientEmailSample}}",
 											"host": [
 												"{{host}}"
 											],
@@ -2492,6 +2413,12 @@
 												"appointments",
 												"dentists",
 												":email"
+											],
+											"query": [
+												{
+													"key": "userId",
+													"value": "{{patientEmailSample}}"
+												}
 											],
 											"variable": [
 												{
@@ -2530,23 +2457,11 @@
 											}
 										}
 									],
-									"protocolProfileBehavior": {
-										"disableBodyPruning": true
-									},
 									"request": {
 										"method": "GET",
 										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
 										"url": {
-											"raw": "{{host}}/api/v1/appointments/dentists/:email",
+											"raw": "{{host}}/api/v1/appointments/dentists/:email?userId={{empty}}",
 											"host": [
 												"{{host}}"
 											],
@@ -2556,6 +2471,12 @@
 												"appointments",
 												"dentists",
 												":email"
+											],
+											"query": [
+												{
+													"key": "userId",
+													"value": "{{empty}}"
+												}
 											],
 											"variable": [
 												{
@@ -2595,7 +2516,6 @@
 										}
 									],
 									"protocolProfileBehavior": {
-										"disableBodyPruning": true,
 										"disableCookies": false
 									},
 									"request": {
@@ -2607,17 +2527,8 @@
 												"type": "text"
 											}
 										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"email\": \"{{patientEmailSample}}\"\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
 										"url": {
-											"raw": "{{host}}/api/v1/appointments/dentists/:email",
+											"raw": "{{host}}/api/v1/appointments/dentists/:email?userId={{patientEmailSample}}",
 											"host": [
 												"{{host}}"
 											],
@@ -2627,6 +2538,12 @@
 												"appointments",
 												"dentists",
 												":email"
+											],
+											"query": [
+												{
+													"key": "userId",
+													"value": "{{patientEmailSample}}"
+												}
 											],
 											"variable": [
 												{
@@ -2662,23 +2579,13 @@
 										}
 									],
 									"protocolProfileBehavior": {
-										"disableBodyPruning": true,
 										"disableCookies": false
 									},
 									"request": {
 										"method": "GET",
 										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"email\": \"{{patientEmailSample}}\"\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
 										"url": {
-											"raw": "{{host}}/api/v1/appointments/dentists/:email",
+											"raw": "{{host}}/api/v1/appointments/dentists/:email?userId={{patientEmailSample}}",
 											"host": [
 												"{{host}}"
 											],
@@ -2689,10 +2596,16 @@
 												"dentists",
 												":email"
 											],
+											"query": [
+												{
+													"key": "userId",
+													"value": "{{patientEmailSample}}"
+												}
+											],
 											"variable": [
 												{
 													"key": "email",
-													"value": "{{dentistEmailSample}}!@#@"
+													"value": "{{dentistEmailSample}}1312dasd"
 												}
 											]
 										},
@@ -2735,23 +2648,11 @@
 											}
 										}
 									],
-									"protocolProfileBehavior": {
-										"disableBodyPruning": true
-									},
 									"request": {
 										"method": "GET",
 										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"email\": \"{{patientEmailSample}}\"\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
 										"url": {
-											"raw": "{{host}}/api/v1/appointments/dentists/:email",
+											"raw": "{{host}}/api/v1/appointments/dentists/:email?userId={{patientEmailSample}}",
 											"host": [
 												"{{host}}"
 											],
@@ -2761,6 +2662,12 @@
 												"appointments",
 												"dentists",
 												":email"
+											],
+											"query": [
+												{
+													"key": "userId",
+													"value": "{{patientEmailSample}}"
+												}
 											],
 											"variable": [
 												{
@@ -2807,23 +2714,11 @@
 											}
 										}
 									],
-									"protocolProfileBehavior": {
-										"disableBodyPruning": true
-									},
 									"request": {
 										"method": "GET",
 										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"email\": \"{{patientEmailSample}}\"\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
 										"url": {
-											"raw": "{{host}}/api/v1/appointments/dentists/:email?onlyAvailable=true",
+											"raw": "{{host}}/api/v1/appointments/dentists/:email?userId={{patientEmailSample}}&onlyAvailable=true",
 											"host": [
 												"{{host}}"
 											],
@@ -2835,6 +2730,10 @@
 												":email"
 											],
 											"query": [
+												{
+													"key": "userId",
+													"value": "{{patientEmailSample}}"
+												},
 												{
 													"key": "onlyAvailable",
 													"value": "true"
@@ -2885,23 +2784,11 @@
 											}
 										}
 									],
-									"protocolProfileBehavior": {
-										"disableBodyPruning": true
-									},
 									"request": {
 										"method": "GET",
 										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"email\": \"{{patientEmailSample}}\"\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
 										"url": {
-											"raw": "{{host}}/api/v1/appointments/dentists/:email?onlyAvailable=false",
+											"raw": "{{host}}/api/v1/appointments/dentists/:email?userId={{patientEmailSample}}&onlyAvailable=false",
 											"host": [
 												"{{host}}"
 											],
@@ -2913,6 +2800,10 @@
 												":email"
 											],
 											"query": [
+												{
+													"key": "userId",
+													"value": "{{patientEmailSample}}"
+												},
 												{
 													"key": "onlyAvailable",
 													"value": "false"
@@ -3008,23 +2899,13 @@
 										}
 									],
 									"protocolProfileBehavior": {
-										"disableBodyPruning": true,
 										"disableCookies": false
 									},
 									"request": {
 										"method": "GET",
 										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"email\": \"{{patientEmailSample}}\"\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
 										"url": {
-											"raw": "{{host}}/api/v1/appointments/dentists/:email?onlyAvailable=falsee_",
+											"raw": "{{host}}/api/v1/appointments/dentists/:email?userId={{dentistEmailSample}}&onlyAvailable=falsee_",
 											"host": [
 												"{{host}}"
 											],
@@ -3036,6 +2917,10 @@
 												":email"
 											],
 											"query": [
+												{
+													"key": "userId",
+													"value": "{{dentistEmailSample}}"
+												},
 												{
 													"key": "onlyAvailable",
 													"value": "falsee_"
@@ -3082,23 +2967,11 @@
 											}
 										}
 									],
-									"protocolProfileBehavior": {
-										"disableBodyPruning": true
-									},
 									"request": {
 										"method": "GET",
 										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"email\": \"{{dentistEmailSample}}\"\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
 										"url": {
-											"raw": "{{host}}/api/v1/appointments/dentists/:email",
+											"raw": "{{host}}/api/v1/appointments/dentists/:email?userId={{dentistEmailSample}}",
 											"host": [
 												"{{host}}"
 											],
@@ -3108,6 +2981,12 @@
 												"appointments",
 												"dentists",
 												":email"
+											],
+											"query": [
+												{
+													"key": "userId",
+													"value": "{{dentistEmailSample}}"
+												}
 											],
 											"variable": [
 												{
@@ -3151,23 +3030,11 @@
 											}
 										}
 									],
-									"protocolProfileBehavior": {
-										"disableBodyPruning": true
-									},
 									"request": {
 										"method": "GET",
 										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"email\": \"{{dentistEmailSample}}\"\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
 										"url": {
-											"raw": "{{host}}/api/v1/appointments/dentists/:email?onlyAvailable=false",
+											"raw": "{{host}}/api/v1/appointments/dentists/:email?userId={{dentistEmailSample}}&onlyAvailable=false",
 											"host": [
 												"{{host}}"
 											],
@@ -3179,6 +3046,10 @@
 												":email"
 											],
 											"query": [
+												{
+													"key": "userId",
+													"value": "{{dentistEmailSample}}"
+												},
 												{
 													"key": "onlyAvailable",
 													"value": "false"
@@ -3229,23 +3100,11 @@
 											}
 										}
 									],
-									"protocolProfileBehavior": {
-										"disableBodyPruning": true
-									},
 									"request": {
 										"method": "GET",
 										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"email\": \"{{dentistEmailSample}}\"\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
 										"url": {
-											"raw": "{{host}}/api/v1/appointments/dentists/:email?onlyAvailable=true",
+											"raw": "{{host}}/api/v1/appointments/dentists/:email?userId={{dentistEmailSample}}&onlyAvailable=true",
 											"host": [
 												"{{host}}"
 											],
@@ -3257,6 +3116,10 @@
 												":email"
 											],
 											"query": [
+												{
+													"key": "userId",
+													"value": "{{dentistEmailSample}}"
+												},
 												{
 													"key": "onlyAvailable",
 													"value": "true"
@@ -3299,23 +3162,11 @@
 											}
 										}
 									],
-									"protocolProfileBehavior": {
-										"disableBodyPruning": true
-									},
 									"request": {
 										"method": "GET",
 										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"email\": \"{{dentistEmailSample}}\"\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
 										"url": {
-											"raw": "{{host}}/api/v1/appointments/dentists/:email",
+											"raw": "{{host}}/api/v1/appointments/dentists/:email?userId={{dentistEmailSample}}",
 											"host": [
 												"{{host}}"
 											],
@@ -3326,10 +3177,16 @@
 												"dentists",
 												":email"
 											],
+											"query": [
+												{
+													"key": "userId",
+													"value": "{{dentistEmailSample}}"
+												}
+											],
 											"variable": [
 												{
 													"key": "email",
-													"value": "{{dentistEmailSample}}!@#das"
+													"value": "{{dentistEmailSample}}131ds"
 												}
 											]
 										}
@@ -3343,6 +3200,55 @@
 				{
 					"name": "GET /:id",
 					"item": [
+						{
+							"name": "switch-to-patient",
+							"item": [
+								{
+									"name": "POST/api/patients/login",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"email\": \"{{patientEmailSample}}\",\n    \"password\": \"complicatedpassword\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{host}}/api/v1/patients/login",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"patients",
+												"login"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
 						{
 							"name": "GET (invalid cookie)",
 							"event": [
@@ -3370,9 +3276,6 @@
 									}
 								}
 							],
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
 							"request": {
 								"method": "GET",
 								"header": [
@@ -3383,17 +3286,8 @@
 										"type": "text"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"email\": \"{{patientEmailSample}}\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
-									"raw": "{{host}}/api/v1/appointments/:id",
+									"raw": "{{host}}/api/v1/appointments/:id?userId={{patientEmailSample}}",
 									"host": [
 										"{{host}}"
 									],
@@ -3402,6 +3296,12 @@
 										"v1",
 										"appointments",
 										":id"
+									],
+									"query": [
+										{
+											"key": "userId",
+											"value": "{{patientEmailSample}}"
+										}
 									],
 									"variable": [
 										{
@@ -3440,23 +3340,11 @@
 									}
 								}
 							],
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
 							"request": {
 								"method": "GET",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
-									"raw": "{{host}}/api/v1/appointments/:id",
+									"raw": "{{host}}/api/v1/appointments/:id?userId={{empty}}",
 									"host": [
 										"{{host}}"
 									],
@@ -3465,6 +3353,12 @@
 										"v1",
 										"appointments",
 										":id"
+									],
+									"query": [
+										{
+											"key": "userId",
+											"value": "{{empty}}"
+										}
 									],
 									"variable": [
 										{
@@ -3503,23 +3397,11 @@
 									}
 								}
 							],
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
 							"request": {
 								"method": "GET",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"email\": \"{{patientEmailSample}})@*#das\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
-									"raw": "{{host}}/api/v1/appointments/:id",
+									"raw": "{{host}}/api/v1/appointments/:id?userId={{patientEmailSample}}(@!*kD",
 									"host": [
 										"{{host}}"
 									],
@@ -3528,6 +3410,13 @@
 										"v1",
 										"appointments",
 										":id"
+									],
+									"query": [
+										{
+											"key": "userId",
+											"value": "{{patientEmailSample}}(@!*kD",
+											"description": "Not a valid patientID."
+										}
 									],
 									"variable": [
 										{
@@ -3566,23 +3455,11 @@
 									}
 								}
 							],
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
 							"request": {
 								"method": "GET",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"email\": \"{{patientEmailSample}}\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
-									"raw": "{{host}}/api/v1/appointments/:id",
+									"raw": "{{host}}/api/v1/appointments/:id?userId={{patientEmailSample}}",
 									"host": [
 										"{{host}}"
 									],
@@ -3591,6 +3468,12 @@
 										"v1",
 										"appointments",
 										":id"
+									],
+									"query": [
+										{
+											"key": "userId",
+											"value": "{{patientEmailSample}}"
+										}
 									],
 									"variable": [
 										{
@@ -3641,23 +3524,11 @@
 									}
 								}
 							],
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
 							"request": {
 								"method": "GET",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"email\": \"{{patientEmailSample}}\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
-									"raw": "{{host}}/api/v1/appointments/:id",
+									"raw": "{{host}}/api/v1/appointments/:id?userId={{patientEmailSample}}",
 									"host": [
 										"{{host}}"
 									],
@@ -3666,6 +3537,12 @@
 										"v1",
 										"appointments",
 										":id"
+									],
+									"query": [
+										{
+											"key": "userId",
+											"value": "{{patientEmailSample}}"
+										}
 									],
 									"variable": [
 										{
@@ -3757,17 +3634,8 @@
 									"request": {
 										"method": "PATCH",
 										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"email\": \"{{dentistEmailSample}}\",\n    \"patientId\": \"12312321\" // make the appointment booked\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
 										"url": {
-											"raw": "{{host}}/api/v1/appointments/:id?toBook=true",
+											"raw": "{{host}}/api/v1/appointments/:id?patientId={{patientEmailSample}}&toBook=true",
 											"host": [
 												"{{host}}"
 											],
@@ -3778,6 +3646,10 @@
 												":id"
 											],
 											"query": [
+												{
+													"key": "patientId",
+													"value": "{{patientEmailSample}}"
+												},
 												{
 													"key": "toBook",
 													"value": "true"
@@ -3874,17 +3746,8 @@
 							"request": {
 								"method": "PATCH",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
-									"raw": "{{host}}/api/v1/appointments/:id?toBook=true",
+									"raw": "{{host}}/api/v1/appointments/:id?patientId={{empty}}&toBook=true",
 									"host": [
 										"{{host}}"
 									],
@@ -3895,6 +3758,10 @@
 										":id"
 									],
 									"query": [
+										{
+											"key": "patientId",
+											"value": "{{empty}}"
+										},
 										{
 											"key": "toBook",
 											"value": "true"
@@ -3946,17 +3813,8 @@
 										"type": "text"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"patientId\": \"{{patientEmailSample}}\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
-									"raw": "{{host}}/api/v1/appointments/:id?toBook=true",
+									"raw": "{{host}}/api/v1/appointments/:id?patientId={{patientEmailSample}}&toBook=true",
 									"host": [
 										"{{host}}"
 									],
@@ -3967,6 +3825,10 @@
 										":id"
 									],
 									"query": [
+										{
+											"key": "patientId",
+											"value": "{{patientEmailSample}}"
+										},
 										{
 											"key": "toBook",
 											"value": "true"
@@ -4012,17 +3874,8 @@
 							"request": {
 								"method": "PATCH",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"patientId\": \"{{patientEmailSample}})d9sadna\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
-									"raw": "{{host}}/api/v1/appointments/:id?toBook=true",
+									"raw": "{{host}}/api/v1/appointments/:id?patientId={{patientEmailSample}}d23121&toBook=true",
 									"host": [
 										"{{host}}"
 									],
@@ -4033,6 +3886,11 @@
 										":id"
 									],
 									"query": [
+										{
+											"key": "patientId",
+											"value": "{{patientEmailSample}}d23121",
+											"description": "Invalid."
+										},
 										{
 											"key": "toBook",
 											"value": "true"
@@ -4096,17 +3954,8 @@
 							"request": {
 								"method": "PATCH",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"patientId\": \"{{patientEmailSample}}\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
-									"raw": "{{host}}/api/v1/appointments/:id?toBook=true",
+									"raw": "{{host}}/api/v1/appointments/:id?patientId={{patientEmailSample}}&toBook=true",
 									"host": [
 										"{{host}}"
 									],
@@ -4117,6 +3966,10 @@
 										":id"
 									],
 									"query": [
+										{
+											"key": "patientId",
+											"value": "{{patientEmailSample}}"
+										},
 										{
 											"key": "toBook",
 											"value": "true"
@@ -4156,21 +4009,9 @@
 									}
 								}
 							],
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
 							"request": {
 								"method": "GET",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
 									"raw": "{{host}}/api/v1/appointments/patients/:email",
 									"host": [
@@ -4219,17 +4060,8 @@
 							"request": {
 								"method": "PATCH",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"patientId\": \"{{patientEmailSample}}\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
-									"raw": "{{host}}/api/v1/appointments/:id?toBook=true",
+									"raw": "{{host}}/api/v1/appointments/:id?patientId={{patientEmailSample}}&toBook=true",
 									"host": [
 										"{{host}}"
 									],
@@ -4240,6 +4072,10 @@
 										":id"
 									],
 									"query": [
+										{
+											"key": "patientId",
+											"value": "{{patientEmailSample}}"
+										},
 										{
 											"key": "toBook",
 											"value": "true"
@@ -4285,17 +4121,8 @@
 							"request": {
 								"method": "PATCH",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"patientId\": \"{{patientEmailSample}}\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
-									"raw": "{{host}}/api/v1/appointments/:id?toBook=true",
+									"raw": "{{host}}/api/v1/appointments/:id?patientId={{patientEmailSample}}&toBook=true",
 									"host": [
 										"{{host}}"
 									],
@@ -4306,6 +4133,10 @@
 										":id"
 									],
 									"query": [
+										{
+											"key": "patientId",
+											"value": "{{patientEmailSample}}"
+										},
 										{
 											"key": "toBook",
 											"value": "true"
@@ -4367,17 +4198,8 @@
 							"request": {
 								"method": "PATCH",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"patientId\": \"{{patientEmailSample}}\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
-									"raw": "{{host}}/api/v1/appointments/:id?toBook=false",
+									"raw": "{{host}}/api/v1/appointments/:id?patientId={{patientEmailSample}}&toBook=false",
 									"host": [
 										"{{host}}"
 									],
@@ -4388,6 +4210,10 @@
 										":id"
 									],
 									"query": [
+										{
+											"key": "patientId",
+											"value": "{{patientEmailSample}}"
+										},
 										{
 											"key": "toBook",
 											"value": "false"
@@ -4426,21 +4252,9 @@
 									}
 								}
 							],
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
 							"request": {
 								"method": "GET",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
 									"raw": "{{host}}/api/v1/appointments/patients/:email",
 									"host": [
@@ -4493,17 +4307,8 @@
 							"request": {
 								"method": "PATCH",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"patientId\": \"{{patientEmailSample}}\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
-									"raw": "{{host}}/api/v1/appointments/:id?toBook=falseee",
+									"raw": "{{host}}/api/v1/appointments/:id?patientId={{patientEmailSample}}&toBook=falseee",
 									"host": [
 										"{{host}}"
 									],
@@ -4514,6 +4319,10 @@
 										":id"
 									],
 									"query": [
+										{
+											"key": "patientId",
+											"value": "{{patientEmailSample}}"
+										},
 										{
 											"key": "toBook",
 											"value": "falseee"
@@ -4568,17 +4377,8 @@
 									"request": {
 										"method": "DELETE",
 										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"email\": \"{{dentistEmailSample}}\"\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
 										"url": {
-											"raw": "{{host}}/api/v1/appointments/:id",
+											"raw": "{{host}}/api/v1/appointments/:id?dentistId={{patientEmailSample}}",
 											"host": [
 												"{{host}}"
 											],
@@ -4587,6 +4387,12 @@
 												"v1",
 												"appointments",
 												":id"
+											],
+											"query": [
+												{
+													"key": "dentistId",
+													"value": "{{patientEmailSample}}"
+												}
 											],
 											"variable": [
 												{
@@ -4681,17 +4487,8 @@
 									"request": {
 										"method": "DELETE",
 										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
 										"url": {
-											"raw": "{{host}}/api/v1/appointments/:id",
+											"raw": "{{host}}/api/v1/appointments/:id?dentistId={{empty}}",
 											"host": [
 												"{{host}}"
 											],
@@ -4700,6 +4497,12 @@
 												"v1",
 												"appointments",
 												":id"
+											],
+											"query": [
+												{
+													"key": "dentistId",
+													"value": "{{empty}}"
+												}
 											],
 											"variable": [
 												{
@@ -4747,17 +4550,8 @@
 												"type": "text"
 											}
 										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"email\": \"{{dentistEmailSample}}\"\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
 										"url": {
-											"raw": "{{host}}/api/v1/appointments/:id",
+											"raw": "{{host}}/api/v1/appointments/:id?dentistId={{dentistEmailSample}}",
 											"host": [
 												"{{host}}"
 											],
@@ -4766,6 +4560,12 @@
 												"v1",
 												"appointments",
 												":id"
+											],
+											"query": [
+												{
+													"key": "dentistId",
+													"value": "{{dentistEmailSample}}"
+												}
 											],
 											"variable": [
 												{
@@ -4807,17 +4607,8 @@
 									"request": {
 										"method": "DELETE",
 										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"email\": \"{{dentistEmailSample}}\"\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
 										"url": {
-											"raw": "{{host}}/api/v1/appointments/:id",
+											"raw": "{{host}}/api/v1/appointments/:id?dentistId={{dentistEmailSample}}",
 											"host": [
 												"{{host}}"
 											],
@@ -4826,6 +4617,12 @@
 												"v1",
 												"appointments",
 												":id"
+											],
+											"query": [
+												{
+													"key": "dentistId",
+													"value": "{{dentistEmailSample}}"
+												}
 											],
 											"variable": [
 												{
@@ -4869,17 +4666,8 @@
 							"request": {
 								"method": "DELETE",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"email\": \"{{dentistEmailSample}}\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
-									"raw": "{{host}}/api/v1/appointments/:id",
+									"raw": "{{host}}/api/v1/appointments/:id?dentistId={{dentistEmailSample}}",
 									"host": [
 										"{{host}}"
 									],
@@ -4889,10 +4677,16 @@
 										"appointments",
 										":id"
 									],
+									"query": [
+										{
+											"key": "dentistId",
+											"value": "{{dentistEmailSample}}"
+										}
+									],
 									"variable": [
 										{
 											"key": "id",
-											"value": "{{appointmentId}}_!@#*312"
+											"value": "{{appointmentId}}dsa"
 										}
 									]
 								}
@@ -4941,17 +4735,8 @@
 							"request": {
 								"method": "DELETE",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"email\": \"{{dentistEmailSample}}\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
-									"raw": "{{host}}/api/v1/appointments/:id",
+									"raw": "{{host}}/api/v1/appointments/:id?dentistId={{dentistEmailSample}}",
 									"host": [
 										"{{host}}"
 									],
@@ -4960,6 +4745,12 @@
 										"v1",
 										"appointments",
 										":id"
+									],
+									"query": [
+										{
+											"key": "dentistId",
+											"value": "{{dentistEmailSample}}"
+										}
 									],
 									"variable": [
 										{
@@ -5001,17 +4792,8 @@
 							"request": {
 								"method": "DELETE",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"email\": \"{{dentistEmailSample}}\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
-									"raw": "{{host}}/api/v1/appointments/:id",
+									"raw": "{{host}}/api/v1/appointments/:id?dentistId={{dentistEmailSample}}",
 									"host": [
 										"{{host}}"
 									],
@@ -5020,6 +4802,12 @@
 										"v1",
 										"appointments",
 										":id"
+									],
+									"query": [
+										{
+											"key": "dentistId",
+											"value": "{{dentistEmailSample}}"
+										}
 									],
 									"variable": [
 										{
@@ -5677,6 +5465,262 @@
 								"v1",
 								"notifications",
 								"dentist1@example.com"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "admin-service",
+			"item": [
+				{
+					"name": "POST api/admins/login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\": \"admin@gmail.com\", \"password\": \"password\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/admins/login",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admins",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET api/v1/sessions/whois",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Retrieve correct whois data\", function () {",
+									"        var jsonData = pm.response.json();",
+									"        pm.expect(jsonData.email).to.eql(\"admin@gmail.com\");",
+									"        pm.expect(jsonData.type).to.eql(\"a\");",
+									"    });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/sessions/whois",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sessions",
+								"whois"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST api/admins/login (invalid)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\": \"admin123@gmail.com\", \"password\": \"password\"} // invalid admin email",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/admins/login",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admins",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST api/admins/login (invalid) 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code shall be 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\": \"admin123@gmail.com\"} //missing password field",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/admins/login",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admins",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST api/v1/admins/login (invalid) 3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code shall be 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\": \"admin@gmail.com\", \"password\": \"incorrectPassword\"} // invalid admin password",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/admins/login",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admins",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE api/admins/logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/admins/logout",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admins",
+								"logout"
 							]
 						}
 					},
