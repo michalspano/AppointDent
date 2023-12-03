@@ -5,6 +5,7 @@ import { createSignal } from 'solid-js'
 import { Api } from '../../../utils/api'
 import type { Registration } from '../../../utils/types'
 import { validateAddress, validateUserInfo } from '../utils'
+import { countries } from '../countries'
 
 export default function DentistForm (): JSX.Element {
   const [email, setEmail] = createSignal('')
@@ -18,6 +19,7 @@ export default function DentistForm (): JSX.Element {
   const [clinicZipCode, setClinicZipcode] = createSignal('')
   const [picture, setPicture] = createSignal('')
   const [error, setError] = createSignal<string | null>(null)
+  const countryOptions = countries
 
   const signUp = async (): Promise<void> => {
     const registrationData: Registration = {
@@ -113,7 +115,7 @@ export default function DentistForm (): JSX.Element {
           <div class="flex flex-row">
             <input
               class="input h-12 w-full px-3 py-2 mb-3 md:mb-0 mr-2 border rounded-xl"
-              type="text"
+              type="select"
               placeholder="First name"
               onChange={(event) => setFirstName(event.target.value)}
             />
@@ -127,12 +129,17 @@ export default function DentistForm (): JSX.Element {
           <label class="text-black block pl-2 text-xs font-extralight pb-1">
                 Address of the clinic
           </label>
-           <input
+           <select
               class="input h-12 w-full px-3 py-2 mb-3  mr-2  border rounded-xl"
-              type="text"
-              placeholder="Country"
               onChange={(event) => setClinicCountry(event.target.value)}
-            />
+            >
+              <option value="none" selected disabled hidden>Select your Country</option>
+              {
+              countryOptions.map((country) => (
+                <option value={country.code}>{country.name}</option>
+              ))
+            }
+          </select>
           <div class="flex flex-row">
             <input
               class="input h-12 w-full px-3 py-2 mb-3  mr-2  border rounded-xl"
