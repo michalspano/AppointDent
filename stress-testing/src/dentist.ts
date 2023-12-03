@@ -1,11 +1,13 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 
+const host = 'http://localhost:3000/api/v1/dentists';
 export const options = {
   stages: [
     { duration: '1s', target: 1500 }, // Ramp up to 100 virtual users in 1 minute
     { duration: '1m', target: 1500 } // Ramp up to 200 virtual users in 1 minute
-  ]
+  ],
+  http_req_timeout: 30000
 };
 
 interface User {
@@ -40,7 +42,7 @@ function registerDentist (): User {
   };
 
   // Make a POST request to your registration endpoint
-  const res = http.post('http://localhost:3005/register', JSON.stringify(payload), { headers });
+  const res = http.post(host + '/register', JSON.stringify(payload), { headers });
 
   // Check for expected status codes
   check(res, {
@@ -67,7 +69,7 @@ function loginDentist (user: User): User {
   };
 
   // Make a POST request to your login endpoint
-  const res = http.post('http://localhost:3005/login', JSON.stringify(payload), { headers });
+  const res = http.post(host + '/login', JSON.stringify(payload), { headers });
 
   // Check for expected status codes
   check(res, {
@@ -86,7 +88,7 @@ function getAllDentists (): void {
   };
 
   // Make a POST request to your login endpoint
-  const res = http.get('http://localhost:3005/', { headers });
+  const res = http.get(host + '/', { headers });
 
   // Check for expected status codes
   check(res, {
@@ -147,7 +149,7 @@ function logoutDentist (user: User): void {
   };
 
   // Make a DELETE request to remove the dentist's cookie
-  const res = http.del('http://localhost:3005/logout', null, { headers });
+  const res = http.del(host + '/logout', null, { headers });
 
   // Check for expected status codes
   check(res, {

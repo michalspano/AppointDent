@@ -25,7 +25,6 @@ export async function insertUser (user: CreateUser): Promise<void> {
       // Execute the query with user email, hashed password and session hash which will be empty.
       const result: QueryResult = insertQuery?.run(user.email, hash, user.type) as QueryResult;
       if (result.changes === 0) { reject(new Error('No changes made.')); return; }
-      console.log('User added successfully.');
       resolve();
     } catch (err) {
       try {
