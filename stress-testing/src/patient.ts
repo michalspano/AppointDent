@@ -3,7 +3,12 @@ import { check, sleep } from 'k6';
 
 export const options = {
   stages: [
-    { duration: '1m', target: 200 } // Ramp up to 200 virtual users in 1 minute
+
+    { duration: '1m', target: 100 }, // Ramp up to 100 virtual users in 1 minute
+    { duration: '1m', target: 200 }, // Ramp up to 200 virtual users in 1 minute
+    { duration: '1m', target: 200 }, // Stay at 200 virtual users for 1 minutes
+    { duration: '1m', target: 0 } // Ramp down to 0 virtual users in 1 minute
+
   ]
 };
 
@@ -153,7 +158,7 @@ function logoutPatient (): void {
 
 export default function (): void {
   // Get the virtual user ID (VU) from the context
-  const userId = __VU;
+  const userId: number = __VU;
 
   // Simulate user registration
   registerUser(userId);
