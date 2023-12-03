@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { addRequest } from '../controllers/post.controller';
-import { getRequest, getAllRequests } from '../controllers/get.controller';
+import { addRequest } from '../controllers/add.data.controller';
+import { getRequest, getAllRequests } from '../controllers/get.data.controller';
 
 import { loginAdminWrapper } from '../controllers/login.controller';
 import { logoutAdminWrapper } from '../controllers/logout.controller';

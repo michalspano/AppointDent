@@ -1,10 +1,9 @@
 {
 	"info": {
-		"_postman_id": "3c480ab8-1025-4145-a439-b1ee623bbb64",
-		"name": "Test",
+		"_postman_id": "1753d732-023b-4cbb-aefa-1de2a8058824",
+		"name": "Test3dec",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "31133267",
-		"_collection_link": "https://appointdent.postman.co/workspace/AppointDent~3d7b8d88-ecc1-4d83-a513-eb9122453c58/collection/31133267-3c480ab8-1025-4145-a439-b1ee623bbb64?action=share&source=collection_link&creator=31133267"
+		"_exporter_id": "28264405"
 	},
 	"item": [
 		{
@@ -5476,6 +5475,137 @@
 			"name": "admin-service",
 			"item": [
 				{
+					"name": "POST NOT SAVED /requests",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Analytics object created\", () => {",
+									"    pm.response.to.have.status(201);",
+									"})",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"method\": \"GET\",\n    \"path\": \"/appointments\",\n    \"agent\": \"Linux\",\n    \"clientHash\" : \"secureHash\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3006/requests",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3006",
+							"path": [
+								"requests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET (fail) /requests",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Missing session key\", () => {",
+									"    pm.response.to.have.status(400);",
+									"})",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3006/requests/banana",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3006",
+							"path": [
+								"requests",
+								"banana"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /requests",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Analytics object created\", () => {",
+									"    pm.response.to.have.status(201);",
+									"})",
+									"",
+									"pm.test(\"Id Set\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"requestId\", jsonData.id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"method\": \"GET\",\n    \"path\": \"/appointments\",\n    \"agent\": \"Linux\",\n    \"clientHash\" : \"secureHash\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3006/requests",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3006",
+							"path": [
+								"requests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "POST api/admins/login",
 					"event": [
 						{
@@ -5512,6 +5642,194 @@
 								"v1",
 								"admins",
 								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /requests",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Analytics object created\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"pm.test(\"Correct retrieval of analytics object\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.method).to.eql(\"GET\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3006/requests/{{requestId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3006",
+							"path": [
+								"requests",
+								"{{requestId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /requests 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Analytics object created\", () => {",
+									"    pm.response.to.have.status(201);",
+									"})",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"method\": \"GET\",\n    \"path\": \"/appointments\",\n    \"agent\": \"Linux\",\n    \"clientHash\" : \"secureHash\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3006/requests",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3006",
+							"path": [
+								"requests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /requests 3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Analytics object created\", () => {",
+									"    pm.response.to.have.status(201);",
+									"})",
+									"",
+									"pm.test(\"Timestamp set\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"start_ts\",jsonData.timestamp+1);",
+									"    pm.environment.set(\"end_ts\",jsonData.timestamp-3600);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"method\": \"GET\",\n    \"path\": \"/appointments\",\n    \"agent\": \"Linux\",\n    \"clientHash\" : \"secureHash\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:3006/requests",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3006",
+							"path": [
+								"requests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Interval /requests",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Analytics object created\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"pm.test(\"Intervals working\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.length).to.eql(5);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:3006/requests?start={{start_ts}}&end={{end_ts}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3006",
+							"path": [
+								"requests"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "{{start_ts}}"
+								},
+								{
+									"key": "end",
+									"value": "{{end_ts}}"
+								}
 							]
 						}
 					},
