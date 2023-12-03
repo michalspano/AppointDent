@@ -59,7 +59,6 @@ function registerUser (userId: number): void {
 // Function to simulate user login
 function loginUser (): void {
   const loginEmail = registeredUsers[registeredUsers.length - 1].email;
-
   const payload = {
     email: loginEmail,
     password: 'Password123!'
@@ -77,9 +76,9 @@ function loginUser (): void {
     'Status is 200': (r) => r.status === 200,
     'Status is not 401': (r) => r.status !== 401
   });
+
   const cookies = res.cookies;
   registeredUsers.push({ email: loginEmail, cookies });
-
   // Simulate user think time
   sleep(3);
 }

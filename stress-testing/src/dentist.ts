@@ -144,7 +144,7 @@ function patchDentist (): void {
   };
 
   // Make a PATCH request to modify the dentist information
-  const res = http.patch(`http://localhost:3000/api/v1/dentists/${loginEmail}`, payload, { headers });
+  const res = http.patch(`http://localhost:3000/api/v1/dentists/${loginEmail}`, JSON.stringify(payload), { headers });
 
   // Check for expected status codes
   check(res, {
