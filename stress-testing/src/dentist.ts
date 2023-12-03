@@ -10,13 +10,19 @@ export const options = {
   ]
 };
 
-// Array to store registered emails
-const registeredEmails: any[] = [];
+interface User {
+  email: string
+  cookies: any
+}
+
+// Array to store registered users with their respective cookies
+const registeredUsers: User[] = [];
 
 // Function to generate a unique email address for each virtual user
-function generateUniqueEmail (userId: number): string {
+function generateUniqueEmail (userId: any): string {
   const timestamp = Date.now();
-  return `test${userId}_${timestamp}@example.com`;
+  const randomString = Math.random().toString(36).substring(7); // Generate a random string
+  return `test${userId}_${timestamp}_${randomString}@example.com`;
 }
 
 // Function to simulate user registration
@@ -48,18 +54,15 @@ function registerDentist (userId: number): void {
   });
 
   // Add the registered email to the array
-  registeredEmails.push(payload.email);
+  registeredUsers.push({ email: payload.email, cookies: undefined });
 
   // Simulate user think time
-  sleep(Math.random() * 3); // Sleep for a random duration between 0 and 3 seconds
+  sleep(3);
 }
 
 // Function to simulate user login
 function loginDentist (): void {
-  // Use a randomly selected registered email for login
-  const emailIndex = Math.floor(Math.random() * registeredEmails.length);
-  const loginEmail = registeredEmails[emailIndex];
-
+  const loginEmail = registeredUsers[registeredUsers.length - 1].email;
   const payload = {
     email: loginEmail,
     password: 'Password123!'
@@ -78,8 +81,11 @@ function loginDentist (): void {
     'Status is not 401': (r) => r.status !== 401
   });
 
+  const cookies = res.cookies;
+  registeredUsers.push({ email: loginEmail, cookies });
+
   // Simulate user think time
-  sleep(Math.random() * 3); // Sleep for a random duration between 0 and 3 seconds
+  sleep(3);
 }
 
 // Function to simulate getting all dentists
@@ -98,18 +104,16 @@ function getAllDentists (): void {
   });
 
   // Simulate user think time
-  sleep(Math.random() * 3); // Sleep for a random duration between 0 and 3 seconds
+  sleep(3);
 }
 
-// Function to simulate getting a dentist
-/*
 function getDentist (): void {
-  // Use a randomly selected registered email for login
-  const emailIndex = Math.floor(Math.random() * registeredEmails.length);
-  const loginEmail = registeredEmails[emailIndex];
+  const loginEmail = registeredUsers[registeredUsers.length - 1].email;
+  const cookies = registeredUsers[registeredUsers.length - 1].cookies;
 
   const headers = {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    Cookie: cookies
   };
 
   // Make a POST request to your login endpoint
@@ -122,9 +126,57 @@ function getDentist (): void {
   });
 
   // Simulate user think time
-  sleep(Math.random() * 3); // Sleep for a random duration between 0 and 3 seconds
+  sleep(3);
 }
-*/
+
+// Function to simulate dentist patching
+function patchDentist (): void {
+  const payload = {
+    lastName: 'Dentist'
+  };
+
+  const loginEmail = registeredUsers[registeredUsers.length - 1].email;
+  const cookies = registeredUsers[registeredUsers.length - 1].cookies;
+
+  const headers = {
+    'Content-Type': 'application/json',
+    Cookie: cookies
+  };
+
+  // Make a PATCH request to modify the dentist information
+  const res = http.patch(`http://localhost:3000/api/v1/dentists/${loginEmail}`, payload, { headers });
+
+  // Check for expected status codes
+  check(res, {
+    'Status is 200': (r) => r.status === 200,
+    'Status is not 401': (r) => r.status !== 401
+  });
+
+  // Simulate user think time
+  sleep(3);
+}
+
+// Function to simulate dentist logging out
+function logoutDentist (): void {
+  const cookies = registeredUsers[registeredUsers.length - 1].cookies;
+
+  const headers = {
+    'Content-Type': 'application/json',
+    Cookie: cookies
+  };
+
+  // Make a DELETE request to remove the dentist's cookie
+  const res = http.del('http://localhost:3000/api/v1/dentists/logout', null, { headers });
+
+  // Check for expected status codes
+  check(res, {
+    'Status is 200': (r) => r.status === 200,
+    'Status is not 401': (r) => r.status !== 401
+  });
+
+  // Simulate user think time
+  sleep(3);
+}
 export default function (): void {
   // Get the virtual user ID (VU) from the context
   const userId: number = __VU;
@@ -137,4 +189,13 @@ export default function (): void {
 
   // Simulate getting all dentists
   getAllDentists();
+
+  // Simulate getting a dentist
+  getDentist();
+
+  // Simulae patching a dentist
+  patchDentist();
+
+  // Simulate logging out a dentist
+  logoutDentist();
 }

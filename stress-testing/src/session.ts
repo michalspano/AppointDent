@@ -70,22 +70,22 @@ function loginUser (): void {
   };
 
   // Make a POST request to your login endpoint
-  const res = http.post('http://localhost:3000/api/v1/patients/login', payload, { headers });
+  const res = http.post('http://localhost:3000/api/v1/patients/login', JSON.stringify(payload), { headers });
 
   // Check for expected status codes
   check(res, {
     'Status is 200': (r) => r.status === 200,
     'Status is not 401': (r) => r.status !== 401
   });
-
   const cookies = res.cookies;
   registeredUsers.push({ email: loginEmail, cookies });
+
   // Simulate user think time
   sleep(3);
 }
 
-function getPatient (): void {
-  const loginEmail = registeredUsers[registeredUsers.length - 1].email;
+// Function to simulate who is logged in
+function whois (): void {
   const cookies = registeredUsers[registeredUsers.length - 1].cookies;
 
   const headers = {
@@ -94,7 +94,7 @@ function getPatient (): void {
   };
 
   // Make a POST request to your login endpoint
-  const res = http.get(`http://localhost:3000/api/v1/patients/${loginEmail}`, { headers });
+  const res = http.get('http://localhost:3000/api/v1/sessions/whois', { headers });
 
   // Check for expected status codes
   check(res, {
@@ -105,56 +105,6 @@ function getPatient (): void {
   // Simulate user think time
   sleep(3);
 }
-
-// Function to simulate dentist patching
-function patchPatient (): void {
-  const payload = {
-    lastName: 'Patient'
-  };
-
-  const loginEmail = registeredUsers[registeredUsers.length - 1].email;
-  const cookies = registeredUsers[registeredUsers.length - 1].cookies;
-
-  const headers = {
-    'Content-Type': 'application/json',
-    Cookie: cookies
-  };
-
-  // Make a PATCH request to modify the dentist information
-  const res = http.patch(`http://localhost:3000/api/v1/patients/${loginEmail}`, JSON.stringify(payload), { headers });
-
-  // Check for expected status codes
-  check(res, {
-    'Status is 200': (r) => r.status === 200,
-    'Status is not 401': (r) => r.status !== 401
-  });
-
-  // Simulate user think time
-  sleep(3);
-}
-
-// Function to simulate dentist logging out
-function logoutPatient (): void {
-  const cookies = registeredUsers[registeredUsers.length - 1].cookies;
-
-  const headers = {
-    'Content-Type': 'application/json',
-    Cookie: cookies
-  };
-
-  // Make a DELETE request to remove the dentist's cookie
-  const res = http.del('http://localhost:3000/api/v1/patients/logout', cookies, { headers });
-
-  // Check for expected status codes
-  check(res, {
-    'Status is 200': (r) => r.status === 200,
-    'Status is not 401': (r) => r.status !== 401
-  });
-
-  // Simulate user think time
-  sleep(3);
-}
-
 export default function (): void {
   // Get the virtual user ID (VU) from the context
   const userId = __VU;
@@ -165,7 +115,5 @@ export default function (): void {
   // Simulate user login
   loginUser();
 
-  getPatient();
-  patchPatient();
-  logoutPatient();
+  whois();
 }

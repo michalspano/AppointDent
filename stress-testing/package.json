@@ -6,7 +6,8 @@
     "lint": "eslint 'src/**/*.ts'",
     "build": "npm run lint && webpack",
     "dentist": "npm run build && k6 run dist/dentist.js",
-    "patient": "npm run build && k6 run dist/patient.js"
+    "patient": "npm run build && k6 run dist/patient.js",
+    "session": "npm run build && k6 run dist/session.js"
   },
   "keywords": [],
   "author": "",
