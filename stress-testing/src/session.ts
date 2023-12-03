@@ -7,6 +7,7 @@ export const options = {
     { duration: '1m', target: 200 }, // Ramp up to 200 virtual users in 1 minute
     { duration: '1m', target: 200 }, // Stay at 200 virtual users for 1 minutes
     { duration: '1m', target: 0 } // Ramp down to 0 virtual users in 1 minute
+
   ]
 };
 
@@ -26,14 +27,18 @@ function generateUniqueEmail (userId: any): string {
 }
 
 // Function to simulate user registration
-function registerUser (userId: number): void {
+function registerDentist (userId: number): void {
   const payload = {
     email: generateUniqueEmail(userId),
-    firstName: 'Patient',
+    firstName: 'Dentist',
     lastName: 'Doe',
-    password: 'Password123!',
-    birthDate: '2000'
-
+    clinicCountry: 'Sweden',
+    clinicCity: 'Göteborg',
+    clinicStreet: 'Street',
+    clinicHouseNumber: '1',
+    clinicZipCode: '12345',
+    picture: 'base64encodedimage',
+    password: 'Password123!'
   };
 
   const headers = {
@@ -41,7 +46,7 @@ function registerUser (userId: number): void {
   };
 
   // Make a POST request to your registration endpoint
-  const res = http.post('http://localhost:3000/api/v1/patients/register', JSON.stringify(payload), { headers });
+  const res = http.post('http://localhost:3000/api/v1/dentists/register', JSON.stringify(payload), { headers });
 
   // Check for expected status codes
   check(res, {
@@ -53,13 +58,12 @@ function registerUser (userId: number): void {
   registeredUsers.push({ email: payload.email, cookies: undefined });
 
   // Simulate user think time
-  sleep(3);
+  sleep(5);
 }
 
 // Function to simulate user login
-function loginUser (): void {
+function loginDentist (): void {
   const loginEmail = registeredUsers[registeredUsers.length - 1].email;
-
   const payload = {
     email: loginEmail,
     password: 'Password123!'
@@ -70,20 +74,20 @@ function loginUser (): void {
   };
 
   // Make a POST request to your login endpoint
-  const res = http.post('http://localhost:3000/api/v1/patients/login', JSON.stringify(payload), { headers });
+  const res = http.post('http://localhost:3000/api/v1/dentists/login', JSON.stringify(payload), { headers });
 
   // Check for expected status codes
   check(res, {
     'Status is 200': (r) => r.status === 200,
     'Status is not 401': (r) => r.status !== 401
   });
+
   const cookies = res.cookies;
   registeredUsers.push({ email: loginEmail, cookies });
 
   // Simulate user think time
-  sleep(3);
+  sleep(5);
 }
-
 // Function to simulate who is logged in
 function whois (): void {
   const cookies = registeredUsers[registeredUsers.length - 1].cookies;
@@ -103,17 +107,17 @@ function whois (): void {
   });
 
   // Simulate user think time
-  sleep(3);
+  sleep(5);
 }
 export default function (): void {
   // Get the virtual user ID (VU) from the context
   const userId = __VU;
 
   // Simulate user registration
-  registerUser(userId);
+  registerDentist(userId);
 
   // Simulate user login
-  loginUser();
+  loginDentist();
 
   whois();
 }
