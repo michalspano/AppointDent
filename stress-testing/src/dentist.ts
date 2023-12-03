@@ -3,10 +3,8 @@ import { check, sleep } from 'k6';
 
 export const options = {
   stages: [
-    { duration: '1m', target: 100 }, // Ramp up to 100 virtual users in 1 minute
-    { duration: '1m', target: 200 }, // Ramp up to 200 virtual users in 1 minute
-    { duration: '1m', target: 200 }, // Stay at 200 virtual users for 1 minutes
-    { duration: '1m', target: 0 } // Ramp down to 0 virtual users in 1 minute
+    { duration: '1s', target: 1500 }, // Ramp up to 100 virtual users in 1 minute
+    { duration: '1m', target: 1500 } // Ramp up to 200 virtual users in 1 minute
   ]
 };
 
@@ -15,20 +13,17 @@ interface User {
   cookies: any
 }
 
-// Array to store registered users with their respective cookies
-const registeredUsers: User[] = [];
-
 // Function to generate a unique email address for each virtual user
-function generateUniqueEmail (userId: any): string {
+function generateUniqueEmail (): string {
   const timestamp = Date.now();
   const randomString = Math.random().toString(36).substring(7); // Generate a random string
-  return `test${userId}_${timestamp}_${randomString}@example.com`;
+  return `test${timestamp}_${randomString}@example.com`;
 }
 
 // Function to simulate user registration
-function registerDentist (userId: number): void {
+function registerDentist (): User {
   const payload = {
-    email: generateUniqueEmail(userId),
+    email: generateUniqueEmail(),
     firstName: 'Dentist',
     lastName: 'Doe',
     clinicCountry: 'Sweden',
@@ -45,7 +40,7 @@ function registerDentist (userId: number): void {
   };
 
   // Make a POST request to your registration endpoint
-  const res = http.post('http://localhost:3000/api/v1/dentists/register', JSON.stringify(payload), { headers });
+  const res = http.post('http://localhost:3005/register', JSON.stringify(payload), { headers });
 
   // Check for expected status codes
   check(res, {
@@ -54,15 +49,14 @@ function registerDentist (userId: number): void {
   });
 
   // Add the registered email to the array
-  registeredUsers.push({ email: payload.email, cookies: undefined });
+  const user: User = { email: payload.email, cookies: undefined };
 
-  // Simulate user think time
-  sleep(3);
+  return user;
 }
 
 // Function to simulate user login
-function loginDentist (): void {
-  const loginEmail = registeredUsers[registeredUsers.length - 1].email;
+function loginDentist (user: User): User {
+  const loginEmail = user.email;
   const payload = {
     email: loginEmail,
     password: 'Password123!'
@@ -73,7 +67,7 @@ function loginDentist (): void {
   };
 
   // Make a POST request to your login endpoint
-  const res = http.post('http://localhost:3000/api/v1/dentists/login', JSON.stringify(payload), { headers });
+  const res = http.post('http://localhost:3005/login', JSON.stringify(payload), { headers });
 
   // Check for expected status codes
   check(res, {
@@ -81,11 +75,8 @@ function loginDentist (): void {
     'Status is not 401': (r) => r.status !== 401
   });
 
-  const cookies = res.cookies;
-  registeredUsers.push({ email: loginEmail, cookies });
-
-  // Simulate user think time
-  sleep(3);
+  user.cookies = res.cookies;
+  return user;
 }
 
 // Function to simulate getting all dentists
@@ -95,7 +86,7 @@ function getAllDentists (): void {
   };
 
   // Make a POST request to your login endpoint
-  const res = http.get('http://localhost:3000/api/v1/dentists', { headers });
+  const res = http.get('http://localhost:3005/', { headers });
 
   // Check for expected status codes
   check(res, {
@@ -107,36 +98,29 @@ function getAllDentists (): void {
   sleep(3);
 }
 
-function getDentist (): void {
-  const loginEmail = registeredUsers[registeredUsers.length - 1].email;
-  const cookies = registeredUsers[registeredUsers.length - 1].cookies;
-
+function getDentist (user: User): void {
   const headers = {
-    'Content-Type': 'application/json',
-    Cookie: cookies
+    'Content-Type': 'application/json'
   };
 
   // Make a POST request to your login endpoint
-  const res = http.get(`http://localhost:3000/api/v1/dentists/${loginEmail}`, { headers });
+  const res = http.get(`http://localhost:3005/${user.email}`, { headers });
 
   // Check for expected status codes
   check(res, {
     'Status is 200': (r) => r.status === 200,
     'Status is not 401': (r) => r.status !== 401
   });
-
-  // Simulate user think time
-  sleep(3);
 }
 
 // Function to simulate dentist patching
-function patchDentist (): void {
+function patchDentist (user: User): void {
   const payload = {
     lastName: 'Dentist'
   };
 
-  const loginEmail = registeredUsers[registeredUsers.length - 1].email;
-  const cookies = registeredUsers[registeredUsers.length - 1].cookies;
+  const loginEmail = user.email;
+  const cookies = user.cookies;
 
   const headers = {
     'Content-Type': 'application/json',
@@ -144,21 +128,18 @@ function patchDentist (): void {
   };
 
   // Make a PATCH request to modify the dentist information
-  const res = http.patch(`http://localhost:3000/api/v1/dentists/${loginEmail}`, payload, { headers });
+  const res = http.patch(`http://localhost:3005/${loginEmail}`, JSON.stringify(payload), { headers });
 
   // Check for expected status codes
   check(res, {
     'Status is 200': (r) => r.status === 200,
     'Status is not 401': (r) => r.status !== 401
   });
-
-  // Simulate user think time
-  sleep(3);
 }
 
 // Function to simulate dentist logging out
-function logoutDentist (): void {
-  const cookies = registeredUsers[registeredUsers.length - 1].cookies;
+function logoutDentist (user: User): void {
+  const cookies = user.cookies;
 
   const headers = {
     'Content-Type': 'application/json',
@@ -166,36 +147,31 @@ function logoutDentist (): void {
   };
 
   // Make a DELETE request to remove the dentist's cookie
-  const res = http.del('http://localhost:3000/api/v1/dentists/logout', null, { headers });
+  const res = http.del('http://localhost:3005/logout', null, { headers });
 
   // Check for expected status codes
   check(res, {
     'Status is 200': (r) => r.status === 200,
     'Status is not 401': (r) => r.status !== 401
   });
-
-  // Simulate user think time
-  sleep(3);
 }
 export default function (): void {
-  // Get the virtual user ID (VU) from the context
-  const userId: number = __VU;
-
   // Simulate dentist registration
-  registerDentist(userId);
+  let user: User = registerDentist();
 
   // Simulate dentist login
-  loginDentist();
+  user = loginDentist(user);
 
   // Simulate getting all dentists
   getAllDentists();
 
   // Simulate getting a dentist
-  getDentist();
+  getDentist(user);
 
   // Simulae patching a dentist
-  patchDentist();
+  patchDentist(user);
 
   // Simulate logging out a dentist
-  logoutDentist();
+  logoutDentist(user);
+  // Calculate how long the actions took to execute
 }
