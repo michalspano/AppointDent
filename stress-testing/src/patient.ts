@@ -3,12 +3,10 @@ import { check, sleep } from 'k6';
 
 export const options = {
   stages: [
-
     { duration: '1m', target: 100 }, // Ramp up to 100 virtual users in 1 minute
     { duration: '1m', target: 200 }, // Ramp up to 200 virtual users in 1 minute
     { duration: '1m', target: 200 }, // Stay at 200 virtual users for 1 minutes
     { duration: '1m', target: 0 } // Ramp down to 0 virtual users in 1 minute
-
   ]
 };
 
@@ -61,6 +59,7 @@ function registerUser (userId: number): void {
 // Function to simulate user login
 function loginUser (): void {
   const loginEmail = registeredUsers[registeredUsers.length - 1].email;
+
   const payload = {
     email: loginEmail,
     password: 'Password123!'
@@ -71,7 +70,7 @@ function loginUser (): void {
   };
 
   // Make a POST request to your login endpoint
-  const res = http.post('http://localhost:3000/api/v1/patients/login', JSON.stringify(payload), { headers });
+  const res = http.post('http://localhost:3000/api/v1/patients/login', payload, { headers });
 
   // Check for expected status codes
   check(res, {
@@ -144,7 +143,7 @@ function logoutPatient (): void {
   };
 
   // Make a DELETE request to remove the dentist's cookie
-  const res = http.del('http://localhost:3000/api/v1/patients/logout', null, { headers });
+  const res = http.del('http://localhost:3000/api/v1/patients/logout', cookies, { headers });
 
   // Check for expected status codes
   check(res, {
@@ -158,7 +157,7 @@ function logoutPatient (): void {
 
 export default function (): void {
   // Get the virtual user ID (VU) from the context
-  const userId: number = __VU;
+  const userId = __VU;
 
   // Simulate user registration
   registerUser(userId);
