@@ -30,7 +30,7 @@ export interface Appointment {
 export enum UserType {
   Dentist = 'd',
   Patient = 'p',
-  Admin = 'a' // this abstraction is still WIP
+  Admin = 'a'
 };
 
 /**
@@ -41,6 +41,7 @@ export enum UserType {
 export interface WhoisResponse {
   status: SessionResponse
   email: string | undefined
+  // the same as: email?: string (documented for clarity)
   type: UserType | undefined
 };
 
