@@ -62,3 +62,28 @@ export interface Registration {
   clinicZipCode: string
   picture: string
 }
+
+export enum UserType {
+  Dentist = 'd',
+  Patient = 'p'
+}
+
+/**
+ * @description the response of the WHOIS topic is an object
+ * with two properties: email and type. The email is the email
+ * of the user, and the type is the type of the user.
+ */
+export interface WhoisResponse {
+  status: SessionResponse
+  email: string | undefined
+  type: UserType | undefined
+}
+
+/**
+ * @description the session service responds with 0 on failed requests
+ * and with 1 on successful requests.
+ */
+export enum SessionResponse {
+  Fail = 0,
+  Success = 1
+}

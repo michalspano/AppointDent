@@ -31,7 +31,7 @@ const options: object = Object.freeze({
  * DB_FILE is set to a custom path (typically <service>-test.db).
  * This way, we can seamlessly switch which local .db file is used.
  */
-const DB_FILE: string = process.env.CUSTOM_DB_PATH ?? './db/admins.db';
+const DB_FILE: string = process.env.CUSTOM_DB_ADMINS ?? './db/admins.db';
 
 /**
  * @description the path to the schema file.

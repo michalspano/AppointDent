@@ -6,3 +6,5 @@ import database from '../db/config';
  * a suitable option. */
 database?.exec('DROP TABLE IF EXISTS admins;');
 database?.exec('DROP TABLE IF EXISTS requests;');
+console.log(`Dropping the database ${database?.name}...`);
+database?.exec('DROP TABLE IF EXISTS admins;');

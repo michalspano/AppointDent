@@ -27,8 +27,8 @@ const proxyTargets: ProxyTargets = {
   patients: 'http://localhost:3002',
   appointments: 'http://localhost:3003',
   notifications: 'http://localhost:3004',
-  dentists: 'http://localhost:3005'
-
+  dentists: 'http://localhost:3005',
+  admins: 'http://localhost:3006'
 };
 
 const proxies: ProxyMap = constructProxies(proxyTargets);

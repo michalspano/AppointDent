@@ -6,7 +6,7 @@ import { validateRequestFormat } from '../helper/validator';
 
 const TOPIC = 'INSERTUSER';
 const RESPONSE_TOPIC = 'INSERTUSERRES';
-const ALLOWED_TYPES = ['p', 'd'];
+const ALLOWED_TYPES = ['p', 'd', 'a'];
 /**
  * Insert user into database.
  * @param user The user object to be inserted.

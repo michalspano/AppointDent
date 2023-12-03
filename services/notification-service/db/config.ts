@@ -6,7 +6,7 @@ import type { Database as DatabaseType } from 'better-sqlite3';
  * @description the options for the database connection.
  */
 const options: object = Object.freeze({
-  fileMustExist: true
+  verbose: console.log
   // TODO: add more options
 });
 
@@ -16,17 +16,12 @@ const options: object = Object.freeze({
  * DB_FILE is set to a custom path (typically <service>-test.db).
  * This way, we can seamlessly switch which local .db file is used.
  */
-const DB_FILE: string = process.env.CUSTOM_DB_PATH ?? './db/notifications.db';
+const DB_FILE: string = process.env.CUSTOM_DB_NOTIFICATIONS ?? './db/notifications.db';
 
 /**
  * @description the path to the schema file.
  */
 const schemaFilePath: string = './db/schema.sql';
-
-/* Verify that DB_FILE exists. If not, create it (just an empty file).
- * This eliminates the error that occurs when the database file does not exist
- * on the local machine. */
-if (!fs.existsSync(DB_FILE)) fs.writeFileSync(DB_FILE, '');
 
 /**
  * @description the database instance with the options and the local
