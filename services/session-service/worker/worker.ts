@@ -1,4 +1,4 @@
-import { parentPort } from 'worker_threads';
+/* import { parentPort } from 'worker_threads';
 import database from '../db/config';
 
 parentPort?.on('message', ({ query, params }) => {
@@ -13,3 +13,4 @@ parentPort?.on('message', ({ query, params }) => {
     parentPort?.postMessage({ error: error.message, result: null });
   }
 });
+*/

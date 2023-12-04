@@ -5,57 +5,38 @@ import { createServer } from 'net';
 import aedesPersistenceRedis from 'aedes-persistence-redis';
 import MQEmitterRedis from 'mqemitter-redis';
 
-const port = 1883;
+const rawPort: string | undefined = process.env.LOCAL_BROKER_PORT;
+const port: number = rawPort === undefined ? 1883 : parseInt(rawPort);
+const redisConnection = {
+  port: 6379,
+  host: '127.0.0.1'
+};
 
-if (cluster.isMaster) {
-  // This is the master cluster process
-  const numWorkers = os.cpus().length;
-  console.log('Starting a new worker with redis');
-
-  console.log(`Master cluster setting up ${numWorkers} workers...`);
-
-  // Fork workers.
-  for (let i = 0; i < numWorkers; i++) {
+if (cluster.isPrimary) {
+  const nWorkers = os.cpus().length;
+  if (nWorkers === 0) { console.error('Cannot find any available CPU cores. Exiting...'); process.exit(1); }
+  /**
+   * For each CPU core, fork the process onto a new thread.
+   */
+  for (let i = 0; i < nWorkers; i++) {
     cluster.fork();
   }
-
-  cluster.on('exit', (worker, code, signal) => {
-    console.log(`Worker ${worker.process.pid} died with code: ${code}, and signal: ${signal}`);
-    cluster.fork();
+  cluster.on('exit', (_worker, exitCode, _reason) => {
+    console.log('Worker exited with code: ' + exitCode);
   });
 } else {
-  // Worker processes have their own Redis persistence and MQEmitter
-  const persistence = aedesPersistenceRedis({
-    // Your Redis configuration here
-    // e.g., port: 6379, host: "127.0.0.1"
-    port: 6379,
-    host: '127.0.0.1'
-  });
-
-  const mqEmitter = MQEmitterRedis({
-    // Your Redis configuration here
-    // e.g., port: 6379, host: "127.0.0.1"
-    port: 6379,
-    host: '127.0.0.1'
-  });
-
-  // Aedes setup with shared Redis persistence and emitter
   const aedes = new Aedes({
-    persistence,
-    mq: mqEmitter,
-    concurrency: 10000,
-    queueLimit: 10000,
+    persistence: aedesPersistenceRedis(redisConnection),
+    mq: MQEmitterRedis(redisConnection),
+    concurrency: 100,
+    queueLimit: 1000,
     connectTimeout: 1200000
   });
-
   const server = createServer(aedes.handle);
-
   server.listen(port, function () {
-    console.log(`Worker ${process.pid} started MQTT Broker on port ${port}`);
+    console.log(`MQTT Broker ${process.pid} started at port: ${port}`);
   });
-
-  // Handle uncaught exceptions to avoid crashing the worker
   process.on('uncaughtException', (err) => {
-    console.error(`Caught exception: ${err.message}`);
+    console.error(`Exception: ${err.message}`);
   });
 }

@@ -4,8 +4,8 @@ import { check, sleep } from 'k6';
 const host = 'http://localhost:3000/api/v1/dentists';
 export const options = {
   stages: [
-    { duration: '1s', target: 1500 }, // Ramp up to 100 virtual users in 1 minute
-    { duration: '1m', target: 1500 } // Ramp up to 200 virtual users in 1 minute
+    { duration: '1s', target: 3000 }, // Ramp up to 100 virtual users in 1 minute
+    { duration: '1m', target: 3000 } // Ramp up to 200 virtual users in 1 minute
   ],
   http_req_timeout: 30000
 };

@@ -1,12 +1,11 @@
 import http from 'k6/http';
-import { check, sleep } from 'k6';
+import { check } from 'k6';
 
 export const options = {
   stages: [
-    { duration: '1m', target: 100 }, // Ramp up to 100 virtual users in 1 minute
-    { duration: '1m', target: 200 }, // Ramp up to 200 virtual users in 1 minute
-    { duration: '1m', target: 200 }, // Stay at 200 virtual users for 1 minutes
-    { duration: '1m', target: 0 } // Ramp down to 0 virtual users in 1 minute
+    { duration: '1s', target: 3000 }, // Ramp up to 100 virtual users in 1 minute
+    { duration: '1m', target: 3000 } // Ramp up to 200 virtual users in 1 minute
+
   ]
 };
 
@@ -15,25 +14,26 @@ interface User {
   cookies: any
 }
 
-// Array to store registered users with their respective cookies
-const registeredUsers: User[] = [];
-
 // Function to generate a unique email address for each virtual user
-function generateUniqueEmail (userId: any): string {
+function generateUniqueEmail (): string {
   const timestamp = Date.now();
   const randomString = Math.random().toString(36).substring(7); // Generate a random string
-  return `test${userId}_${timestamp}_${randomString}@example.com`;
+  return `test${timestamp}_${randomString}@example.com`;
 }
 
 // Function to simulate user registration
-function registerUser (userId: number): void {
+function registerDentist (): User {
   const payload = {
-    email: generateUniqueEmail(userId),
-    firstName: 'Patient',
+    email: generateUniqueEmail(),
+    firstName: 'Dentist',
     lastName: 'Doe',
-    password: 'Password123!',
-    birthDate: '2000'
-
+    clinicCountry: 'Sweden',
+    clinicCity: 'Göteborg',
+    clinicStreet: 'Street',
+    clinicHouseNumber: '1',
+    clinicZipCode: '12345',
+    picture: 'base64encodedimage',
+    password: 'Password123!'
   };
 
   const headers = {
@@ -41,7 +41,7 @@ function registerUser (userId: number): void {
   };
 
   // Make a POST request to your registration endpoint
-  const res = http.post('http://localhost:3000/api/v1/patients/register', JSON.stringify(payload), { headers });
+  const res = http.post('http://localhost:3000/api/v1/dentists/register', JSON.stringify(payload), { headers });
 
   // Check for expected status codes
   check(res, {
@@ -49,17 +49,14 @@ function registerUser (userId: number): void {
     'Status is not 401': (r) => r.status !== 401
   });
 
-  // Add the registered email to the array
-  registeredUsers.push({ email: payload.email, cookies: undefined });
+  const user: User = { email: payload.email, cookies: undefined };
 
-  // Simulate user think time
-  sleep(3);
+  return user;
 }
 
 // Function to simulate user login
-function loginUser (): void {
-  const loginEmail = registeredUsers[registeredUsers.length - 1].email;
-
+function loginDentist (user: User): User {
+  const loginEmail = user.email;
   const payload = {
     email: loginEmail,
     password: 'Password123!'
@@ -70,23 +67,21 @@ function loginUser (): void {
   };
 
   // Make a POST request to your login endpoint
-  const res = http.post('http://localhost:3000/api/v1/patients/login', JSON.stringify(payload), { headers });
+  const res = http.post('http://localhost:3000/api/v1/dentists/login', JSON.stringify(payload), { headers });
 
   // Check for expected status codes
   check(res, {
     'Status is 200': (r) => r.status === 200,
     'Status is not 401': (r) => r.status !== 401
   });
-  const cookies = res.cookies;
-  registeredUsers.push({ email: loginEmail, cookies });
 
-  // Simulate user think time
-  sleep(3);
+  user.cookies = res.cookies;
+  return user;
 }
 
 // Function to simulate who is logged in
-function whois (): void {
-  const cookies = registeredUsers[registeredUsers.length - 1].cookies;
+function whois (user: User): void {
+  const cookies = user.cookies;
 
   const headers = {
     'Content-Type': 'application/json',
@@ -101,19 +96,13 @@ function whois (): void {
     'Status is 200': (r) => r.status === 200,
     'Status is not 401': (r) => r.status !== 401
   });
-
-  // Simulate user think time
-  sleep(3);
 }
 export default function (): void {
-  // Get the virtual user ID (VU) from the context
-  const userId = __VU;
-
   // Simulate user registration
-  registerUser(userId);
+  let user: User = registerDentist();
 
   // Simulate user login
-  loginUser();
+  user = loginDentist(user);
 
-  whois();
+  whois(user);
 }
