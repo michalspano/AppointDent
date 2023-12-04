@@ -1,13 +1,20 @@
 declare module 'express-queue' {
-    // You can specify the module's exports here.
-    // For example, if it exports a function, you can describe it like this:
-    // function myFunction(args: any): any;
-  
-    // If you're unsure of the module's structure, you can use the `any` type
-    // to bypass type checking (this is not recommended for production code
-    // as it disables type checking for the module).
-    const queueMiddleware: any;
-  
-    export default queueMiddleware;
-  }
-  
+  /**
+   * Options for the queue middleware.
+   */
+  export interface QueueMiddlewareOptions {
+    maxQueue: number;
+    activeLimit: number;
+    // Add other properties if needed
+  };
+
+  /**
+   * The queue middleware type that is exported by the module.
+   * It assumes options of type QueueMiddlewareOptions 
+   */
+  export type QueueMiddleware<T = any> = (options: QueueMiddlewareOptions) => T;
+
+  const queueMiddleware: QueueMiddleware;
+
+  export default queueMiddleware;
+}
