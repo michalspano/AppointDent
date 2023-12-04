@@ -5,7 +5,7 @@ import { createSignal } from 'solid-js'
 import { Api } from '../../../utils/api'
 import type { Registration } from '../../../utils/types'
 import { validateAddress, validateUserInfo } from '../utils'
-import { countries } from '../countries'
+import { countries } from '../../../utils/countries'
 
 export default function DentistForm (): JSX.Element {
   const [email, setEmail] = createSignal('')
