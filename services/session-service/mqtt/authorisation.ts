@@ -5,6 +5,7 @@ import { type AuthenticationRequest, type Session, type User } from '../types/ty
 import { executeQuery } from '../helper/query';
 import { EXPIRE_IN_SECONDS } from '../helper/constants';
 import { validateRequestFormat } from '../helper/validator';
+import { hashThis } from '../helper/hash';
 
 const TOPIC = 'AUTHREQ';
 const RESPONSE_TOPIC = 'AUTHRES';
@@ -26,6 +27,9 @@ async function parseRawRequest (rawMsg: string): Promise<AuthenticationRequest> 
   return request;
 }
 
+const userQuery: Statement<any> | Statement<[any]> | undefined = database?.prepare('SELECT session_hash FROM users WHERE email = ?');
+const sessionQuery: Statement<any> | Statement<[any]> | undefined = database?.prepare('SELECT expiry FROM sessions WHERE hash = ?');
+
 /**
  * Authenticate an authorization request.
  * @param request The authorization request object to be authenticated.
@@ -34,24 +38,26 @@ async function parseRawRequest (rawMsg: string): Promise<AuthenticationRequest> 
 async function authenticateRequest (request: AuthenticationRequest): Promise<boolean> {
   return await new Promise<boolean>((resolve, reject) => {
     try {
+      hashThis(request.session_key).then((hashedKey) => {
       // Retrieve the session hash for the user from the database
-      const userQuery: Statement<any> | Statement<[any]> | undefined = database?.prepare('SELECT session_hash FROM users WHERE email = ?');
-      const userResult: User = userQuery?.get(request.email) as User;
+        const userResult: User = userQuery?.get(request.email) as User;
 
-      if (userResult === undefined) { resolve(false); return; }
+        if (userResult === undefined) { resolve(false); return; }
+        if (userResult.session_hash !== hashedKey) { resolve(false); return; }
+        // Retrieve the session expiry from the database
+        const sessionResult: unknown = sessionQuery?.get(userResult.session_hash);
+        // Get the current timestamp
+        const timestamp = Math.round(Date.now() / 1000);
 
-      // Retrieve the session expiry from the database
-      const sessionQuery: Statement<any> | Statement<[any]> | undefined = database?.prepare('SELECT expiry FROM sessions WHERE hash = ?');
-      const sessionResult: unknown = sessionQuery?.get(userResult.session_hash);
-      // Get the current timestamp
-      const timestamp = Math.round(Date.now() / 1000);
+        // Can not authenticate user if the session is undefined or expired
+        if (sessionResult === undefined || (sessionResult as Session).expiry < timestamp) { resolve(false); return; }
 
-      // Can not authenticate user if the session is undefined or expired
-      if (sessionResult === undefined || (sessionResult as Session).expiry < timestamp) { resolve(false); return; }
-
-      // Update the session expiry in the database by 1 hour from now
-      executeQuery('UPDATE sessions SET expiry = ? WHERE token = ?', [(timestamp + EXPIRE_IN_SECONDS), request.session_key], true, true);
-      resolve(true);
+        // Update the session expiry in the database by 1 hour from now
+        executeQuery('UPDATE sessions SET expiry = ? WHERE token = ?', [(timestamp + EXPIRE_IN_SECONDS), request.session_key], true, true);
+        resolve(true);
+      }).catch((err) => {
+        reject(new Error((err as Error).message));
+      });
     } catch (err) {
       try {
         reject(new Error((err as Error).message));

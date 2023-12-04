@@ -5,7 +5,7 @@ import queueMiddleware from 'express-queue';
 
 const app: Express = express();
 
-app.use(queueMiddleware({ maxQueue: -1, activeLimit: 6 }));
+app.use(queueMiddleware({ maxQueue: -1, activeLimit: 1 }));
 app.use(morgan('dev')); // Add morgan HTTP request logger.
 
 interface CorsOptions {

@@ -2,7 +2,7 @@ import database from '../db/config';
 import type * as mqtt from 'mqtt';
 import { type WhoIsRequestMQTT, type WhoIsRequest } from '../types/types';
 import { validateRequestFormat } from '../helper/validator';
-import * as crypto from 'crypto';
+import { hashThis } from '../helper/hash';
 
 const TOPIC = 'WHOIS';
 const RESPONSE_TOPIC = 'WHOISRES';
@@ -13,25 +13,18 @@ const RESPONSE_TOPIC = 'WHOISRES';
  */
 export async function whois (request: WhoIsRequestMQTT): Promise<string> {
   return await new Promise<string>((resolve, reject) => {
-    try {
-      // Retrieve the session hash for the user from the database
-      const hash: string = crypto.createHash('sha256').update(request.session_key).digest('hex');
-
+    hashThis(request.session_key).then((hash) => {
       let result: WhoIsRequest;
       try {
         result = database?.prepare('SELECT email,type FROM users WHERE session_hash = ?').get(hash) as WhoIsRequest;
       } catch (err: Error | unknown) {
-        reject(new Error('One or more queries resulted in zero changes.')); return;
+        reject(new Error('One or more queries resulted in zero output.')); return;
       }
       const stringResult: string = result.email + '/' + result.type;
       resolve(stringResult);
-    } catch (err) {
-      try {
-        reject(new Error((err as Error).message));
-      } catch (err) {
-        reject(new Error('Fatal error.'));
-      }
-    }
+    }).catch((err) => {
+      reject(new Error((err as Error).message));
+    });
   });
 }
 /**
