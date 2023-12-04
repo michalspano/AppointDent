@@ -7,6 +7,7 @@ import { fadeIn, fadeOut, hamburger, notify, slideIn, slideOut, toggleHamburger,
 import location from '../../assets/location.png'
 import { Api } from '../../utils/api'
 import profile from '../../assets/profile.png'
+import ServicesUnavailableModal from './ServicesUnavailableModal'
 
 const logout = async (): Promise<void> => {
   const endpoints = ['/dentists/logout', '/patients/logout', '/admins/logout']
@@ -27,7 +28,13 @@ const userType = async (): Promise<string> => {
   return response.data.type
 }
 
+const servicesErr = async (): Promise<string[]> => {
+  const response = await Api.get('/heartbeat', { withCredentials: true })
+  return response.data
+}
+
 createEffect(async () => {
+  setErrServices(await servicesErr())
   const type = await userType()
   setType(type)
   switch (type) {
@@ -52,6 +59,8 @@ createEffect(async () => {
 const [routes, setRoutes] = createSignal<any[]>()
 const [logoLink, setLogoLink] = createSignal<string>('')
 const [type, setType] = createSignal<string>('')
+const [errServices, setErrServices] = createSignal<string[]>([])
+const [showList, setShowList] = createSignal<boolean>(false)
 
 export default function Navbar (): JSX.Element {
   return <>
@@ -87,6 +96,20 @@ export default function Navbar (): JSX.Element {
                     }</For>
                 </div>
                 </div>
+            </div>
+            <div class='servicesContainer flex flex-row rounded p-2 cursor-pointer' onClick={() => setShowList(true)}>
+              <div class='mr-1'>🚨 Some services are unavailable</div>
+               <strong class='seeMoreText'>
+                ...see more
+              </strong>
+              {showList() &&
+                <ServicesUnavailableModal
+                onCancel={() => {
+                  setShowList(false)
+                }}
+                services={errServices()}
+                />
+              }
             </div>
                 <div class="flex items-center sm:static sm:inset-auto ">
             <a href="/notifications">
