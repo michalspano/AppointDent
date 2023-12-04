@@ -62,3 +62,9 @@ export enum SessionResponse {
  * @see https://expressjs.com/en/api.html#res
  */
 export type AsyncResObj = Promise<Response<any, Record<string, any>>>;
+
+/**
+ * @description a time range: [from, to] in the from of two Unix
+ * timestamps, therefore type number and NOT Date.
+ */
+export interface UnixTimestampRange { from?: number, to?: number };

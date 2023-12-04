@@ -9,7 +9,7 @@ import database from '../db/config';
 import { client } from '../mqtt/mqtt';
 import * as utils from '../utils';
 import type { Request, Response } from 'express';
-import { SessionResponse, type AsyncResObj, UserType, type WhoisResponse, type Appointment } from '../types/types';
+import { SessionResponse, type AsyncResObj, UserType, type WhoisResponse, type Appointment, type UnixTimestampRange } from '../types/types';
 
 /**
  * @description A controller function to get all unbooked appointments.
@@ -181,8 +181,13 @@ const getAppointmentsByPatientId = async (req: Request, res: Response): AsyncRes
  * the dentist only. If a patient attempts to use this flag, it is ignored, and only
  * unbooked appointments are returned anyway.
  *
+ * Furthermore, there's the possibility to filter the appointments with a date range.
+ * Use the `from` and `to` query parameters to filter the appointments. If these are not
+ * given, all appointments are returned.
+ *
  * @see whoisByToken
  * @see WhoisResponse
+ * @see UnixTimestampRange
  * @see appointmentsByDentistId
  *
  * @param req the request object.
@@ -205,6 +210,8 @@ const getAppointmentsByDentistId = async (req: Request, res: Response): AsyncRes
   const dentistId: string | undefined = req.params.email;
   const email: string | undefined = req.query.userId as string;
   const sessionKey: string | undefined = req.cookies.sessionKey;
+  // Read the [from, to] interval from the query parameters.
+  const { from, to }: { from?: string, to?: string } = req.query;
 
   // 'undefined', 'null' are used for testing purposes.
   // This is because the tests for this endpoint use a query parameter.
@@ -261,18 +268,63 @@ const getAppointmentsByDentistId = async (req: Request, res: Response): AsyncRes
     }
   }
 
+  const interval: UnixTimestampRange = {};
+  // If both `from` and `to` not given, then a custom range is not used.
+  const hasRange: boolean = from !== undefined && to !== undefined;
+
+  if (hasRange) {
+    /**
+     * Note to developers: `parseInt` will strop all non-numeric characters.
+     * So, if the user passes a string like '123abc', it will be parsed as '123'.
+     * This is likely be altered in the future, but for now, this is the intended
+     * behavior.
+     */
+    const fromRaw: number = parseInt(from as string);
+    const toRaw: number = parseInt(to as string);
+
+    /**
+     * An interval is only valid iff: (i) both `from` and `to` are numbers,
+     * (ii) `from` is smaller than `to`. In case that holds, `interval` is
+     * populated accordingly.
+     */
+    if (isNaN(fromRaw) || isNaN(toRaw)) {
+      return res.status(400).json({ message: 'Bad request: to and from must be numbers.' });
+    } else if (fromRaw > toRaw) {
+      return res.status(400).json({ message: 'Bad request: from must be smaller than to.' });
+    } else {
+      interval.from = fromRaw;
+      interval.to = toRaw;
+    }
+  }
+
   let result: Appointment[];
   try {
-    result = database.prepare(`
+    /**
+     * The query is different based on the following:
+     * (i) whether to filter booked appointments or not,
+     * (ii) whether to filter by a date range or not.
+     * These two flags can be combined and both have default values
+     * (i.e., can be omitted).
+     */
+    const rawQuery: string = `
       SELECT * FROM appointments WHERE dentistId = ?
-      ${getOnlyAvailable ? 'AND patientId IS NULL' : ''}
-    `).all(dentistId) as Appointment[];
+      ${getOnlyAvailable ? ' AND patientId IS NULL' : ''}
+      ${hasRange ? ' AND start_timestamp >= ? AND end_timestamp <= ?' : ''}
+    `;
+
+    // In case the range is provided, then the query must be prepared with the range.
+    // Type `any` is used because the array does not mutate.
+    const options: any[] = !hasRange
+      ? [dentistId]
+      : [dentistId, interval.from, interval.to];
+    result = database.prepare(rawQuery).all(options) as Appointment[];
   } catch (err: Error | unknown) {
     return res.status(500).json({
       message: 'Internal server error: fail performing selection.'
     });
   }
 
+  // All went well, return the retrieved result.
   return res.status(200).json(result);
 };
 
