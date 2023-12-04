@@ -5,7 +5,7 @@ import { createStore } from 'solid-js/store'
 import { createEffect, createSignal, type JSX } from 'solid-js'
 import { type AxiosResponse } from 'axios'
 import { type DentistProfileProps } from '../MyProfileTypes'
-import { isValidDentist } from '../utils'
+import { validateUserInfo, validateAddress } from '../utils'
 import CustomInput from '../CustomInput'
 import { Api } from '../../../utils/api'
 import { countries } from '../../Signup/countries'
@@ -42,10 +42,16 @@ export default function DentistProfile (dentistProp: DentistProfileProps): JSX.E
   }
 
   const patchDentist = async function patchDentist (patchedDentist: Dentist): Promise<void> {
-    const validDentist = isValidDentist(dentist)
+    const validDentist = validateUserInfo(patchedDentist)
     if (validDentist !== undefined) {
       setError(new Error(validDentist))
-      setTimeout(() => setError(null), 2000)
+      setTimeout(() => setError(null), 3000)
+      return
+    }
+    const validAddress = await validateAddress(patchedDentist)
+    if (validAddress !== undefined) {
+      setError(new Error(validAddress))
+      setTimeout(() => setError(null), 3000)
       return
     }
     const url = `/dentists/${dentistProp.dentistProp.email}`
