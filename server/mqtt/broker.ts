@@ -3,11 +3,12 @@ import os from 'os';
 import Aedes from 'aedes';
 import { createServer } from 'net';
 import aedesPersistenceRedis from 'aedes-persistence-redis';
+import type { RedisConnectionOptions } from 'aedes-persistence-redis';
 import MQEmitterRedis from 'mqemitter-redis';
 
 const rawPort: string | undefined = process.env.LOCAL_BROKER_PORT;
 const port: number = rawPort === undefined ? 1883 : parseInt(rawPort);
-const redisConnection = {
+const redisConnection: RedisConnectionOptions = {
   port: 6379,
   host: '127.0.0.1'
 };
