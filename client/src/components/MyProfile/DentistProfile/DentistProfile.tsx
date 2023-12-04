@@ -8,13 +8,15 @@ import { type DentistProfileProps } from '../MyProfileTypes'
 import { validateUserInfo, validateAddress } from '../utils'
 import CustomInput from '../CustomInput'
 import { Api } from '../../../utils/api'
-import { countries } from '../../Signup/countries'
+import { countries } from '../../../utils/countries'
+import { type Country } from '../../../utils/countries'
 
 export default function DentistProfile (dentistProp: DentistProfileProps): JSX.Element {
   const [dentist, setDentist] = createStore<Dentist>(dentistProp.dentistProp)
   const [proImage, setProImage] = createSignal<string>(dentistProp.dentistProp.picture)
   const [getError, setError] = createSignal<Error | null>(null)
   const countryOptions = countries
+  const dentistCountryName: Country = countries.filter(country => country.code === dentistProp.dentistProp.clinicCountry)[0]
 
   createEffect(async () => {
     setDentist(dentistProp.dentistProp)
@@ -99,7 +101,7 @@ export default function DentistProfile (dentistProp: DentistProfileProps): JSX.E
               class="input h-12 w-full px-3 py-2 mb-3  mr-2  border rounded-xl"
               onChange={(event) => { setDentist('clinicCountry', event.target.value) }}
             >
-              <option value={dentistProp.dentistProp.clinicCountry} selected disabled hidden>Select your Country</option>
+              <option value={dentistProp.dentistProp.clinicCountry} selected disabled hidden>{dentistCountryName.name}</option>
               {
               countryOptions.map((country) => (
                 <option value={country.code}>{country.name}</option>
