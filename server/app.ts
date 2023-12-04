@@ -4,6 +4,8 @@ import { parseServices } from './scripts/parse_services';
 import { routeProxy } from './proxy/proxy';
 import app from './config/config';
 import spawnServices from './scripts/spawn_services';
+import { heartbeatWrapper } from './controllers/heartbeat.controller';
+import { Router } from 'express';
 
 config(); // init dotenv environment
 
@@ -11,6 +13,10 @@ const port: string = process.env.PORT ?? '3000';
 
 const TOPICS: string[] = ['HEARTBEAT'];
 const parsedServices: string[] = [];
+
+const router: Router = Router();
+router.get('/api/v1/heartbeat', heartbeatWrapper);
+app.use(router);
 
 /* Middleware */
 app.use('/api/v1', routeProxy);

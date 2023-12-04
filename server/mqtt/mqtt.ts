@@ -1,7 +1,7 @@
 import * as mqtt from 'mqtt';
 import { listenForHeartbeat } from './heartbeatListener';
 
-let client = undefined as mqtt.MqttClient | undefined;
+export let client = undefined as mqtt.MqttClient | undefined;
 
 export const mqttClient = {
   setup: async (services: string[], topics: string[]) => {
