@@ -8,12 +8,13 @@ import { type DentistProfileProps } from '../MyProfileTypes'
 import { isValidDentist } from '../utils'
 import CustomInput from '../CustomInput'
 import { Api } from '../../../utils/api'
+import { countries } from '../../Signup/countries'
 
 export default function DentistProfile (dentistProp: DentistProfileProps): JSX.Element {
   const [dentist, setDentist] = createStore<Dentist>(dentistProp.dentistProp)
   const [proImage, setProImage] = createSignal<string>(dentistProp.dentistProp.picture)
-
   const [getError, setError] = createSignal<Error | null>(null)
+  const countryOptions = countries
 
   createEffect(async () => {
     setDentist(dentistProp.dentistProp)
@@ -88,6 +89,17 @@ export default function DentistProfile (dentistProp: DentistProfileProps): JSX.E
           <label class="text-black block pl-2 text-xs font-extralight pb-1">
                 Address of the clinic
           </label>
+          <select
+              class="input h-12 w-full px-3 py-2 mb-3  mr-2  border rounded-xl"
+              onChange={(event) => { setDentist('clinicCountry', event.target.value) }}
+            >
+              <option value={dentistProp.dentistProp.clinicCountry} selected disabled hidden>Select your Country</option>
+              {
+              countryOptions.map((country) => (
+                <option value={country.code}>{country.name}</option>
+              ))
+            }
+          </select>
           <div class="flex flex-row">
             <CustomInput class='mr-2' value={dentistProp.dentistProp.clinicCity} inputType='text' onChange={(event) => { setDentist('clinicCity', event.target.value) }} disabled={false}/>
             <CustomInput value={dentistProp.dentistProp.clinicStreet} inputType='text' onChange={(event) => { setDentist('clinicStreet', event.target.value) }} disabled={false}/>
