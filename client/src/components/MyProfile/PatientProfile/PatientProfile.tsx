@@ -5,7 +5,7 @@ import { createStore } from 'solid-js/store'
 import { createEffect, createSignal, type JSX } from 'solid-js'
 import { type AxiosResponse } from 'axios'
 import { type PatientProfileProps } from '../MyProfileTypes'
-import { isValidPatient } from '../utils'
+import { validateUserInfo } from '../utils'
 import CustomInput from '../CustomInput'
 import { Api } from '../../../utils/api'
 
@@ -18,7 +18,7 @@ export default function PatientProfile (patientProp: PatientProfileProps): JSX.E
   })
 
   const patchPatient = async function patchPatient (patchedPatient: Patient): Promise<void> {
-    const validPatient = isValidPatient(patient)
+    const validPatient = validateUserInfo(patchedPatient)
     if (validPatient !== undefined) {
       setError(new Error(validPatient))
       setTimeout(() => setError(null), 2000)
