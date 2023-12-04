@@ -6,6 +6,9 @@ import { hashThis } from '../helper/hash';
 
 const TOPIC = 'WHOIS';
 const RESPONSE_TOPIC = 'WHOISRES';
+
+const whoisQuery = database?.prepare('SELECT email,type FROM users WHERE session_hash = ?');
+
 /**
  * Check who a session key belongs to
  * @param user The user object to be deleted.
@@ -16,7 +19,7 @@ export async function whois (request: WhoIsRequestMQTT): Promise<string> {
     hashThis(request.session_key).then((hash) => {
       let result: WhoIsRequest;
       try {
-        result = database?.prepare('SELECT email,type FROM users WHERE session_hash = ?').get(hash) as WhoIsRequest;
+        result = whoisQuery?.get(hash) as WhoIsRequest;
       } catch (err: Error | unknown) {
         reject(new Error('One or more queries resulted in zero output.')); return;
       }

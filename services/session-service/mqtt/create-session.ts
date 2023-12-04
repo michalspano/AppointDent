@@ -27,6 +27,8 @@ async function parseRawRequest (rawMsg: string): Promise<CreateSessionRequest> {
   };
   return request;
 }
+const sessionQuery: Statement<any> | Statement<[any]> | undefined = database?.prepare('SELECT * FROM sessions WHERE token = ?');
+const user: Statement<any> | Statement<[any]> | undefined = database?.prepare('SELECT * FROM users WHERE email = ?');
 
 /**
  * Used to create a new session key with an expiry of 1 hour.
@@ -37,7 +39,6 @@ async function createNewSession (request: CreateSessionRequest): Promise<string>
   return await new Promise<string>((resolve, reject) => {
     try {
       // Retrieve user information from the database
-      const user: Statement<any> | Statement<[any]> | undefined = database?.prepare('SELECT * FROM users WHERE email = ?');
       const userResult: User = user?.get(request.email) as User;
       if (userResult === undefined) reject(new Error('User undefined.'));
 
@@ -50,7 +51,6 @@ async function createNewSession (request: CreateSessionRequest): Promise<string>
         let keyUnique: boolean = false;
         // Ensure the key is unique
         while (!keyUnique) {
-          const sessionQuery: Statement<any> | Statement<[any]> | undefined = database?.prepare('SELECT * FROM sessions WHERE token = ?');
           const session = sessionQuery?.get(key);
           if (session === undefined) keyUnique = true;
           key = crypto.randomUUID();
