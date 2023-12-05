@@ -20,8 +20,13 @@ import { SessionResponse, type AsyncResObj, UserType, type WhoisResponse, type A
  * when the user has a valid session. The session is verified by the session
  * service.
  *
+ * Furthermore, there's the possibility to filter the appointments with a date range.
+ * Use the `from` and `to` query parameters to filter the appointments. If these are not
+ * given, all appointments are returned.
+ *
  * @see verifySession
  * @see SessionResponse
+ * @see UnixTimestampRange
  * @see allAppointments
  *
  * @returns Promise that resolves to a response object.
@@ -41,6 +46,8 @@ const getAllAppointments = async (req: Request, res: Response): AsyncResObj => {
 
   const email: string | undefined = req.query.userId as string;
   const sessionKey: string | undefined = req.cookies.sessionKey;
+  // Read the [from, to] interval from the query parameters.
+  const { from, to }: { from?: string, to?: string } = req.query;
 
   if (sessionKey === undefined || utils.isForbiddenId(email)) {
     return res.status(400).json({ message: 'Bad request: missing session key or email.' });
@@ -69,12 +76,49 @@ const getAllAppointments = async (req: Request, res: Response): AsyncResObj => {
     });
   }
 
+  const interval: UnixTimestampRange = {};
+  // If both `from` and `to` not given, then a custom range is not used.
+  const hasRange: boolean = from !== undefined && to !== undefined;
+
+  if (hasRange) {
+    /**
+     * Note to developers: `parseInt` will strop all non-numeric characters.
+     * So, if the user passes a string like '123abc', it will be parsed as '123'.
+     * This is likely be altered in the future, but for now, this is the intended
+     * behavior.
+     */
+    const fromRaw: number = parseInt(from as string);
+    const toRaw: number = parseInt(to as string);
+
+    /**
+     * An interval is only valid iff: (i) both `from` and `to` are numbers,
+     * (ii) `from` is smaller than `to`. In case that holds, `interval` is
+     * populated accordingly.
+     */
+    if (isNaN(fromRaw) || isNaN(toRaw)) {
+      return res.status(400).json({ message: 'Bad request: to and from must be numbers.' });
+    } else if (fromRaw > toRaw) {
+      return res.status(400).json({ message: 'Bad request: from must be smaller than to.' });
+    } else {
+      interval.from = fromRaw;
+      interval.to = toRaw;
+    }
+  }
+
   // Session has been validated, proceed with the request.
   let result: Appointment[];
   try {
-    result = database.prepare(`
+    const rawQuery: string = `
       SELECT * FROM appointments WHERE patientId IS NULL
-    `).all() as Appointment[];
+      ${hasRange ? ' AND start_timestamp >= ? AND end_timestamp <= ?' : ''}
+    `;
+
+    // In case the range is provided, then the query must be prepared with the range.
+    // Type `any` is used because the array does not mutate.
+    const options: Array<number | undefined> = !hasRange
+      ? []
+      : [interval.from, interval.to];
+    result = database.prepare(rawQuery).all(options) as Appointment[];
   } catch (err: Error | unknown) {
     return res.status(500).json({
       message: 'Internal server error: fail performing selection.'
@@ -113,9 +157,7 @@ const getAppointmentsByPatientId = async (req: Request, res: Response): AsyncRes
   const email: string | undefined = req.params.email;
   const sessionKey: string | undefined = req.cookies.sessionKey;
 
-  // 'undefined', 'null' are used for testing purposes.
-  // This is because the tests for this endpoint use a query parameter.
-  if (sessionKey === undefined || email === undefined || ['undefined', 'null', ''].includes(email.trim())) {
+  if (sessionKey === undefined || utils.isForbiddenId(email)) {
     return res.status(400).json({ message: 'Bad request: missing session key or email.' });
   }
 
@@ -217,7 +259,7 @@ const getAppointmentsByDentistId = async (req: Request, res: Response): AsyncRes
   // This is because the tests for this endpoint use a query parameter.
   if (sessionKey === undefined || utils.isForbiddenId(email)) {
     return res.status(400).json({ message: 'Bad request: missing session key or email.' });
-  } else if (dentistId === undefined || ['undefined', 'null', ''].includes(dentistId.trim())) {
+  } else if (dentistId === undefined || utils.isForbiddenId(dentistId)) {
     return res.status(400).json({ message: 'Bad request: missing dentist id.' });
   }
 
