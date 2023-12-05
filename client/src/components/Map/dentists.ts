@@ -1,8 +1,9 @@
 import axios from 'axios'
-import * as leaflet from 'leaflet'
-import { type Place, type Dentist } from '../../utils/types'
-import { Api } from '../../utils/api'
 import 'leaflet.markercluster'
+import * as leaflet from 'leaflet'
+import { Api } from '../../utils/api'
+import { getUser, parseDateStringToInt } from '../../utils'
+import { type Place, type Dentist, type FilterInterval, type AppointmentResponse } from '../../utils/types'
 
 /**
  * Used to convert addresses into long and lat for the map.
@@ -82,24 +83,55 @@ async function addNewDentist (dentist: Dentist, markerCluster: leaflet.MarkerClu
 }
 
 /**
- * This function calls the dentist API and plots them on a map
+ * This function calls the dentist API and plots them on a map.
+ * Furthermore, it can filter the dentists by a time range of their appointments.
+ *
  * @param map leaflet map
+ * @param timeRange time range to filter the dentists by
+ * @default undefined if no time range is specified
  */
-export async function addDentistsToMap (map: leaflet.Map): Promise<void> {
-  // We create this big cluster which will act as a middleware for which markers to show
-  const cluster = leaflet.markerClusterGroup({
-    maxClusterRadius: 80 // Max amount of pixels for a cluster
-  })
+export async function addDentistsToCluster (cluster: leaflet.MarkerClusterGroup, timeRange: FilterInterval | undefined = undefined): Promise<void> {
+  // Get all dentists from the API
+  let dentists: Dentist[]
+  try {
+    dentists = (await Api.get('dentists')).data as Dentist[]
+  } catch (error: any) {
+    alert('Problem with getting dentists...')
+    console.error(error)
+    return
+  }
 
-  Api.get('dentists').then((result) => {
-    const dentists: Dentist[] = result.data
-    for (let i = 0; i < dentists.length; i++) {
-      // Add each dentist to the cluster
-      void addNewDentist(dentists[i], cluster)
-    }
-    map.addLayer(cluster) // Add the cluster as a layer
-  }).catch((err) => {
-    alert(err)
-    console.error(err)
+  // No time range is given, proceed to add all dentists
+  if (timeRange === undefined) {
+    for (const dentist of dentists) void addNewDentist(dentist, cluster)
+    return
+  }
+
+  // If the time range is specified, proceed to apply the filter
+  let appointments: AppointmentResponse[]
+  try {
+    // Parse the values required for the API call.
+    const userId: string = (await getUser())?.email as string
+    const from: number = parseDateStringToInt(timeRange.start)
+    const to: number = parseDateStringToInt(timeRange.end)
+
+    const query: string = `appointments/?userId=${userId}&from=${from}&to=${to}`
+    appointments = (await Api.get(query, { withCredentials: true }
+    )).data as AppointmentResponse[]
+  } catch (error: any) {
+    alert('Problem with filtering appointments...')
+    console.error(error)
+    return
+  }
+
+  // Retain dentists that have an appointment in within the specified
+  // time range.
+  appointments.forEach((appointment: AppointmentResponse) => {
+    void addNewDentist(
+      dentists.find((dentist: Dentist) =>
+        dentist.email === appointment.dentistId
+      ) as Dentist,
+      cluster
+    )
   })
 }
