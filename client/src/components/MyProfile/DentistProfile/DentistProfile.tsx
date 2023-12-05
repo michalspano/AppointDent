@@ -15,7 +15,7 @@ export default function DentistProfile (dentistProp: DentistProfileProps): JSX.E
   const [dentist, setDentist] = createStore<Dentist>(dentistProp.dentistProp)
   const [proImage, setProImage] = createSignal<string>(dentistProp.dentistProp.picture)
   const [getError, setError] = createSignal<Error | null>(null)
-  
+
   const possibleDentCountry: Country | undefined = countries.find((country) => country.code === dentist.clinicCountry)
   const dentCountryName = possibleDentCountry !== undefined ? possibleDentCountry.name : 'Select your country'
 
@@ -101,7 +101,6 @@ export default function DentistProfile (dentistProp: DentistProfileProps): JSX.E
           <select
               class="input h-12 w-full px-3 py-2 mb-3  mr-2  border rounded-xl"
               onChange={(event) => { setDentist('clinicCountry', event.target.value) }}
-              
           >
                 <option selected disabled hidden value={dentistProp.dentistProp.clinicCountry}>{dentCountryName}</option>
               {

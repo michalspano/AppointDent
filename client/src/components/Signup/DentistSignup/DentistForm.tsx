@@ -54,10 +54,11 @@ export default function DentistForm (): JSX.Element {
       // enable automatic login when user registers
         await login()
       }).catch((error: any) => {
-        const resError: string | AxiosError = (error as AxiosError) || 'Something went wrong, Please try again.'
+        const resError: string | AxiosError = error instanceof AxiosError ? error : 'Something went wrong, Please try again.'
         if (resError instanceof AxiosError) {
-          if (resError.response !== undefined)
-          setError(resError.response.data as string)
+          if (resError.response !== undefined) {
+            setError(resError.response.data as string)
+          }
         } else {
           setError(resError)
         }
