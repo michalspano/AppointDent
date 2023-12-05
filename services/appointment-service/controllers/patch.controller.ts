@@ -145,6 +145,14 @@ const bookAppointment = async (req: Request, res: Response): AsyncResObj => {
     });
   }
 
+  // As the appointment has been booked or canceled right now, we also want to
+  // send a notification to the patient that just booked  or canceled it.
+  // we also neeed to let the dentist know that their appointment was booked or canceled.
+  const patientMessage = toBook ? 'Your booking was confirmed.' : 'Your booking was canceled.';
+  const dentistMessage = toBook ? `${email} made a booking with you on ${new Date(appointment.start_timestamp).toISOString().split('T').toString()}` : `${email} canceled their booking with you on ${new Date(appointment.start_timestamp).toISOString().split('T').toString()}`;
+  utils.pubNotification(email, patientMessage, client);
+  utils.pubNotification(appointment.dentistId, dentistMessage, client);
+
   // All went well, return the patched object.
   return res.status(200).json(appointment);
 };
