@@ -185,3 +185,16 @@ export const pubNotification = (email: string, message: string, client: MqttClie
   const payload = `${email}/${message}/*`;
   client.publish('NOTREQ', payload);
 };
+
+export const formatDateTime = (timestamp: number): string => {
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  };
+  const formatedTimestamp = new Date(timestamp * 1000).toISOString().slice(0, 16);
+  return new Date(formatedTimestamp).toLocaleDateString('sv-SE', options);
+};
