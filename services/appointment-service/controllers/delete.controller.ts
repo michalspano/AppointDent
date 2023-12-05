@@ -112,10 +112,10 @@ export const deleteAppointment = async (req: Request, res: Response): AsyncResOb
   // send a notification to the patient (if not null) that had booked the appointment.
   // finlly we sent a confirmation notification to the dentist who deleted it
   if (objToDelete.patientId !== null) {
-    const patientMessage = 'Your appointment was canceled with your dentist. Please book another appointment.';
+    const patientMessage = `Your appointment on ${utils.formatDateTime(objToDelete.end_timestamp)} was canceled with your dentist. Please book another appointment.`;
     utils.pubNotification(objToDelete.patientId, patientMessage, client);
   }
-  const dentistMessage = 'Your appointment was successfully deleted.';
+  const dentistMessage = `Your appointment on ${utils.formatDateTime(objToDelete.end_timestamp)} was successfully deleted.`;
   utils.pubNotification(objToDelete.dentistId, dentistMessage, client);
 
   return res.status(200).json(objToDelete);
