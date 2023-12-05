@@ -65,15 +65,3 @@ a {
 .hamburger svg {
   stroke:white;
 }
-
-.servicesContainer {
-  background-color: rgb(217, 152, 152);
-  /* position: absolute;
-  left: 30%;
-  right: 30%;
-  width: 370px; */
-}
-
-.seeMoreText {
-  color: rgb(95, 10, 10);
-}
