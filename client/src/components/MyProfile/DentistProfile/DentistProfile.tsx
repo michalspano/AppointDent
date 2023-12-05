@@ -15,8 +15,9 @@ export default function DentistProfile (dentistProp: DentistProfileProps): JSX.E
   const [dentist, setDentist] = createStore<Dentist>(dentistProp.dentistProp)
   const [proImage, setProImage] = createSignal<string>(dentistProp.dentistProp.picture)
   const [getError, setError] = createSignal<Error | null>(null)
-  const countryOptions = countries
-  const dentistCountryName: Country = countries.filter(country => country.code === dentistProp.dentistProp.clinicCountry)[0]
+  
+  const possibleDentCountry: Country | undefined = countries.find((country) => country.code === dentist.clinicCountry)
+  const dentCountryName = possibleDentCountry !== undefined ? possibleDentCountry.name : 'Select your country'
 
   createEffect(async () => {
     setDentist(dentistProp.dentistProp)
@@ -100,10 +101,11 @@ export default function DentistProfile (dentistProp: DentistProfileProps): JSX.E
           <select
               class="input h-12 w-full px-3 py-2 mb-3  mr-2  border rounded-xl"
               onChange={(event) => { setDentist('clinicCountry', event.target.value) }}
-            >
-              <option value={dentistProp.dentistProp.clinicCountry} selected disabled hidden>{dentistCountryName.name}</option>
+              
+          >
+                <option selected disabled hidden value={dentistProp.dentistProp.clinicCountry}>{dentCountryName}</option>
               {
-              countryOptions.map((country) => (
+              countries.map((country) => (
                 <option value={country.code}>{country.name}</option>
               ))
             }
