@@ -6,6 +6,7 @@ import { Api } from '../../../utils/api'
 import type { Registration } from '../../../utils/types'
 import { validateAddress, validateUserInfo } from '../utils'
 import { countries } from '../../../utils/countries'
+import { AxiosError } from 'axios'
 
 export default function DentistForm (): JSX.Element {
   const [email, setEmail] = createSignal('')
@@ -53,7 +54,13 @@ export default function DentistForm (): JSX.Element {
       // enable automatic login when user registers
         await login()
       }).catch((error: any) => {
-        setError('Something went wrong, try again.')
+        const resError: string | AxiosError = (error as AxiosError) || 'Something went wrong, Please try again.'
+        if (resError instanceof AxiosError) {
+          if (resError.response !== undefined)
+          setError(resError.response.data as string)
+        } else {
+          setError(resError)
+        }
         console.error('Error during sign up', error)
       })
   }

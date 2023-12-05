@@ -4,6 +4,7 @@ import { A } from '@solidjs/router'
 import { createSignal } from 'solid-js'
 import { Api } from '../../../utils/api'
 import { validateUserInfo } from '../utils'
+import { AxiosError } from 'axios'
 
 export default function PatientForm (): JSX.Element {
   const oneTimeStampDay: number = 24 * 60 * 60 * 1000
@@ -39,11 +40,15 @@ export default function PatientForm (): JSX.Element {
         await login()
       })
       .catch((error: any) => {
-        setError('Something went wrong, try again.')
-        console.log('Server response:', error.response)
+        const resError: string | AxiosError = (error as AxiosError) || 'Something went wrong, Please try again.'
+        if (resError instanceof AxiosError) {
+          if (resError.response !== undefined)
+          setError(resError.response.data as string)
+        } else {
+          setError(resError)
+        }
+        console.error('Error during sign up', error)
       })
-
-    setError(null)
   }
 
   const login = async (): Promise<void> => {
