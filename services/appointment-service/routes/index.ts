@@ -20,6 +20,7 @@ router.delete('/:id', deleteAppointment);
 router.patch('/:id', editAppointment);
 
 // Relational endpoints.
+router.get('/admins/count', GET.appointmentCount);
 router.get('/patients/:email', GET.appointmentsByPatientId);
 router.get('/dentists/:email', GET.appointmentsByDentistId);
 
