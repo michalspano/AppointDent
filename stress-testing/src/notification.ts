@@ -4,8 +4,8 @@ import { check } from 'k6';
 const host = 'http://localhost:3000/api/v1/dentists';
 export const options = {
   stages: [
-    { duration: '10s', target: 1500 },
-    { duration: '2m', target: 3000 }
+    { duration: '30s', target: 3000 },
+    { duration: '1m', target: 5000 }
   ]
 };
 
@@ -78,51 +78,13 @@ function loginDentist (dentist: User): User {
   return dentist;
 }
 
-// Simulate getting all dentists
-function getAllDentists (): void {
-  const headers = {
-    'Content-Type': 'application/json'
-  };
-
-  // Make a POST request to your login endpoint
-  const res = http.get(host + '/', { headers });
-
-  // Check for expected status codes
-  check(res, {
-    'Status is 200': (r) => r.status === 200,
-    'Status is not 401': (r) => r.status !== 401
-  });
-}
-
-function getDentist (dentist: User): void {
-  const headers = {
-    'Content-Type': 'application/json'
-  };
-
-  const res = http.get(host + `${dentist.email}`, { headers, tags: { name: 'GetDentist' } });
-
-  // Check for expected status codes
-  check(res, {
-    'Status is 200': (r) => r.status === 200,
-    'Status is not 401': (r) => r.status !== 401
-  });
-}
-
-// Simulate dentist patching
-function patchDentist (dentist: User): void {
-  const payload = {
-    lastName: 'Dentist'
-  };
-
-  const loginEmail = dentist.email;
-  const cookies = dentist.cookies;
-
+function getNotifications (dentist: User): void {
   const headers = {
     'Content-Type': 'application/json',
-    Cookie: cookies
+    Cookies: dentist.cookies
   };
 
-  const res = http.patch(host + `${loginEmail}`, JSON.stringify(payload), { headers, tags: { name: 'UpdateDentist' } });
+  const res = http.get(`http://localhost:3000/api/v1/notifications/${dentist.email}`, { headers, tags: { name: 'GetDentistNotifications' } });
 
   // Check for expected status codes
   check(res, {
@@ -131,39 +93,11 @@ function patchDentist (dentist: User): void {
   });
 }
 
-// Simulate dentist logging out
-function logoutDentist (dentist: User): void {
-  const cookies = dentist.cookies;
-
-  const headers = {
-    'Content-Type': 'application/json',
-    Cookie: cookies
-  };
-
-  const res = http.del(host + '/logout', null, { headers, tags: { name: 'LogoutDentist' } });
-
-  // Check for expected status codes
-  check(res, {
-    'Status is 200': (r) => r.status === 200,
-    'Status is not 401': (r) => r.status !== 401
-  });
-}
 export default function (): void {
   // Simulate dentist registration
   let dentist: User = registerDentist();
 
   // Simulate dentist login
   dentist = loginDentist(dentist);
-
-  // Simulate getting all dentists
-  getAllDentists();
-
-  // Simulate getting a dentist
-  getDentist(dentist);
-
-  // Simulae patching a dentist
-  patchDentist(dentist);
-
-  // Simulate logging out a dentist
-  logoutDentist(dentist);
+  getNotifications(dentist);
 }

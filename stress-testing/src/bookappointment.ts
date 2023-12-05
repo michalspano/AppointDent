@@ -215,7 +215,7 @@ function unbookAppointment (patient: User, appointmentId: string): void {
   };
 
   // Make a POST request to your login endpoint
-  const res = http.patch(`http://localhost:3000/api/v1/appointments/${appointmentId}?patientId=${patientEmail}&toBook=false`, null, { headers, tags: { name: 'BookAppointment' } });
+  const res = http.patch(`http://localhost:3000/api/v1/appointments/${appointmentId}?patientId=${patientEmail}&toBook=false`, null, { headers, tags: { name: 'UnbookAppointment' } });
 
   // Check for expected status codes
   check(res, {
