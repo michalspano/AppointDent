@@ -8,6 +8,7 @@
 import { client } from '../mqtt/mqtt';
 import { randomBytes } from 'crypto';
 import { SessionResponse, type WhoisResponse, type UserType } from '../types/types';
+import { MqttClient } from 'mqtt/*';
 
 /**
  * @description the default timeout for the MQTT client to wait for a response.
@@ -179,3 +180,8 @@ export const isForbiddenId = (id: string): boolean => {
   if (id === undefined) return true;
   return Object.values(ForbiddenIds).includes(id.toUpperCase().trim()) || id === '';
 };
+
+export const pubNotification = (email: string, message: string, client: MqttClient): void => {
+  const payload = `${email}/${message}/*`;
+  client.publish('NOTREQ', payload);
+}
