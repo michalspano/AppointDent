@@ -21,7 +21,7 @@ function generateUniqueEmail (): string {
   return `test${timestamp}_${randomString}@example.com`;
 }
 
-// Function to simulate user registration
+// Simulate dentist registration
 function registerDentist (): User {
   const payload = {
     email: generateUniqueEmail(),
@@ -40,7 +40,6 @@ function registerDentist (): User {
     'Content-Type': 'application/json'
   };
 
-  // Make a POST request to your registration endpoint
   const res = http.post(host + '/register', JSON.stringify(payload), { headers, tags: { name: 'RegisterDentist' } });
 
   // Check for expected status codes
@@ -50,14 +49,14 @@ function registerDentist (): User {
   });
 
   // Add the registered email to the array
-  const user: User = { email: payload.email, cookies: undefined };
+  const dentist: User = { email: payload.email, cookies: undefined };
 
-  return user;
+  return dentist;
 }
 
-// Function to simulate user login
-function loginDentist (user: User): User {
-  const loginEmail = user.email;
+// Simulate dentist login
+function loginDentist (dentist: User): User {
+  const loginEmail = dentist.email;
   const payload = {
     email: loginEmail,
     password: 'Password123!'
@@ -67,7 +66,6 @@ function loginDentist (user: User): User {
     'Content-Type': 'application/json'
   };
 
-  // Make a POST request to your login endpoint
   const res = http.post(host + '/login', JSON.stringify(payload), { headers, tags: { name: 'LoginDentist' } });
 
   // Check for expected status codes
@@ -76,11 +74,11 @@ function loginDentist (user: User): User {
     'Status is not 401': (r) => r.status !== 401
   });
 
-  user.cookies = res.cookies;
-  return user;
+  dentist.cookies = res.cookies;
+  return dentist;
 }
 
-// Function to simulate getting all dentists
+// Simulate getting all dentists
 function getAllDentists (): void {
   const headers = {
     'Content-Type': 'application/json'
@@ -96,13 +94,12 @@ function getAllDentists (): void {
   });
 }
 
-function getDentist (user: User): void {
+function getDentist (dentist: User): void {
   const headers = {
     'Content-Type': 'application/json'
   };
 
-  // Make a POST request to your login endpoint
-  const res = http.get(`http://localhost:3005/${user.email}`, { headers, tags: { name: 'GetDentist' } });
+  const res = http.get(`http://localhost:3005/${dentist.email}`, { headers, tags: { name: 'GetDentist' } });
 
   // Check for expected status codes
   check(res, {
@@ -111,21 +108,20 @@ function getDentist (user: User): void {
   });
 }
 
-// Function to simulate dentist patching
-function patchDentist (user: User): void {
+// Simulate dentist patching
+function patchDentist (dentist: User): void {
   const payload = {
     lastName: 'Dentist'
   };
 
-  const loginEmail = user.email;
-  const cookies = user.cookies;
+  const loginEmail = dentist.email;
+  const cookies = dentist.cookies;
 
   const headers = {
     'Content-Type': 'application/json',
     Cookie: cookies
   };
 
-  // Make a PATCH request to modify the dentist information
   const res = http.patch(`http://localhost:3005/${loginEmail}`, JSON.stringify(payload), { headers, tags: { name: 'UpdateDentist' } });
 
   // Check for expected status codes
@@ -135,16 +131,15 @@ function patchDentist (user: User): void {
   });
 }
 
-// Function to simulate dentist logging out
-function logoutDentist (user: User): void {
-  const cookies = user.cookies;
+// Simulate dentist logging out
+function logoutDentist (dentist: User): void {
+  const cookies = dentist.cookies;
 
   const headers = {
     'Content-Type': 'application/json',
     Cookie: cookies
   };
 
-  // Make a DELETE request to remove the dentist's cookie
   const res = http.del(host + '/logout', null, { headers, tags: { name: 'LogoutDentist' } });
 
   // Check for expected status codes
@@ -155,21 +150,20 @@ function logoutDentist (user: User): void {
 }
 export default function (): void {
   // Simulate dentist registration
-  let user: User = registerDentist();
+  let dentist: User = registerDentist();
 
   // Simulate dentist login
-  user = loginDentist(user);
+  dentist = loginDentist(dentist);
 
   // Simulate getting all dentists
   getAllDentists();
 
   // Simulate getting a dentist
-  getDentist(user);
+  getDentist(dentist);
 
   // Simulae patching a dentist
-  patchDentist(user);
+  patchDentist(dentist);
 
   // Simulate logging out a dentist
-  logoutDentist(user);
-  // Calculate how long the actions took to execute
+  logoutDentist(dentist);
 }

@@ -8,7 +8,7 @@ export const options = {
 
   ]
 };
-
+const host = 'http://localhost:3000/api/v1/dentists';
 interface User {
   email: string
   cookies: any
@@ -21,7 +21,7 @@ function generateUniqueEmail (): string {
   return `test${timestamp}_${randomString}@example.com`;
 }
 
-// Function to simulate user registration
+// Simulate dentist registration
 function registerDentist (): User {
   const payload = {
     email: generateUniqueEmail(),
@@ -40,8 +40,7 @@ function registerDentist (): User {
     'Content-Type': 'application/json'
   };
 
-  // Make a POST request to your registration endpoint
-  const res = http.post('http://localhost:3000/api/v1/dentists/register', JSON.stringify(payload), { headers });
+  const res = http.post(host + '/register', JSON.stringify(payload), { headers, tags: { name: 'RegisterDentist' } });
 
   // Check for expected status codes
   check(res, {
@@ -49,14 +48,15 @@ function registerDentist (): User {
     'Status is not 401': (r) => r.status !== 401
   });
 
-  const user: User = { email: payload.email, cookies: undefined };
+  // Add the registered email to the array
+  const dentist: User = { email: payload.email, cookies: undefined };
 
-  return user;
+  return dentist;
 }
 
-// Function to simulate user login
-function loginDentist (user: User): User {
-  const loginEmail = user.email;
+// Simulate dentist login
+function loginDentist (dentist: User): User {
+  const loginEmail = dentist.email;
   const payload = {
     email: loginEmail,
     password: 'Password123!'
@@ -66,8 +66,7 @@ function loginDentist (user: User): User {
     'Content-Type': 'application/json'
   };
 
-  // Make a POST request to your login endpoint
-  const res = http.post('http://localhost:3000/api/v1/dentists/login', JSON.stringify(payload), { headers });
+  const res = http.post(host + '/login', JSON.stringify(payload), { headers, tags: { name: 'LoginDentist' } });
 
   // Check for expected status codes
   check(res, {
@@ -75,11 +74,11 @@ function loginDentist (user: User): User {
     'Status is not 401': (r) => r.status !== 401
   });
 
-  user.cookies = res.cookies;
-  return user;
+  dentist.cookies = res.cookies;
+  return dentist;
 }
 
-// Function to simulate who is logged in
+// Simulate who is logged in
 function whois (user: User): void {
   const cookies = user.cookies;
 
@@ -88,7 +87,6 @@ function whois (user: User): void {
     Cookie: cookies
   };
 
-  // Make a POST request to your login endpoint
   const res = http.get('http://localhost:3000/api/v1/sessions/whois', { headers });
 
   // Check for expected status codes

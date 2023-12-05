@@ -7,7 +7,9 @@
     "build": "npm run lint && webpack",
     "dentist": "npm run build && k6 run dist/dentist.js",
     "patient": "npm run build && k6 run dist/patient.js",
-    "session": "npm run build && k6 run dist/session.js"
+    "session": "npm run build && k6 run dist/session.js",
+    "create-appointment" : "npm run build && k6 run dist/createappointment.js",
+    "book-appointment" : "npm run build && k6 run dist/bookappointment.js"
   },
   "keywords": [],
   "author": "",
