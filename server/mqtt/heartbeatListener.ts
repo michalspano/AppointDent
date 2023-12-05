@@ -2,15 +2,26 @@ import type * as mqtt from 'mqtt';
 
 const heartbeatMonitor: Record<string, number> = {};
 
-async function panicMonitor (inspectInterval: number, panicThreshold: number): Promise<void> {
-  setInterval(() => {
-    for (const key in heartbeatMonitor) {
-      const diff: number = Math.round(Date.now() / 1000) - heartbeatMonitor[key];
-      if (diff > panicThreshold) {
-        console.error(`${key} flatlined.`);
+export async function panicMonitor (inspectInterval: number, panicThreshold: number): Promise<string[]> {
+  return await new Promise((resolve) => {
+    const killedServices: string[] = [];
+    setInterval(() => {
+      for (const key in heartbeatMonitor) {
+        const diff: number = Math.round(Date.now() / 1000) - heartbeatMonitor[key];
+        if (diff > panicThreshold) {
+          killedServices.push(key);
+          console.log(`${key} flatlined.`);
+          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+          delete heartbeatMonitor[key];
+        }
       }
-    }
-  }, inspectInterval);
+      if (killedServices.length > 0) {
+        console.log('killed', killedServices);
+        resolve(killedServices);
+      }
+    }, inspectInterval);
+    resolve(killedServices);
+  });
 }
 
 export async function listenForHeartbeat (services: string[], client: mqtt.MqttClient, panicThreshold: number): Promise<void> {
