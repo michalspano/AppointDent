@@ -36,12 +36,30 @@ export interface Dentist {
   picture: string
 }
 
+/**
+ * @description the interface for the appointment object used in the fullcalendar
+ * component on the client's side.
+ */
 export interface Appointment {
   id: string
   title: string // The patient name (to work with fullcalendar, it has to be named title)
   start: string // The start time (to work with fullcalendar, it has to be named start)
   end: string// The end time (to work with fullcalendar, it has to be named end)
 }
+
+/**
+ * @description the interface for the appointment object retrieved from the database.
+ * The id is a UUID (Universally Unique Identifier) and is
+ * generated using the crypto module from node.js (here, the type is string; there's no
+ * crypto in the browser).
+ */
+export interface AppointmentResponse {
+  id: string
+  start_timestamp: number
+  end_timestamp: number
+  dentistId: string
+  patientId?: string
+};
 
 export interface Notification {
   message: string
@@ -61,6 +79,15 @@ export interface Registration {
   clinicHouseNumber: string
   clinicZipCode: string
   picture: string
+}
+
+/**
+ * @description the filter object is used to filter the appointments
+ * based on a particular time interval, namely [start, end].
+ */
+export interface FilterInterval {
+  start: string
+  end: string
 }
 
 export enum UserType {
