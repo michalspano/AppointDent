@@ -54,49 +54,52 @@ export default function Map (): JSX.Element {
     void addDentistsToCluster(cluster())
   })
   return <>
-      <form
-        id='eventForm'
-        class='z-10 flex flex-col justify-between items-center absolute top-20 right-5 p-4 bg-primary shadow-xl rounded'
-        onSubmit={(event) => {
-          event.preventDefault()
-          handleFilterSubmit().catch(() => { console.error('Error selecting time interval.') })
-        }}
+    <form
+      id='eventForm'
+      class='z-10 flex flex-col justify-between items-center absolute top-20 right-5 p-4 bg-primary shadow-xl rounded'
+      onSubmit={(event) => {
+        event.preventDefault()
+        handleFilterSubmit().catch(() => { console.error('Error selecting time interval.') })
+      }}
+    >
+      <div
+        class='cursor-pointer text-white'
+        // The 'X' is displayed at the top right corner of the filter form
+        classList={{ 'absolute top-0 right-0 m-2 ': toShowFilter() }}
+        onClick={() => setToShowFilter(!toShowFilter())}
       >
-        <div
-          class='absolute top-0 right-0 m-2 cursor-pointer text-white'
-          onClick={() => setToShowFilter(!toShowFilter())}
-      > {toShowFilter() ? 'X' : '●'} {/* TODO: fix this properly */}
-
-        </div>
-        {toShowFilter() && (
-          <div>
+        {toShowFilter() ? 'X' : 'Filter'}
+      </div>
+      {toShowFilter() && (
+        // Grouped in a div to enable conditional rendering of the whole region
+        <div>
           <div class='flex flex-col'>
-          <label>Start:</label>
-          <input
-            required
-            type='datetime-local'
-            value={filterInterval().start}
-            min={0} /* we don't know ahead how old appointments can be, hence only positive integers */
-            onChange={(event) => setFilterInterval({ ...filterInterval(), start: event.target.value })}
+            <label>Start:</label>
+            <input
+              required
+              type='datetime-local'
+              value={filterInterval().start}
+              min={0} /* we don't know ahead how old appointments can be, hence only positive integers */
+              onChange={(event) => setFilterInterval({ ...filterInterval(), start: event.target.value })}
             />
-        </div>
-        <div class='flex flex-col'>
-          <label>End:</label>
-          <input
-            required
-            type='datetime-local'
-            value={filterInterval().end}
-            min={filterInterval().start}
-            onChange={(event) => setFilterInterval({ ...filterInterval(), end: event.target.value })}
+          </div>
+          <div class='flex flex-col'>
+            <label>End:</label>
+            <input
+              required
+              type='datetime-local'
+              value={filterInterval().end}
+              min={filterInterval().start}
+              onChange={(event) => setFilterInterval({ ...filterInterval(), end: event.target.value })}
             />
+          </div>
+          <div class='flex flex-col'>
+            <button class='bg-secondary rounded text-white p-2 mt-3' type='submit'>Apply</button>
+          </div>
         </div>
-        <div class='flex flex-col'>
-          <button class='bg-secondary rounded text-white p-2 mt-3' type='submit'>Apply</button>
-        </div>
-        </div>
-        )}
-      </form>
+      )}
+    </form>
     {/* Display the map component */}
-    <div id="map" class="z-0"/>
+    <div id="map" class="z-0" />
   </>
 }
