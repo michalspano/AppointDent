@@ -93,6 +93,7 @@ export default function Map (): JSX.Element {
               onChange={(event) => setFilterInterval({ ...filterInterval(), end: event.target.value })}
             />
           </div>
+          {/* TODO: add a way to reset the filter interval */}
           <div class='flex flex-col'>
             <button class='bg-secondary rounded text-white p-2 mt-3' type='submit'>Apply</button>
           </div>
