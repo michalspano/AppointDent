@@ -15,7 +15,6 @@ async function geoCodeAddress (address: string): Promise<Place> {
   return await new Promise((resolve, reject) => {
     axios.get(`https://geocode.maps.co/search?q=${address}`).then((result) => {
       const data: Place = result.data[0]
-      console.log(data)
       resolve(data)
     }).catch((err) => {
       console.error(err)
@@ -25,20 +24,38 @@ async function geoCodeAddress (address: string): Promise<Place> {
 }
 
 /**
- * This function has the responsibility of taking a user to the page where they can see a dentist's appointments
+ * This function has the responsibility of taking a user to the page where they
+ * can see a dentist's appointments. Furthermore, it adds the additional functionality
+ * of filtering the appointments by a time range.
+ * 
  * @param email email of the dentist to see appointments with
+ * @param timeRange time range to filter the appointments by
+ * @default undefined if no time range is specified
  */
-function openAvailableSlots (email: string): void {
-  window.location.replace('/book-appointment/' + btoa(email))
+function openAvailableSlots(email: string, timeRange?: FilterInterval): void {
+  const DEFAULT_URL: string = '/book-appointment/' + btoa(email)
+
+  // If the time range is not defined, redirect to the default url.
+  if (timeRange === undefined) { window.location.replace(DEFAULT_URL); return }
+
+  const from: number = parseDateStringToInt(timeRange.start)
+  const to: number = parseDateStringToInt(timeRange.end)
+
+  window.location.replace(`${DEFAULT_URL}?from=${from}&to=${to}`)
 }
 
 /**
  * In this function we geocode the address as well as insert the marker into the cluster group
  * We add the event handler to initiate when a marker has been selected.
  * @param dentist dentist that is going to be inserted
- * @param markerCluster the cluster group which acts as a middleware between the map and the markers.
+ * @param markerCluster the cluster group which acts as a middleware
+ *  between the map and the markers.
+ * @param timeRange time range to filter the appointments by
+ * @default undefined if no time range is specified
+ * 
+ * TODO: extract hardcoded values to standalone variables/containers
  */
-async function addNewDentist (dentist: Dentist, markerCluster: leaflet.MarkerClusterGroup): Promise<void> {
+async function addNewDentist(dentist: Dentist, markerCluster: leaflet.MarkerClusterGroup, timeRange?: FilterInterval): Promise<void> {
   const dentistCombinedAddress: string = dentist.clinicStreet + ' ' + dentist.clinicHouseNumber + ' ' + dentist.clinicZipCode + ' ' + dentist.clinicCity
   geoCodeAddress(dentistCombinedAddress).then((result: Place) => {
     const dentistCard = `
@@ -74,7 +91,10 @@ async function addNewDentist (dentist: Dentist, markerCluster: leaflet.MarkerClu
     pin.on('popupopen', () => {
       const showSlotsButton = document.getElementById('showSlotsButton')
       showSlotsButton?.addEventListener('click', (e) => {
-        openAvailableSlots((e.target as HTMLInputElement)?.value)
+        // Pass the time range if it is defined.
+        timeRange === undefined
+          ? openAvailableSlots((e.target as HTMLInputElement)?.value)
+          : openAvailableSlots((e.target as HTMLInputElement)?.value, timeRange)
       })
     })
   }).catch((err) => {
@@ -90,7 +110,7 @@ async function addNewDentist (dentist: Dentist, markerCluster: leaflet.MarkerClu
  * @param timeRange time range to filter the dentists by
  * @default undefined if no time range is specified
  */
-export async function addDentistsToCluster (cluster: leaflet.MarkerClusterGroup, timeRange: FilterInterval | undefined = undefined): Promise<void> {
+export async function addDentistsToCluster (cluster: leaflet.MarkerClusterGroup, timeRange?: FilterInterval): Promise<void> {
   // Get all dentists from the API
   let dentists: Dentist[]
   try {
@@ -131,7 +151,8 @@ export async function addDentistsToCluster (cluster: leaflet.MarkerClusterGroup,
       dentists.find((dentist: Dentist) =>
         dentist.email === appointment.dentistId
       ) as Dentist,
-      cluster
+      cluster,
+      timeRange
     )
   })
 }
