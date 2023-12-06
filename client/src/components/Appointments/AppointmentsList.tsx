@@ -33,10 +33,13 @@ export default function AppointmentsList (): JSX.Element {
    */
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   onMount(async () => {
-    // Resolve the query parameters and the dentist email from path parameters
-    // TODO: fix types here - a timeRange shall never be undefined; if it is not given
-    // then it shall be an empty string.
-    setTimeRange({ start: queryParams.from, end: queryParams.to })
+    /* This is just a detail, but FilterInterval doesn't permit null values
+     * hence an empty string is used instead. This is not checked by TS and
+     * is only to ensure consistency. */
+    setTimeRange({
+      start: queryParams.from ?? '',
+      end: queryParams.to ?? ''
+    })
     const params: Record<string, string> = useParams<{ email: string }>()
     setDentistEmail(atob(params.email))
 
@@ -56,8 +59,7 @@ export default function AppointmentsList (): JSX.Element {
       const patientResponse: WhoisResponse = (await Api.get('sessions/whois', { withCredentials: true })).data
       const patientEmail: string = patientResponse.email?.toString() ?? ''
 
-      // FIXME: see line 37
-      const hasInterval: boolean = (timeRange().start !== undefined) && (timeRange().end !== undefined)
+      const hasInterval: boolean = (timeRange().start !== '') && (timeRange().end !== '')
 
       // Formatted request URL with all *default* parameters
       let requestURL: string = `/appointments/dentists/${dentistEmail()}` +
@@ -154,9 +156,11 @@ export default function AppointmentsList (): JSX.Element {
   const [dentistLocation, setDentistLocation] = createSignal<string>()
   const [dentistImage, setDentistImage] = createSignal<string>()
 
-  // TODO: add proper types.
+  // TODO: add proper types to all function below.
   const formatDate = (date: string): string => {
-    const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' }
+    const options: Intl.DateTimeFormatOptions = {
+      day: 'numeric', month: 'short', year: 'numeric'
+    }
     return new Date(date).toLocaleDateString('sv-SE', options)
   }
 
@@ -241,7 +245,7 @@ export default function AppointmentsList (): JSX.Element {
               </div>
             )}
             {(selectedDate() !== '') && (selectedTime() !== '') && (
-              <button class='bg-secondary rounded-lg text-white p-4 mr-3 mt-6 ml-4 text-black px-8' onClick={onBookAppointment}>
+              <button class='bg-secondary rounded-lg text-white p-4 mr-3 mt-6 ml-4 px-8' onClick={onBookAppointment}>
                 Book Appointment
               </button>
             )}
