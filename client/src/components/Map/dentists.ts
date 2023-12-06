@@ -27,12 +27,12 @@ async function geoCodeAddress (address: string): Promise<Place> {
  * This function has the responsibility of taking a user to the page where they
  * can see a dentist's appointments. Furthermore, it adds the additional functionality
  * of filtering the appointments by a time range.
- * 
+ *
  * @param email email of the dentist to see appointments with
  * @param timeRange time range to filter the appointments by
  * @default undefined if no time range is specified
  */
-function openAvailableSlots(email: string, timeRange?: FilterInterval): void {
+function openAvailableSlots (email: string, timeRange?: FilterInterval): void {
   const DEFAULT_URL: string = '/book-appointment/' + btoa(email)
 
   // If the time range is not defined, redirect to the default url.
@@ -52,10 +52,10 @@ function openAvailableSlots(email: string, timeRange?: FilterInterval): void {
  *  between the map and the markers.
  * @param timeRange time range to filter the appointments by
  * @default undefined if no time range is specified
- * 
+ *
  * TODO: extract hardcoded values to standalone variables/containers
  */
-async function addNewDentist(dentist: Dentist, markerCluster: leaflet.MarkerClusterGroup, timeRange?: FilterInterval): Promise<void> {
+async function addNewDentist (dentist: Dentist, markerCluster: leaflet.MarkerClusterGroup, timeRange?: FilterInterval): Promise<void> {
   const dentistCombinedAddress: string = dentist.clinicStreet + ' ' + dentist.clinicHouseNumber + ' ' + dentist.clinicZipCode + ' ' + dentist.clinicCity
   geoCodeAddress(dentistCombinedAddress).then((result: Place) => {
     const dentistCard = `
