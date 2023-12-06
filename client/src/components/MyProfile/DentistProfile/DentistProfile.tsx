@@ -1,58 +1,66 @@
 // import { type JSX } from 'solid-js/jsx-runtime'
 import logo from '../../../assets/logo.png'
-import { type Dentist } from '../../../utils/types'
+import { type Dentist, type Country } from '../../../utils/types'
 import { createStore } from 'solid-js/store'
 import { createEffect, createSignal, type JSX } from 'solid-js'
 import { type AxiosResponse } from 'axios'
 import { type DentistProfileProps } from '../MyProfileTypes'
-import { validateUserInfo, validateAddress } from '../utils'
+import { validateName, validateAddress } from '../utils'
 import CustomInput from '../CustomInput'
 import { Api } from '../../../utils/api'
-import { countries } from '../../../utils/countries'
-import { type Country } from '../../../utils/countries'
+import * as CountryList from 'country-list'
 
 export default function DentistProfile (dentistProp: DentistProfileProps): JSX.Element {
+  const allCountriesNames = CountryList.getNameList()
+  const allCountries: Country[] = []
+  for (const key in allCountriesNames) {
+    allCountries.push({ name: key, code: CountryList.getCode(key) as string })
+  }
+
   const [dentist, setDentist] = createStore<Dentist>(dentistProp.dentistProp)
   const [proImage, setProImage] = createSignal<string>(dentistProp.dentistProp.picture)
   const [getError, setError] = createSignal<Error | null>(null)
+  const [dentCountry, setDentCountry] = createSignal<Country | undefined>(allCountries.find((country) => country.code === dentistProp.dentistProp.clinicCountry))
 
-  const possibleDentCountry: Country | undefined = countries.find((country) => country.code === dentist.clinicCountry)
-  const dentCountryName = possibleDentCountry !== undefined ? possibleDentCountry.name : 'Select your country'
+  // const possibleDentCountry: Country | undefined = allCountries.find((country) => country.code === dentist.clinicCountry)
+  // const dentCountryName = possibleDentCountry !== undefined ? possibleDentCountry.name : 'Select your country'
 
   createEffect(async () => {
     setDentist(dentistProp.dentistProp)
     setProImage(dentistProp.dentistProp.picture)
+    setDentCountry(allCountries.find((country) => country.code === dentistProp.dentistProp.clinicCountry))
   })
 
   // using blob and FileReader to read an image and render it on the front-end
-  const handleUpload = async (): Promise<void> => {
-    const fileInput = document.querySelector('input[type=file]')
+  const handleUpload = async (): Promise<string> => {
+    const fileInput: HTMLInputElement | null = document.querySelector('input[type=file]')
 
     if (fileInput != null) {
-      const file = fileInput.files[0]
-      const reader = new FileReader()
-
-      await new Promise<void>((resolve) => {
-        reader.onloadend = function () {
-          setDentist('picture', reader.result as string) // Update dentist.picture
-          setProImage(reader.result as string) // Update proImage
-          resolve()
-        }
-        reader.readAsDataURL(file)
-      }); return
+      if (fileInput.files != null) {
+        const file = fileInput?.files[0]
+        const reader = new FileReader()
+        const baseString = await new Promise<string | ArrayBuffer | null>((resolve) => {
+          reader.onloadend = function () {
+            resolve(reader.result)
+          }
+          reader.readAsDataURL(file)
+        })
+        return baseString as string ?? ''
+      }
     }
     throw new Error('File input element not found.')
   }
 
   const patchDentist = async function patchDentist (patchedDentist: Dentist): Promise<void> {
-    const validDentist = validateUserInfo(patchedDentist)
-    if (validDentist !== undefined) {
-      setError(new Error(validDentist))
+    // if false is returned, the name is not valid
+    const validDentist = validateName(patchedDentist.firstName, patchedDentist.lastName)
+    if (!validDentist) {
+      setError(new Error('First name and last name cannot be empty.'))
       setTimeout(() => setError(null), 3000)
       return
     }
     const validAddress = await validateAddress(patchedDentist)
-    if (validAddress !== undefined) {
+    if (validAddress !== null) {
       setError(new Error(validAddress))
       setTimeout(() => setError(null), 3000)
       return
@@ -102,9 +110,9 @@ export default function DentistProfile (dentistProp: DentistProfileProps): JSX.E
               class="input h-12 w-full px-3 py-2 mb-3  mr-2  border rounded-xl"
               onChange={(event) => { setDentist('clinicCountry', event.target.value) }}
           >
-                <option selected disabled hidden value={dentistProp.dentistProp.clinicCountry}>{dentCountryName}</option>
+                <option selected disabled hidden value={dentistProp.dentistProp.clinicCountry}>{dentCountry()?.name}</option>
               {
-              countries.map((country) => (
+              allCountries.map((country) => (
                 <option value={country.code}>{country.name}</option>
               ))
             }

@@ -1,6 +1,8 @@
 import axios from 'axios'
 import type { Place, DentistRegistration, PatientRegistration } from '../../utils/types'
 
+// Validity check for users before performing sign up
+
 function validateEmail (email: string): boolean {
   // Regex for checking email validation. Source: https://stackoverflow.com/questions/46155/how-can-i-validate-an-email-address-in-javascript
   const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
@@ -27,6 +29,7 @@ function validateName (fName: string, lName: string): boolean {
 }
 
 function validateZip (zip: string): boolean {
+  // Zip must be at least 5 digits
   const zipRegex = /^\d\d\d\d\d$/
   if (zip.match(zipRegex) == null || Number(zip) <= 0) {
     return false
@@ -35,7 +38,6 @@ function validateZip (zip: string): boolean {
 }
 
 export function validateUserInfo (user: PatientRegistration | DentistRegistration): null | string {
-
   if (!validateEmail(user.email)) {
     return 'Please provide a valid email address.'
   }
@@ -49,24 +51,22 @@ export function validateUserInfo (user: PatientRegistration | DentistRegistratio
 }
 
 export async function validateAddress (dentist: DentistRegistration): Promise<null | string> {
-  if(!validateZip(dentist.clinicZipCode)) {
+  if (!validateZip(dentist.clinicZipCode)) {
     return 'Zip must be five digits and be greater than zero.'
   }
   if (Number(dentist.clinicHouseNumber) <= 0) {
     return 'House number must be greater than zero.'
   }
   const dentistCombinedAddress: string = dentist.clinicHouseNumber + ' ' + dentist.clinicStreet + ' ' + dentist.clinicZipCode + ' ' + dentist.clinicCity
-  console.log(dentistCombinedAddress)
   let result
   try {
     result = await axios.get(`https://geocode.maps.co/search?q=${dentistCombinedAddress}`)
-    console.log(result)
   } catch (err) {
     console.log(err)
     return 'Please provide a valid address.'
   }
+  // the address is saved as the first element in the data array returned by the API. This is the top choice provided by the API.
   const data: Place = result.data[0]
-  console.log(data)
   if (data === undefined) {
     return 'Please provide a valid address.'
   }

@@ -9,6 +9,9 @@ import type { PatientRegistration } from '../../../utils/types'
 
 export default function PatientForm (): JSX.Element {
   const oneTimeStampDay: number = 24 * 60 * 60 * 1000
+  // The result of the new Date().toISOString() returns a date along with the time of the day, seperated by a 'T'.
+  // We exlcude the time of the day by spliting the Date string by 'T'.
+  // The result of date is saved in the first element of the String array returned.
   const yesterday = new Date(Date.now() - oneTimeStampDay).toISOString().split('T')[0]
   const [email, setEmail] = createSignal('')
   const [password, setPassword] = createSignal('')

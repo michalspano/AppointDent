@@ -95,3 +95,8 @@ export enum SessionResponse {
   Fail = 0,
   Success = 1
 }
+
+export interface Country {
+  name: string
+  code: string
+}

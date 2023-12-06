@@ -3,11 +3,10 @@ import logo from '../../../assets/logo.png'
 import { A } from '@solidjs/router'
 import { createSignal } from 'solid-js'
 import { Api } from '../../../utils/api'
-import type { DentistRegistration } from '../../../utils/types'
+import type { DentistRegistration, Country } from '../../../utils/types'
 import { validateAddress, validateUserInfo } from '../utils'
 import { AxiosError } from 'axios'
 import * as CountryList from 'country-list'
-import type { Country } from '../../../utils/countries'
 
 export default function DentistForm (): JSX.Element {
   const [email, setEmail] = createSignal('')
@@ -23,9 +22,9 @@ export default function DentistForm (): JSX.Element {
   const [error, setError] = createSignal<string | null>(null)
 
   const allCountriesNames = CountryList.getNameList()
-  let allCountries: Country[] = new Array()
-  for (let key in allCountriesNames) {
-    allCountries.push({ name: key, code: CountryList.getCode(key) as string})
+  const allCountries: Country[] = []
+  for (const key in allCountriesNames) {
+    allCountries.push({ name: key, code: CountryList.getCode(key) as string })
   }
 
   const signUp = async (): Promise<void> => {
