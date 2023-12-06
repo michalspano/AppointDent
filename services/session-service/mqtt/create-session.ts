@@ -6,6 +6,7 @@ import { type User, type CreateSessionRequest } from '../types/types';
 import { executeQuery } from '../helper/query';
 import { EXPIRE_IN_SECONDS } from '../helper/constants';
 import { validateRequestFormat } from '../helper/validator';
+import { hashThis } from '../helper/hash';
 
 const TOPIC = 'CREATESESSION';
 const RESPONSE_TOPIC = 'SESSION';
@@ -26,6 +27,8 @@ async function parseRawRequest (rawMsg: string): Promise<CreateSessionRequest> {
   };
   return request;
 }
+const sessionQuery: Statement<any> | Statement<[any]> | undefined = database?.prepare('SELECT * FROM sessions WHERE token = ?');
+const user: Statement<any> | Statement<[any]> | undefined = database?.prepare('SELECT * FROM users WHERE email = ?');
 
 /**
  * Used to create a new session key with an expiry of 1 hour.
@@ -36,38 +39,41 @@ async function createNewSession (request: CreateSessionRequest): Promise<string>
   return await new Promise<string>((resolve, reject) => {
     try {
       // Retrieve user information from the database
-      const user: Statement<any> | Statement<[any]> | undefined = database?.prepare('SELECT * FROM users WHERE email = ?');
       const userResult: User = user?.get(request.email) as User;
       if (userResult === undefined) reject(new Error('User undefined.'));
 
       // Hash the user's provided password and compare it with the stored hash
-      const hash: string = crypto.createHash('sha256').update(request.password).digest('hex');
-      if (hash !== userResult.password_hash) reject(new Error('Unmatching hashes'));
+      hashThis(request.password).then((hash) => {
+        if (hash !== userResult.password_hash) reject(new Error('Unmatching hashes'));
 
-      // Generate a unique session token
-      let key: string = crypto.randomUUID();
-      let keyUnique: boolean = false;
-      // Ensure the key is unique
-      while (!keyUnique) {
-        const sessionQuery: Statement<any> | Statement<[any]> | undefined = database?.prepare('SELECT * FROM sessions WHERE token = ?');
-        const session = sessionQuery?.get(key);
-        if (session === undefined) keyUnique = true;
-        key = crypto.randomUUID();
-      }
+        // Generate a unique session token
+        let key: string = crypto.randomUUID();
+        let keyUnique: boolean = false;
+        // Ensure the key is unique
+        while (!keyUnique) {
+          const session = sessionQuery?.get(key);
+          if (session === undefined) keyUnique = true;
+          key = crypto.randomUUID();
+        }
 
-      // Hash the session token
-      const hashedKey: string = crypto.createHash('sha256').update(key).digest('hex');
+        // Hash the session token
+        hashThis(key).then((hashedKey) => {
+        // Calculate the session's expiration time (1 hour from now), this extends the expiry
+          const expiry: number = (Math.round(Date.now() / 1000) + EXPIRE_IN_SECONDS);
 
-      // Calculate the session's expiration time (1 hour from now), this extends the expiry
-      const expiry: number = (Math.round(Date.now() / 1000) + EXPIRE_IN_SECONDS);
-
-      // Delete the previous session key
-      executeQuery('DELETE FROM sessions WHERE hash = ?', [userResult.session_hash], false, false);
-      // Insert new session
-      executeQuery('INSERT INTO sessions (hash, token, expiry) VALUES (?, ?, ?)', [hashedKey, key, expiry], true, true);
-      // Update the session hash in the users table
-      executeQuery('UPDATE users SET session_hash = ? WHERE email = ?', [hashedKey, request.email], true, true);
-      resolve(key);
+          // Delete the previous session key
+          executeQuery('DELETE FROM sessions WHERE hash = ?', [userResult.session_hash], false, false);
+          // Insert new session
+          executeQuery('INSERT INTO sessions (hash, token, expiry) VALUES (?, ?, ?)', [hashedKey, key, expiry], true, true);
+          // Update the session hash in the users table
+          executeQuery('UPDATE users SET session_hash = ? WHERE email = ?', [hashedKey, request.email], true, true);
+          resolve(key);
+        }).catch((err) => {
+          reject(new Error((err as Error).message));
+        });
+      }).catch((err) => {
+        reject(new Error((err as Error).message));
+      });
     } catch (err) {
       try {
         reject(new Error((err as Error).message));

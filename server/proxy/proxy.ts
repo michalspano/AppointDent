@@ -70,8 +70,9 @@ export function routeProxy (req: Request, res: Response, next: NextFunction): vo
     const newPath = pathParts.slice(2).join('/');
     req.url = newPath;
     req.originalUrl = newPath;
-    target.web(req, res, {}, (err: Error) => {
-      throw new Error(err.message);
+    target.web(req, res, { timeout: 60000, proxyTimeout: 60000 }, (err: Error) => {
+      console.error('Error proxying to target:', err.message);
+      res.status(502).send('Bad Gateway');
     });
   } else {
     next();
