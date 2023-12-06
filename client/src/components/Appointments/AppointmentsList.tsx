@@ -31,8 +31,7 @@ export default function AppointmentsList (): JSX.Element {
    * This logic is extracted from the createEffect hook to avoid
    * calling the API multiple times.
    */
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  onMount(async () => {
+  onMount(() => {
     /* This is just a detail, but FilterInterval doesn't permit null values
      * hence an empty string is used instead. This is not checked by TS and
      * is only to ensure consistency. */
@@ -44,11 +43,8 @@ export default function AppointmentsList (): JSX.Element {
     setDentistEmail(atob(params.email))
 
     // Fetch resources in a loop
-    await fetchAppointments()
-    await fetchDentist()
-    setInterval(async () => {
-      await fetchAppointments()
-    }, FETCH_INTERVAL)
+    void fetchAppointments(); void fetchDentist()
+    setInterval(() => { void fetchAppointments() }, FETCH_INTERVAL)
   })
   /**
    * Fetches all available appointments for the dentist. If a valid time range is specified,
@@ -59,11 +55,12 @@ export default function AppointmentsList (): JSX.Element {
       const patientResponse: WhoisResponse = (await Api.get('sessions/whois', { withCredentials: true })).data
       const patientEmail: string = patientResponse.email?.toString() ?? ''
 
-      const hasInterval: boolean = (timeRange().start !== '') && (timeRange().end !== '')
+      const hasInterval: boolean = (timeRange().start !== '') &&
+                                   (timeRange().end !== '')
 
       // Formatted request URL with all *default* parameters
       let requestURL: string = `/appointments/dentists/${dentistEmail()}` +
-                                  `?userId=${patientEmail}&onlyAvailable=true`
+                                `?userId=${patientEmail}&onlyAvailable=true`
 
       // If the time range is given, add the query parameters to the request URL
       // Afterwards, fetch the appointments based on the query parameters
