@@ -7,6 +7,589 @@
 	},
 	"item": [
 		{
+			"name": "admin-service",
+			"item": [
+				{
+					"name": "POST NOT SAVED /requests",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Analytics object created\", () => {",
+									"    pm.response.to.have.status(201);",
+									"})",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"method\": \"GET\",\n    \"path\": \"/appointments\",\n    \"agent\": \"Linux\",\n    \"clientHash\" : \"secureHash\"\n}"
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/admins/requests",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admins",
+								"requests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET (fail) /requests",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Missing session key\", () => {",
+									"    pm.response.to.have.status(400);",
+									"})",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disableCookies": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/admins/requests/banana",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admins",
+								"requests",
+								"banana"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /requests",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Analytics object created\", () => {",
+									"    pm.response.to.have.status(201);",
+									"})",
+									"",
+									"pm.test(\"Id Set\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"requestId\", jsonData.id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"method\": \"GET\",\n    \"path\": \"/appointments\",\n    \"agent\": \"Linux\",\n    \"clientHash\" : \"secureHash\"\n}"
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/admins/requests",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admins",
+								"requests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST api/admins/login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\": \"admin@gmail.com\", \"password\": \"password\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/admins/login",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admins",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /requests",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Analytics object created\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"pm.test(\"Correct retrieval of analytics object\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.method).to.eql(\"GET\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/admins/requests/{{requestId}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admins",
+								"requests",
+								"{{requestId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /requests 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Analytics object created\", () => {",
+									"    pm.response.to.have.status(201);",
+									"})",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"method\": \"GET\",\n    \"path\": \"/appointments\",\n    \"agent\": \"Linux\",\n    \"clientHash\" : \"secureHash\"\n}"
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/admins/requests",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admins",
+								"requests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /requests 3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Analytics object created\", () => {",
+									"    pm.response.to.have.status(201);",
+									"})",
+									"",
+									"pm.test(\"Timestamp set\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"start_ts\",jsonData.timestamp+1);",
+									"    pm.environment.set(\"end_ts\",jsonData.timestamp-3600);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"method\": \"GET\",\n    \"path\": \"/appointments\",\n    \"agent\": \"Linux\",\n    \"clientHash\" : \"secureHash\"\n}"
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/admins/requests",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admins",
+								"requests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Interval /requests",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Analytics object created\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"pm.test(\"Intervals working\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.length).to.be.greaterThan(10).and.to.be.lessThan(13)",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/admins/requests?start={{start_ts}}&end={{end_ts}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admins",
+								"requests"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "{{start_ts}}"
+								},
+								{
+									"key": "end",
+									"value": "{{end_ts}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET api/v1/sessions/whois",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Retrieve correct whois data\", function () {",
+									"        var jsonData = pm.response.json();",
+									"        pm.expect(jsonData.email).to.eql(\"admin@gmail.com\");",
+									"        pm.expect(jsonData.type).to.eql(\"a\");",
+									"    });",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v1/sessions/whois",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sessions",
+								"whois"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST api/admins/login (invalid)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\": \"admin123@gmail.com\", \"password\": \"password\"} // invalid admin email",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/admins/login",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admins",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST api/admins/login (invalid) 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code shall be 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\": \"admin123@gmail.com\"} //missing password field",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/admins/login",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admins",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST api/v1/admins/login (invalid) 3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code shall be 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\": \"admin@gmail.com\", \"password\": \"incorrectPassword\"} // invalid admin password",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/admins/login",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admins",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE api/admins/logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/admins/logout",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admins",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "dentist-service",
 			"item": [
 				{
@@ -5464,581 +6047,6 @@
 								"v1",
 								"notifications",
 								"dentist1@example.com"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "admin-service",
-			"item": [
-				{
-					"name": "POST NOT SAVED /requests",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Analytics object created\", () => {",
-									"    pm.response.to.have.status(201);",
-									"})",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"method\": \"GET\",\n    \"path\": \"/appointments\",\n    \"agent\": \"Linux\",\n    \"clientHash\" : \"secureHash\"\n}"
-						},
-						"url": {
-							"raw": "http://localhost:3006/requests",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3006",
-							"path": [
-								"requests"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GET (fail) /requests",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Missing session key\", () => {",
-									"    pm.response.to.have.status(400);",
-									"})",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "http://localhost:3006/requests/banana",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3006",
-							"path": [
-								"requests",
-								"banana"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "POST /requests",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Analytics object created\", () => {",
-									"    pm.response.to.have.status(201);",
-									"})",
-									"",
-									"pm.test(\"Id Set\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.environment.set(\"requestId\", jsonData.id);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"method\": \"GET\",\n    \"path\": \"/appointments\",\n    \"agent\": \"Linux\",\n    \"clientHash\" : \"secureHash\"\n}"
-						},
-						"url": {
-							"raw": "http://localhost:3006/requests",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3006",
-							"path": [
-								"requests"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "POST api/admins/login",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Response code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"email\": \"admin@gmail.com\", \"password\": \"password\"}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{host}}/api/v1/admins/login",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"admins",
-								"login"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GET /requests",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Analytics object created\", () => {",
-									"    pm.response.to.have.status(200);",
-									"})",
-									"pm.test(\"Correct retrieval of analytics object\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.method).to.eql(\"GET\");",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "http://localhost:3006/requests/{{requestId}}",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3006",
-							"path": [
-								"requests",
-								"{{requestId}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "POST /requests 2",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Analytics object created\", () => {",
-									"    pm.response.to.have.status(201);",
-									"})",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"method\": \"GET\",\n    \"path\": \"/appointments\",\n    \"agent\": \"Linux\",\n    \"clientHash\" : \"secureHash\"\n}"
-						},
-						"url": {
-							"raw": "http://localhost:3006/requests",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3006",
-							"path": [
-								"requests"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "POST /requests 3",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Analytics object created\", () => {",
-									"    pm.response.to.have.status(201);",
-									"})",
-									"",
-									"pm.test(\"Timestamp set\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.environment.set(\"start_ts\",jsonData.timestamp+1);",
-									"    pm.environment.set(\"end_ts\",jsonData.timestamp-3600);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"method\": \"GET\",\n    \"path\": \"/appointments\",\n    \"agent\": \"Linux\",\n    \"clientHash\" : \"secureHash\"\n}"
-						},
-						"url": {
-							"raw": "http://localhost:3006/requests",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3006",
-							"path": [
-								"requests"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GET Interval /requests",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Analytics object created\", () => {",
-									"    pm.response.to.have.status(200);",
-									"})",
-									"pm.test(\"Intervals working\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.length).to.eql(5);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "http://localhost:3006/requests?start={{start_ts}}&end={{end_ts}}",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3006",
-							"path": [
-								"requests"
-							],
-							"query": [
-								{
-									"key": "start",
-									"value": "{{start_ts}}"
-								},
-								{
-									"key": "end",
-									"value": "{{end_ts}}"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GET api/v1/sessions/whois",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Response code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Retrieve correct whois data\", function () {",
-									"        var jsonData = pm.response.json();",
-									"        pm.expect(jsonData.email).to.eql(\"admin@gmail.com\");",
-									"        pm.expect(jsonData.type).to.eql(\"a\");",
-									"    });",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{host}}/api/v1/sessions/whois",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"sessions",
-								"whois"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "POST api/admins/login (invalid)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Response code is 401\", function () {",
-									"    pm.response.to.have.status(401);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"email\": \"admin123@gmail.com\", \"password\": \"password\"} // invalid admin email",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{host}}/api/v1/admins/login",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"admins",
-								"login"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "POST api/admins/login (invalid) 2",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Response code shall be 400\", function () {",
-									"    pm.response.to.have.status(400);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"email\": \"admin123@gmail.com\"} //missing password field",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{host}}/api/v1/admins/login",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"admins",
-								"login"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "POST api/v1/admins/login (invalid) 3",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Response code shall be 401\", function () {",
-									"    pm.response.to.have.status(401);",
-									"});",
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"email\": \"admin@gmail.com\", \"password\": \"incorrectPassword\"} // invalid admin password",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{host}}/api/v1/admins/login",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"admins",
-								"login"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "DELETE api/admins/logout",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Response code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{host}}/api/v1/admins/logout",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"admins",
-								"logout"
 							]
 						}
 					},

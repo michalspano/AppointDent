@@ -6,7 +6,7 @@ import { hashThis } from '../helper/hash';
 
 const TOPIC = 'INSERTUSER';
 const RESPONSE_TOPIC = 'INSERTUSERRES';
-const ALLOWED_TYPES = ['p', 'd'];
+const ALLOWED_TYPES = ['p', 'd', 'a'];
 // SQL query to enter user to database
 const insertQuery = database?.prepare('INSERT INTO users (email, password_hash, type) VALUES (?, ?, ?)');
 

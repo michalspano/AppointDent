@@ -32,7 +32,6 @@ async function addAnalyticsData (req: Request, res: Response): Promise<Response<
    * handled with a 500 status code. */
   try {
     stmt.run(Object.values(request));
-    console.log('Analytics object created');
   } catch (err: Error | unknown) {
     return res.status(400).json({ message: 'Bad request: invalid analytics object.' });
   }
