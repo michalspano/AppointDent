@@ -6,7 +6,14 @@ import { Api } from '../../utils/api'
 
 const servicesErr = async (): Promise<void> => {
   const response = await Api.get('/heartbeat', { withCredentials: true })
-  setErrServices(response.data.data)
+  const killedServices = getKilledServicesNames(response.data.data)
+  setErrServices(killedServices)
+}
+
+function getKilledServicesNames (statusObject: object): string[] {
+  return Object.entries(statusObject)
+    .filter(([_, status]: [string, boolean]) => !status)
+    .map(([serviceName]) => serviceName)
 }
 
 createEffect(async () => {
