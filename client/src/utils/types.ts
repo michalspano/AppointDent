@@ -1,7 +1,6 @@
 /**
  * Response data type from geocoding API
  */
-
 export interface Place {
   boundingBox: [string, string, string, string]
   class: string
@@ -60,6 +59,15 @@ export interface AppointmentResponse {
   dentistId: string
   patientId?: string
 };
+
+/**
+ * An interface that represents a grouped appointment.
+ * That is, a day that has one or more appointments.
+ */
+export interface GroupedAppointments {
+  day: string
+  appointments: Appointment[]
+}
 
 export interface Notification {
   message: string
