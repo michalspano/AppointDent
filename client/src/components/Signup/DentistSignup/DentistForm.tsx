@@ -3,10 +3,11 @@ import logo from '../../../assets/logo.png'
 import { A } from '@solidjs/router'
 import { createSignal } from 'solid-js'
 import { Api } from '../../../utils/api'
-import type { Registration } from '../../../utils/types'
+import type { DentistRegistration } from '../../../utils/types'
 import { validateAddress, validateUserInfo } from '../utils'
-import { countries } from '../../../utils/countries'
 import { AxiosError } from 'axios'
+import * as CountryList from 'country-list'
+import type { Country } from '../../../utils/countries'
 
 export default function DentistForm (): JSX.Element {
   const [email, setEmail] = createSignal('')
@@ -20,10 +21,15 @@ export default function DentistForm (): JSX.Element {
   const [clinicZipCode, setClinicZipcode] = createSignal('')
   const [picture, setPicture] = createSignal('')
   const [error, setError] = createSignal<string | null>(null)
-  const countryOptions = countries
+
+  const allCountriesNames = CountryList.getNameList()
+  let allCountries: Country[] = new Array()
+  for (let key in allCountriesNames) {
+    allCountries.push({ name: key, code: CountryList.getCode(key) as string})
+  }
 
   const signUp = async (): Promise<void> => {
-    const registrationData: Registration = {
+    const registrationData: DentistRegistration = {
       email: email(),
       password: password(),
       firstName: firstName(),
@@ -39,12 +45,12 @@ export default function DentistForm (): JSX.Element {
       setError('Please fill in all fields.')
       return
     }
-    if (validateUserInfo(registrationData) !== undefined) {
+    if (validateUserInfo(registrationData) !== null) {
       setError(validateUserInfo(registrationData) as string)
       return
     }
     const addressValidation = await validateAddress(registrationData)
-    if (addressValidation !== undefined) {
+    if (addressValidation !== null) {
       setError(addressValidation)
       return
     }
@@ -71,18 +77,20 @@ export default function DentistForm (): JSX.Element {
   }
 
   const handleUpload = async (): Promise<string> => {
-    const fileInput = document.querySelector('input[type=file]')
+    const fileInput: HTMLInputElement | null = document.querySelector('input[type=file]')
 
     if (fileInput != null) {
-      const file = fileInput?.files[0]
-      const reader = new FileReader()
-      const baseString = await new Promise<string | ArrayBuffer | null>((resolve) => {
-        reader.onloadend = function () {
-          resolve(reader.result)
-        }
-        reader.readAsDataURL(file)
-      })
-      return baseString as string ?? ''
+      if (fileInput.files != null) {
+        const file = fileInput?.files[0]
+        const reader = new FileReader()
+        const baseString = await new Promise<string | ArrayBuffer | null>((resolve) => {
+          reader.onloadend = function () {
+            resolve(reader.result)
+          }
+          reader.readAsDataURL(file)
+        })
+        return baseString as string ?? ''
+      }
     }
     throw new Error('File input element not found.')
   }
@@ -143,7 +151,7 @@ export default function DentistForm (): JSX.Element {
             >
               <option value="none" selected disabled hidden>Select your Country</option>
               {
-              countryOptions.map((country) => (
+              allCountries.map((country) => (
                 <option value={country.code}>{country.name}</option>
               ))
             }

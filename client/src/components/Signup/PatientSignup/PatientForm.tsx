@@ -5,6 +5,7 @@ import { createSignal } from 'solid-js'
 import { Api } from '../../../utils/api'
 import { validateUserInfo } from '../utils'
 import { AxiosError } from 'axios'
+import type { PatientRegistration } from '../../../utils/types'
 
 export default function PatientForm (): JSX.Element {
   const oneTimeStampDay: number = 24 * 60 * 60 * 1000
@@ -17,12 +18,12 @@ export default function PatientForm (): JSX.Element {
   const [error, setError] = createSignal<string | null>(null)
 
   const signup = async (): Promise<void> => {
-    const requiredFields: any = {
+    const requiredFields: PatientRegistration = {
       email: email(),
       password: password(),
       firstName: firstName(),
       lastName: lastName(),
-      birthDate: dateOfBirth()
+      birthDate: new Date(dateOfBirth()).getTime()
     }
 
     if (Object.values(requiredFields).some((field) => field === '')) {
@@ -30,7 +31,7 @@ export default function PatientForm (): JSX.Element {
       return
     }
 
-    if (validateUserInfo(requiredFields) !== undefined) {
+    if (validateUserInfo(requiredFields) !== null) {
       setError(validateUserInfo(requiredFields) as string)
       return
     }
