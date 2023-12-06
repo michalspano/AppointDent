@@ -99,7 +99,7 @@ function getDentist (dentist: User): void {
     'Content-Type': 'application/json'
   };
 
-  const res = http.get(host + `${dentist.email}`, { headers, tags: { name: 'GetDentist' } });
+  const res = http.get(host + `/${dentist.email}`, { headers, tags: { name: 'GetDentist' } });
 
   // Check for expected status codes
   check(res, {
@@ -122,7 +122,7 @@ function patchDentist (dentist: User): void {
     Cookie: cookies
   };
 
-  const res = http.patch(host + `${loginEmail}`, JSON.stringify(payload), { headers, tags: { name: 'UpdateDentist' } });
+  const res = http.patch(host + `/${loginEmail}`, JSON.stringify(payload), { headers, tags: { name: 'UpdateDentist' } });
 
   // Check for expected status codes
   check(res, {
