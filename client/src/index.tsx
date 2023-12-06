@@ -13,7 +13,7 @@ import MyBookingsPage from './routes/MyBookings.tsx'
 import NotificationsPage from './routes/NotificationsPage.tsx'
 import RouteGuard from './components/RouteGuard.tsx'
 import AppointmentsList from './components/Appointments/AppointmentsList.tsx'
-import Stats from './components/Stats/Stats.tsx'
+import AdminPage from './routes/AdminPage.tsx'
 
 const root = document.getElementById('root')
 if (root === null) throw Error('Root undefined!')
@@ -36,7 +36,7 @@ render(() => <div>
           <Route path="/map" component={Map} />
           <Route path="/my-bookings" component={MyBookingsPage} />
           <Route path="/book-appointment/:email" component={AppointmentsList} />
-          <Route path="/stats" component={Stats} />
+          <Route path="/admin-page" component={AdminPage} />
         </Route>
       </Routes>
     </Router>
