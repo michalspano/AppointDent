@@ -30,6 +30,15 @@ export default function Map (): JSX.Element {
   }
 
   /**
+   * This function is called when the filter interval is reset.
+   * So, the all possible dentists are added to the cluster.
+   */
+  async function handleReset (): Promise<void> {
+    resetCluster(cluster())
+    void addDentistsToCluster(cluster())
+  }
+
+  /**
    * Ensures that the user is a patient, otherwise redirect to calendar.
    */
   createEffect(async () => {
@@ -54,52 +63,62 @@ export default function Map (): JSX.Element {
     void addDentistsToCluster(cluster())
   })
   return <>
-    <form
-      id='eventForm'
-      class='z-10 flex flex-col justify-between items-center absolute top-20 right-5 p-4 bg-primary shadow-xl rounded'
-      onSubmit={(event) => {
-        event.preventDefault()
-        handleFilterSubmit().catch(() => { console.error('Error selecting time interval.') })
-      }}
-    >
-      <div
-        class='cursor-pointer text-white'
-        // The 'X' is displayed at the top right corner of the filter form
-        classList={{ 'absolute top-0 right-0 m-2 ': toShowFilter() }}
-        onClick={() => setToShowFilter(!toShowFilter())}
+    <div class="z-10 flex flex-col justify-between items-center absolute top-20 right-5 p-4 bg-primary shadow-xl rounded">
+      <form
+        id='eventForm'
+        onReset={() => {
+          handleReset().catch(() => {
+            console.error('Error resetting filter.')
+          })
+        }}
+        onSubmit={(event) => {
+          event.preventDefault()
+          handleFilterSubmit().catch(() => {
+            console.error('Error selecting time interval.')
+            void handleReset() // Revert to the default state
+          })
+        }}
       >
-        {toShowFilter() ? 'X' : 'Filter'}
-      </div>
-      {toShowFilter() && (
-        // Grouped in a div to enable conditional rendering of the whole region
-        <div>
-          <div class='flex flex-col'>
-            <label>Start:</label>
-            <input
-              required
-              type='datetime-local'
-              value={filterInterval().start}
-              min={0} /* we don't know ahead how old appointments can be, hence only positive integers */
-              onChange={(event) => setFilterInterval({ ...filterInterval(), start: event.target.value })}
-            />
-          </div>
-          <div class='flex flex-col'>
-            <label>End:</label>
-            <input
-              required
-              type='datetime-local'
-              value={filterInterval().end}
-              min={filterInterval().start}
-              onChange={(event) => setFilterInterval({ ...filterInterval(), end: event.target.value })}
-            />
-          </div>
-          {/* TODO: add a way to reset the filter interval */}
-          <div class='flex flex-col'>
-            <button class='bg-secondary rounded text-white p-2 mt-3' type='submit'>Apply</button>
-          </div>
+        <div
+          class='cursor-pointer text-white'
+          // The 'X' is displayed at the top right corner of the filter form
+          classList={{ 'absolute top-0 right-0 m-2 ': toShowFilter() }}
+          onClick={() => setToShowFilter(!toShowFilter())}
+        >
+          {toShowFilter() ? 'X' : 'Filter'}
         </div>
-      )}
-    </form>
+        {toShowFilter() && (
+          // Grouped in a div to enable conditional rendering of the whole region
+          // TODO: add validation for the maximum date not to exhaust the server
+          <div>
+            <div class='flex flex-col'>
+              <label>Start:</label>
+              <input
+                required
+                type='datetime-local'
+                value={filterInterval().start}
+                min={0} /* we don't know ahead how old appointments can be, hence only positive integers */
+                onChange={(event) => setFilterInterval({ ...filterInterval(), start: event.target.value })}
+              />
+            </div>
+            <div class='flex flex-col'>
+              <label>End:</label>
+              <input
+                required
+                type='datetime-local'
+                value={filterInterval().end}
+                min={filterInterval().start}
+                onChange={(event) => setFilterInterval({ ...filterInterval(), end: event.target.value })}
+              />
+            </div>
+            <div class="inline-flex w-full mt-4">
+              <button class='w-1/2 bg-secondary rounded text-white p-2' type='submit'>Apply</button>
+              <button class='w-1/2 ml-2 bg-grey rounded text-transparent-black p-2' type='reset'>Reset</button>
+            </div>
+          </div>
+        )}
+      </form>
+    </div>
     {/* Display the map component */}
     <div id="map" class="z-0" />
   </>
