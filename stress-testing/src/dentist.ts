@@ -1,25 +1,16 @@
 import http from 'k6/http';
 import { check } from 'k6';
+import { type User, generateUniqueEmail } from './helper';
 
 const host = 'http://localhost:3000/api/v1/dentists';
 export const options = {
   stages: [
-    { duration: '10s', target: 1500 },
-    { duration: '2m', target: 3000 }
+    { duration: '1m', target: 1000 },
+    { duration: '1m', target: 3000 },
+    { duration: '1m', target: 4000 },
+    { duration: '30s', target: 0 }
   ]
 };
-
-interface User {
-  email: string
-  cookies: any
-}
-
-// Function to generate a unique email address for each virtual user
-function generateUniqueEmail (): string {
-  const timestamp = Date.now();
-  const randomString = Math.random().toString(36).substring(7); // Generate a random string
-  return `test${timestamp}_${randomString}@example.com`;
-}
 
 // Simulate dentist registration
 function registerDentist (): User {
@@ -48,7 +39,6 @@ function registerDentist (): User {
     'Status is not 401': (r) => r.status !== 401
   });
 
-  // Add the registered email to the array
   const dentist: User = { email: payload.email, cookies: undefined };
 
   return dentist;
@@ -56,7 +46,7 @@ function registerDentist (): User {
 
 // Simulate dentist login
 function loginDentist (dentist: User): User {
-  const loginEmail = dentist.email;
+  const loginEmail: string = dentist.email;
   const payload = {
     email: loginEmail,
     password: 'Password123!'
@@ -114,8 +104,8 @@ function patchDentist (dentist: User): void {
     lastName: 'Dentist'
   };
 
-  const loginEmail = dentist.email;
-  const cookies = dentist.cookies;
+  const loginEmail: string = dentist.email;
+  const cookies: string = dentist.cookies;
 
   const headers = {
     'Content-Type': 'application/json',
@@ -133,7 +123,7 @@ function patchDentist (dentist: User): void {
 
 // Simulate dentist logging out
 function logoutDentist (dentist: User): void {
-  const cookies = dentist.cookies;
+  const cookies: string = dentist.cookies;
 
   const headers = {
     'Content-Type': 'application/json',

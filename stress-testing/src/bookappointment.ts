@@ -1,27 +1,18 @@
 import http from 'k6/http';
 import { check } from 'k6';
+import { type User, generateUniqueEmail } from './helper';
 
-const host = 'http://localhost:3000/api/v1/dentists';
+const host = 'http://localhost:3000/api/v1';
 export const options = {
   stages: [
-    { duration: '30s', target: 2000 },
-    { duration: '1m', target: 5000 }
+    { duration: '1m', target: 1000 },
+    { duration: '1m', target: 3000 },
+    { duration: '1m', target: 4000 },
+    { duration: '30s', target: 0 }
   ]
 };
 
-interface User {
-  email: string
-  cookies: any
-}
-
-// Function to generate a unique email address for each virtual user
-function generateUniqueEmail (): string {
-  const timestamp = Date.now();
-  const randomString = Math.random().toString(36).substring(7); // Generate a random string
-  return `test${timestamp}_${randomString}@example.com`;
-}
-
-// Function to simulate dentist registration
+// Simulate dentist registration
 function registerDentist (): User {
   const payload = {
     email: generateUniqueEmail(),
@@ -40,8 +31,7 @@ function registerDentist (): User {
     'Content-Type': 'application/json'
   };
 
-  // Make a POST request to your registration endpoint
-  const res = http.post(host + '/register', JSON.stringify(payload), { headers, tags: { name: 'RegisterDentist' } });
+  const res = http.post(host + '/dentists/register', JSON.stringify(payload), { headers, tags: { name: 'RegisterDentist' } });
 
   // Check for expected status codes
   check(res, {
@@ -55,7 +45,7 @@ function registerDentist (): User {
   return dentist;
 }
 
-// Function to simulate dentist login
+// Simulate dentist login
 function loginDentist (dentist: User): User {
   const loginEmail: string = dentist.email;
   const payload = {
@@ -67,8 +57,7 @@ function loginDentist (dentist: User): User {
     'Content-Type': 'application/json'
   };
 
-  // Make a POST request to your login endpoint
-  const res = http.post(host + '/login', JSON.stringify(payload), { headers, tags: { name: 'LoginDentist' } });
+  const res = http.post(host + '/dentists/login', JSON.stringify(payload), { headers, tags: { name: 'LoginDentist' } });
 
   // Check for expected status codes
   check(res, {
@@ -80,7 +69,7 @@ function loginDentist (dentist: User): User {
   return dentist;
 }
 
-// Function to simulate appointment creation
+// Simulate appointment creation
 function createAppointment (dentist: User): string {
   const dentistEmail: string = dentist.email;
   const cookies: string = dentist.cookies;
@@ -96,17 +85,14 @@ function createAppointment (dentist: User): string {
     Cookies: cookies
   };
 
-  // Make a POST request to your login endpoint
-  const res = http.post('http://localhost:3000/api/v1/appointments', JSON.stringify(payload), { headers, tags: { name: 'CreateAppointment' } });
+  const res = http.post(host + '/appointments', JSON.stringify(payload), { headers, tags: { name: 'CreateAppointment' } });
   // Check for expected status codes
   check(res, {
     'Status is 201': (r) => r.status === 201,
     'Status is not 401': (r) => r.status !== 401
   });
 
-  // Parse the response body as JSON if it's a string
   const responseBody: any = res.body;
-
   // Parse the JSON response
   const response = responseBody !== null ? JSON.parse(responseBody) : null;
 
@@ -115,7 +101,7 @@ function createAppointment (dentist: User): string {
   return appointmentId;
 }
 
-// Function to simulate patient registration
+// Simulate patient registration
 function registerPatient (): User {
   const payload = {
     email: generateUniqueEmail(),
@@ -130,7 +116,7 @@ function registerPatient (): User {
     'Content-Type': 'application/json'
   };
 
-  const res = http.post('http://localhost:3000/api/v1/patients/register', JSON.stringify(payload), { headers, tags: { name: 'RegisterPatient' } });
+  const res = http.post(host + '/patients/register', JSON.stringify(payload), { headers, tags: { name: 'RegisterPatient' } });
 
   // Check for expected status codes
   check(res, {
@@ -143,9 +129,9 @@ function registerPatient (): User {
   return patient;
 }
 
-// Function to simulate patient login
+// Simulate patient login
 function loginPatient (patient: User): User {
-  const loginEmail = patient.email;
+  const loginEmail: string = patient.email;
   const payload = {
     email: loginEmail,
     password: 'Password123!'
@@ -155,7 +141,7 @@ function loginPatient (patient: User): User {
     'Content-Type': 'application/json'
   };
 
-  const res = http.post('http://localhost:3000/api/v1/patients/login', JSON.stringify(payload), { headers, tags: { name: 'LoginPatient' } });
+  const res = http.post(host + '/patients/login', JSON.stringify(payload), { headers, tags: { name: 'LoginPatient' } });
 
   // Check for expected status codes
   check(res, {
@@ -167,17 +153,16 @@ function loginPatient (patient: User): User {
   return patient;
 }
 
-// Function to simulate patient booking an appointment
+// Simulate patient booking an appointment
 function bookAppointment (patient: User, appointmentId: string): void {
-  const patientEmail = patient.email;
+  const patientEmail: string = patient.email;
 
   const headers = {
     'Content-Type': 'application/json',
     Cookies: patient.cookies
   };
 
-  // Make a POST request to your login endpoint
-  const res = http.patch(`http://localhost:3000/api/v1/appointments/${appointmentId}?patientId=${patientEmail}&toBook=true`, null, { headers, tags: { name: 'BookAppointment' } });
+  const res = http.patch(host + `/appointments/${appointmentId}?patientId=${patientEmail}&toBook=true`, null, { headers, tags: { name: 'BookAppointment' } });
 
   // Check for expected status codes
   check(res, {
@@ -186,17 +171,16 @@ function bookAppointment (patient: User, appointmentId: string): void {
   });
 }
 
-// Function to simulate patient getting all of their appointments
+// Simulate patient getting all of their appointments
 function getAppointments (patient: User): void {
-  const patientEmail = patient.email;
+  const patientEmail: string = patient.email;
 
   const headers = {
     'Content-Type': 'application/json',
     Cookies: patient.cookies
   };
 
-  // Make a POST request to your login endpoint
-  const res = http.get(`http://localhost:3000/api/v1/appointments/patients/${patientEmail}`, { headers, tags: { name: 'GetPatientAppointments' } });
+  const res = http.get(host + `/appointments/patients/${patientEmail}`, { headers, tags: { name: 'GetPatientAppointments' } });
 
   // Check for expected status codes
   check(res, {
@@ -205,17 +189,16 @@ function getAppointments (patient: User): void {
   });
 }
 
-// Function to simulate patient booking an appointment
+// Simulate patient unbooking an appointment
 function unbookAppointment (patient: User, appointmentId: string): void {
-  const patientEmail = patient.email;
+  const patientEmail: string = patient.email;
 
   const headers = {
     'Content-Type': 'application/json',
     Cookies: patient.cookies
   };
 
-  // Make a POST request to your login endpoint
-  const res = http.patch(`http://localhost:3000/api/v1/appointments/${appointmentId}?patientId=${patientEmail}&toBook=false`, null, { headers, tags: { name: 'UnbookAppointment' } });
+  const res = http.patch(host + `/appointments/${appointmentId}?patientId=${patientEmail}&toBook=false`, null, { headers, tags: { name: 'UnbookAppointment' } });
 
   // Check for expected status codes
   check(res, {
