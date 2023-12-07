@@ -87,3 +87,21 @@ export enum SessionResponse {
   Fail = 0,
   Success = 1
 }
+
+export interface ChartType {
+  type: string
+  timeframe: string
+}
+export interface ChartData {
+  data: number[]
+  labels: string[]
+}
+
+export interface AnalyticsResponse {
+  id: string
+  timestamp: number
+  method: string
+  path: string
+  agent: string
+  clientHash: string
+}

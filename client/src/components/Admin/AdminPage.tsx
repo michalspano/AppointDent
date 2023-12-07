@@ -1,7 +1,8 @@
-import { createSignal, type JSX, Show } from 'solid-js'
+import { createSignal, type JSX } from 'solid-js'
 import './AdminPage.css'
+import { Graph } from './Graph'
 
-export interface Place {
+export interface Tab {
   tab: string
   title: string
 }
@@ -10,9 +11,10 @@ export interface Place {
 export default function Admin (): JSX.Element {
   // State to track the active tab
   const [activeTab, setActiveTab] = createSignal('general')
+  const [activeTime, setActiveTime] = createSignal('1m')
 
   // Function to render tab buttons based on the data
-  const tabComponent = (item: Place): JSX.Element => {
+  const tabComponent = (item: Tab): JSX.Element => {
     return (
         <TabButton tab={item.tab} activeTab={activeTab} setActiveTab={setActiveTab}>
           {item.title}
@@ -20,40 +22,45 @@ export default function Admin (): JSX.Element {
     )
   }
 
+  const timeComponent = (item: Tab): JSX.Element => {
+    return (
+        <TabButton tab={item.tab} activeTab={activeTime} setActiveTab={setActiveTime}>
+          {item.title}
+        </TabButton>
+    )
+  }
+  const times = [
+    { tab: '60', title: '1m' },
+    { tab: '300', title: '5m' },
+    { tab: '3600', title: '1h' },
+    { tab: '86400', title: '1d' },
+    { tab: '2592000', title: '30d' }
+  ]
+
   // Data for tabs
-  const data = [
+  const categories = [
     { tab: 'general', title: 'General' },
     { tab: 'patients', title: 'Patients' },
     { tab: 'appointments', title: 'Appointments' },
     { tab: 'dentists', title: 'Dentists' }
   ]
   return (
-    <div class="flex flex-col p-8">
-        <div class="flex items-center">
-      <h2 class="text-2xl font-bold px-2">Statistics</h2>
-        {data.map(item => tabComponent(item))}
+    <div class="p-8">
+        <p class="text-2xl font-bold px-2">Statistics</p>
+
+        <div class="flex items-center mt-2 flex-wrap gap-y-4">
+        {categories.map(item => tabComponent(item))}
+
       </div>
 
-      <Show when={activeTab() === 'general'}>
-      <div class="flex items-center justify-center mt-8">
-        <GeneralContent />
-        </div>
-      </Show>
-      <Show when={activeTab() === 'patients'}>
-      <div class="flex items-center justify-center mt-8">
-        <PatientsContent />
-        </div>
-      </Show>
-      <Show when={activeTab() === 'appointments'}>
-      <div class="flex items-center justify-center mt-8">
-        <AppointmentsContent />
-        </div>
-      </Show>
-      <Show when={activeTab() === 'dentists'}>
-        <div class="flex items-center justify-center mt-8">
-        <DentistsContent />
-        </div>
-      </Show>
+      <div class="flex items-center justify-center shadow-md">
+        <Graph type={activeTab()} timeframe={activeTime()}/>
+      </div>
+
+      <div class="flex justify-end items-center mt-2 mb-2 flex-wrap gap-y-4">
+      {times.map(item => timeComponent(item))}
+
+      </div>
     </div>
   )
 }
@@ -77,41 +84,5 @@ function TabButton (props: {
     >
       {children}
     </button>
-  )
-}
-
-// To replace with graph components
-function GeneralContent (): JSX.Element {
-  return <GraphComponentContainer>
-    General Graph Component
-    </GraphComponentContainer>
-}
-
-function PatientsContent (): JSX.Element {
-  return <GraphComponentContainer>
-    Graph Component for Patients
-    </GraphComponentContainer>
-}
-
-function AppointmentsContent (): JSX.Element {
-  return <GraphComponentContainer>
-    Graph Component for Appointments
-    </GraphComponentContainer>
-}
-
-// add placeholders
-function DentistsContent (): JSX.Element {
-  return <GraphComponentContainer>
-  Graph Component for Dentists
-  </GraphComponentContainer>
-}
-
-// Container component for graph components with styling
-function GraphComponentContainer (props: { children: string }): JSX.Element {
-  const containerClasses = 'h-96 w-4/5 border-2 border-gray-500 rounded-lg relative shadow-lg px-8 py-8 text-gray-500 mt-4 flex items-center justify-center'
-  return (
-      <div class={containerClasses}>
-        {props.children}
-      </div>
   )
 }
