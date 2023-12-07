@@ -3,20 +3,14 @@ import axios from 'axios'
 
 // validity check for users before patching
 
-export function validateName (fName: string, lName: string): boolean {
-  if (fName.trim() === '' || lName.trim() === '') {
-    return false
-  }
-  return true
+export function isValidName (fName: string, lName: string): boolean {
+  return fName.trim() !== '' && lName.trim() !== ''
 }
 
-function validateZip (zip: string): boolean {
+function isValidZip (zip: string): boolean {
   // Zip must be at least 5 digits
   const zipRegex = /^\d\d\d\d\d$/
-  if (zip.match(zipRegex) == null || Number(zip) <= 0) {
-    return false
-  }
-  return true
+  return zip.match(zipRegex) !== null && Number(zip) > 0
 }
 
 /**
@@ -25,7 +19,7 @@ function validateZip (zip: string): boolean {
  * @returns null if address change is valid; error message if the address change is not valid
  */
 export async function validateAddress (dentist: Dentist): Promise<null | string> {
-  if (!validateZip(String(dentist.clinicZipCode))) {
+  if (!isValidZip(String(dentist.clinicZipCode))) {
     return 'Zip must be five digits and be greater than zero.'
   }
   if (Number(dentist.clinicHouseNumber) <= 0) {

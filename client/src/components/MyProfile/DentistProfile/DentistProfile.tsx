@@ -5,7 +5,7 @@ import { createStore } from 'solid-js/store'
 import { createEffect, createSignal, type JSX } from 'solid-js'
 import { type AxiosResponse } from 'axios'
 import { type DentistProfileProps } from '../MyProfileTypes'
-import { validateName, validateAddress } from '../utils'
+import { isValidName, validateAddress } from '../utils'
 import CustomInput from '../CustomInput'
 import { Api } from '../../../utils/api'
 import * as CountryList from 'country-list'
@@ -53,7 +53,7 @@ export default function DentistProfile (dentistProp: DentistProfileProps): JSX.E
 
   const patchDentist = async function patchDentist (patchedDentist: Dentist): Promise<void> {
     // if false is returned, the name is not valid
-    const validDentist = validateName(patchedDentist.firstName, patchedDentist.lastName)
+    const validDentist = isValidName(patchedDentist.firstName, patchedDentist.lastName)
     if (!validDentist) {
       setError(new Error('First name and last name cannot be empty.'))
       setTimeout(() => setError(null), 3000)
