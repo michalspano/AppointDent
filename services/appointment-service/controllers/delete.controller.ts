@@ -113,10 +113,19 @@ export const deleteAppointment = async (req: Request, res: Response): AsyncResOb
   // finlly we sent a confirmation notification to the dentist who deleted it
   if (objToDelete.patientId !== null) {
     const patientMessage = `Your appointment on ${utils.formatDateTime(objToDelete.end_timestamp)} was canceled with your dentist. Please book another appointment.`;
-    utils.pubNotification(objToDelete.patientId, patientMessage, client);
+    try {
+      utils.pubNotification(objToDelete.patientId, patientMessage, client);
+    } catch (err) {
+      return res.status(503).json((err as Error).message);
+    }
   }
+
   const dentistMessage = `Your appointment on ${utils.formatDateTime(objToDelete.end_timestamp)} was successfully deleted.`;
-  utils.pubNotification(objToDelete.dentistId, dentistMessage, client);
+  try {
+    utils.pubNotification(objToDelete.dentistId, dentistMessage, client);
+  } catch (err) {
+    return res.status(503).json((err as Error).message);
+  }
 
   return res.status(200).json(objToDelete);
 };

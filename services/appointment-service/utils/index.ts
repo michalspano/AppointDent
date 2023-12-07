@@ -183,7 +183,12 @@ export const isForbiddenId = (id: string): boolean => {
 
 export const pubNotification = (email: string, message: string, client: MqttClient): void => {
   const payload = `${email}/${message}/*`;
-  client.publish('NOTREQ', payload);
+  try {
+    client.publish('NOTREQ', payload);
+  } catch (err) {
+    console.log(err);
+    throw new Error('Error while publishing notification.');
+  }
 };
 
 export const formatDateTime = (timestamp: number): string => {
@@ -195,6 +200,5 @@ export const formatDateTime = (timestamp: number): string => {
     hour: '2-digit',
     minute: '2-digit'
   };
-  const formatedTimestamp = new Date(timestamp * 1000).toISOString().slice(0, 16);
-  return new Date(formatedTimestamp).toLocaleDateString('sv-SE', options);
+  return new Date(timestamp * 1000).toLocaleDateString('sv-SE', options).slice(0, 16);
 };
