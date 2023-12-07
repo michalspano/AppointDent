@@ -1,13 +1,34 @@
 import { createSignal, type JSX, createEffect, onCleanup, Show } from 'solid-js'
 import default_doctor from '../../assets/default_doctor.jpg'
 import { Api } from '../../utils/api'
-import type { Appointment, Registration } from '../../utils/types'
+import { UserType, type Appointment, type DentistRegistration, type WhoisResponse } from '../../utils/types'
 import BookingConfirmationPopup from './BookingConfirmation'
-import { useParams } from '@solidjs/router'
+import { useParams, useNavigate } from '@solidjs/router'
+
 export default function AppointmentsList (): JSX.Element {
+  const navigate = useNavigate()
+
+  const isPatient = async (): Promise<boolean> => {
+    try {
+      const response: WhoisResponse = (await Api.get('/sessions/whois', { withCredentials: true })).data
+      if (response.type === UserType.Patient) {
+        return true
+      } else {
+        return false
+      }
+    } catch (error: any) {
+      console.error('Error getting user role', error)
+      return false
+    }
+  }
+
   createEffect(async () => {
     const params = useParams<{ email: string }>()
     setDentistEmail(atob(params.email))
+    const authResult: boolean = await isPatient()
+    if (!authResult) {
+      navigate('/calendar', { replace: true })
+    }
     await fetchAppointments()
     await fetchDentist()
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -94,7 +115,7 @@ export default function AppointmentsList (): JSX.Element {
   const [selectedTime, setSelectedTime] = createSignal<string>('')
   const [showConfirmation, setShowConfirmation] = createSignal<boolean>(false)
   const [selectedAppointment, setSelectedAppointment] = createSignal<Appointment | null>(null)
-  const [dentist, setDentist] = createSignal<Registration>()
+  const [dentist, setDentist] = createSignal<DentistRegistration>()
   const [dentistEmail, setDentistEmail] = createSignal<string>('')
   const [dentistName, setDentistName] = createSignal<string>()
   const [dentistLocation, setDentistLocation] = createSignal<string>()

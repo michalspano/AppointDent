@@ -31,7 +31,7 @@ export interface Dentist {
   clinicCountry: string
   clinicCity: string
   clinicStreet: string
-  clinicHouseNumber: string
+  clinicHouseNumber: number
   clinicZipCode: number
   picture: string
 }
@@ -50,7 +50,7 @@ export interface Notification {
   id?: string
 }
 
-export interface Registration {
+export interface DentistRegistration {
   email: string
   password: string
   firstName: string
@@ -61,4 +61,42 @@ export interface Registration {
   clinicHouseNumber: string
   clinicZipCode: string
   picture: string
+}
+
+export interface PatientRegistration {
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  birthDate: number
+}
+
+export enum UserType {
+  Dentist = 'd',
+  Patient = 'p'
+}
+
+/**
+ * @description the response of the WHOIS topic is an object
+ * with two properties: email and type. The email is the email
+ * of the user, and the type is the type of the user.
+ */
+export interface WhoisResponse {
+  status: SessionResponse
+  email: string | undefined
+  type: UserType | undefined
+}
+
+/**
+ * @description the session service responds with 0 on failed requests
+ * and with 1 on successful requests.
+ */
+export enum SessionResponse {
+  Fail = 0,
+  Success = 1
+}
+
+export interface Country {
+  name: string
+  code: string
 }
