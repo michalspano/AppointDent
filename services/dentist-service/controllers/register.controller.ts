@@ -48,7 +48,7 @@ export const register = async (req: Request, res: Response): Promise<Response<an
   }
   // Check if the email is already registered
   if (checkEmailRegistered(request.email)) {
-    return res.status(409).json({ message: 'Email is already registered' });
+    return res.status(409).json('Email is already registered');
   }
 
   const fieldsToUpdate: string[] = [];
@@ -89,7 +89,7 @@ export const register = async (req: Request, res: Response): Promise<Response<an
   try {
     const mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
     if (mqttResult === '0') {
-      return res.status(401).json({ message: 'Unable to authorize' });
+      return res.status(401).json('Email is already registered.');
     }
   } catch (error) {
     return res.status(504).json({ message: 'Service Timeout' });

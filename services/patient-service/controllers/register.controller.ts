@@ -35,7 +35,7 @@ export const registerController = async (req: Request, res: Response): Promise<R
 
   // To check if the email is already registered
   if (checkEmailRegistered(email)) {
-    return res.sendStatus(400);
+    return res.status(409).json('Email is already registered.');
   }
 
   try {
@@ -63,7 +63,7 @@ export const registerController = async (req: Request, res: Response): Promise<R
     const mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
     // To handle unsuccessful authorization
     if (mqttResult === '0') {
-      return res.sendStatus(401);
+      return res.status(401).json('Email is already registered');
     }
   } catch (error) {
     console.error('Error in registerController:', error);

@@ -7,7 +7,6 @@ import { type Signal, createSignal, type JSX, createEffect, onCleanup, Show, onM
 import {
   type WhoisResponse,
   type Appointment,
-  type Registration,
   type AppointmentResponse,
   type GroupedAppointments,
   type FilterInterval
@@ -147,7 +146,7 @@ export default function AppointmentsList (): JSX.Element {
   const [selectedTime, setSelectedTime] = createSignal<string>('')
   const [showConfirmation, setShowConfirmation] = createSignal<boolean>(false)
   const [selectedAppointment, setSelectedAppointment] = createSignal<Appointment | null>(null)
-  const [dentist, setDentist] = createSignal<Registration>()
+  const [dentist, setDentist] = createSignal<DentistRegistration>()
   const [dentistEmail, setDentistEmail] = createSignal<string>('')
   const [dentistName, setDentistName] = createSignal<string>()
   const [dentistLocation, setDentistLocation] = createSignal<string>()
