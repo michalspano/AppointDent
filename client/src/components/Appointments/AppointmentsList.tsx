@@ -1,7 +1,7 @@
 import { createSignal, type JSX, createEffect, onCleanup, Show } from 'solid-js'
 import default_doctor from '../../assets/default_doctor.jpg'
 import { Api } from '../../utils/api'
-import { UserType, type Appointment, type Registration, type WhoisResponse } from '../../utils/types'
+import { UserType, type Appointment, type DentistRegistration, type WhoisResponse } from '../../utils/types'
 import BookingConfirmationPopup from './BookingConfirmation'
 import { useParams, useNavigate } from '@solidjs/router'
 
@@ -115,7 +115,7 @@ export default function AppointmentsList (): JSX.Element {
   const [selectedTime, setSelectedTime] = createSignal<string>('')
   const [showConfirmation, setShowConfirmation] = createSignal<boolean>(false)
   const [selectedAppointment, setSelectedAppointment] = createSignal<Appointment | null>(null)
-  const [dentist, setDentist] = createSignal<Registration>()
+  const [dentist, setDentist] = createSignal<DentistRegistration>()
   const [dentistEmail, setDentistEmail] = createSignal<string>('')
   const [dentistName, setDentistName] = createSignal<string>()
   const [dentistLocation, setDentistLocation] = createSignal<string>()
