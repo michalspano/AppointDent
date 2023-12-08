@@ -1,5 +1,5 @@
 import { client } from '../mqtt/mqtt';
-const TIMEOUT = 10000;
+const TIMEOUT = 120000;
 
 /**
  * Used to wait for a response from mqtt before continuing the execution of the request processing.
@@ -17,10 +17,10 @@ export async function getServiceResponse (reqId: string, RESPONSE_TOPIC: string)
     const eventHandler = (topic: string, message: Buffer): void => {
       if (topic === RESPONSE_TOPIC) {
         if (message.toString().startsWith(`${reqId}/`)) {
+          resolve(message.toString().split('/')[1]);
           clearTimeout(timeout);
           client?.unsubscribe(topic);
           client?.removeListener('message', eventHandler);
-          resolve(message.toString().split('/')[1]);
         }
       }
     };
