@@ -22,6 +22,15 @@ export interface Appointment {
 };
 
 /**
+ * @description a custom type that denotes the relational table
+ * when a subscription is made between a patient and a dentist.
+ */
+export interface Subscription {
+  dentistId: string
+  patientId: string
+};
+
+/**
  * @description a custom type that denotes the response type
  * of the session service in terms of the allowed types of users.
  * Similarly as the SessionResponse enum, this type maps the
