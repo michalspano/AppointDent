@@ -1,8 +1,7 @@
 import http from 'k6/http';
 import { check } from 'k6';
-import { type User, generateUniqueEmail } from './helper';
+import { type User, generateUniqueEmail, host } from './helper';
 
-const host = 'http://localhost:3000/api/v1';
 export const options = {
   stages: [
     { duration: '1m', target: 1000 },

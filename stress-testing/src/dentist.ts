@@ -1,8 +1,7 @@
 import http from 'k6/http';
 import { check } from 'k6';
-import { type User, generateUniqueEmail } from './helper';
+import { type User, generateUniqueEmail, host } from './helper';
 
-const host = 'http://localhost:3000/api/v1/dentists';
 export const options = {
   stages: [
     { duration: '1m', target: 1000 },
@@ -31,7 +30,7 @@ function registerDentist (): User {
     'Content-Type': 'application/json'
   };
 
-  const res = http.post(host + '/register', JSON.stringify(payload), { headers, tags: { name: 'RegisterDentist' } });
+  const res = http.post(host + '/dentists/register', JSON.stringify(payload), { headers, tags: { name: 'RegisterDentist' } });
 
   // Check for expected status codes
   check(res, {
@@ -56,7 +55,7 @@ function loginDentist (dentist: User): User {
     'Content-Type': 'application/json'
   };
 
-  const res = http.post(host + '/login', JSON.stringify(payload), { headers, tags: { name: 'LoginDentist' } });
+  const res = http.post(host + '/dentists/login', JSON.stringify(payload), { headers, tags: { name: 'LoginDentist' } });
 
   // Check for expected status codes
   check(res, {
@@ -75,7 +74,7 @@ function getAllDentists (): void {
   };
 
   // Make a POST request to your login endpoint
-  const res = http.get(host + '/', { headers });
+  const res = http.get(host + '/dentists/', { headers });
 
   // Check for expected status codes
   check(res, {
@@ -89,7 +88,7 @@ function getDentist (dentist: User): void {
     'Content-Type': 'application/json'
   };
 
-  const res = http.get(host + `/${dentist.email}`, { headers, tags: { name: 'GetDentist' } });
+  const res = http.get(host + `/dentists/${dentist.email}`, { headers, tags: { name: 'GetDentist' } });
 
   // Check for expected status codes
   check(res, {
@@ -112,7 +111,7 @@ function patchDentist (dentist: User): void {
     Cookie: cookies
   };
 
-  const res = http.patch(host + `/${loginEmail}`, JSON.stringify(payload), { headers, tags: { name: 'UpdateDentist' } });
+  const res = http.patch(host + `/dentists/${loginEmail}`, JSON.stringify(payload), { headers, tags: { name: 'UpdateDentist' } });
 
   // Check for expected status codes
   check(res, {
@@ -130,7 +129,7 @@ function logoutDentist (dentist: User): void {
     Cookie: cookies
   };
 
-  const res = http.del(host + '/logout', null, { headers, tags: { name: 'LogoutDentist' } });
+  const res = http.del(host + '/dentists/logout', null, { headers, tags: { name: 'LogoutDentist' } });
 
   // Check for expected status codes
   check(res, {

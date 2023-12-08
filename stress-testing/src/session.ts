@@ -1,6 +1,6 @@
 import http from 'k6/http';
 import { check } from 'k6';
-import { type User, generateUniqueEmail } from './helper';
+import { type User, generateUniqueEmail, host } from './helper';
 
 export const options = {
   stages: [
@@ -11,7 +11,6 @@ export const options = {
 
   ]
 };
-const host = 'http://localhost:3000/api/v1';
 
 // Simulate dentist registration
 function registerDentist (): User {

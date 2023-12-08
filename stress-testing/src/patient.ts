@@ -1,6 +1,6 @@
 import http from 'k6/http';
 import { check } from 'k6';
-import { type User, generateUniqueEmail } from './helper';
+import { type User, generateUniqueEmail, host } from './helper';
 
 export const options = {
   stages: [
@@ -10,8 +10,6 @@ export const options = {
     { duration: '30s', target: 0 }
   ]
 };
-
-const host = 'http://localhost:3000/api/v1/patients';
 
 // Simulate patient registration
 function registerUser (): User {
@@ -28,7 +26,7 @@ function registerUser (): User {
     'Content-Type': 'application/json'
   };
 
-  const res = http.post(host + '/register', JSON.stringify(payload), { headers, tags: { name: 'RegisterPatient' } });
+  const res = http.post(host + '/patients/register', JSON.stringify(payload), { headers, tags: { name: 'RegisterPatient' } });
 
   // Check for expected status codes
   check(res, {
@@ -53,7 +51,7 @@ function loginUser (patient: User): User {
     'Content-Type': 'application/json'
   };
 
-  const res = http.post(host + '/login', JSON.stringify(payload), { headers, tags: { name: 'LoginPatient' } });
+  const res = http.post(host + '/patients/login', JSON.stringify(payload), { headers, tags: { name: 'LoginPatient' } });
 
   // Check for expected status codes
   check(res, {
@@ -75,7 +73,7 @@ function getPatient (patient: User): void {
     Cookie: cookies
   };
 
-  const res = http.get(host + `/${loginEmail}`, { headers, tags: { name: 'GetPatient' } });
+  const res = http.get(host + `/patients/${loginEmail}`, { headers, tags: { name: 'GetPatient' } });
 
   // Check for expected status codes
   check(res, {
@@ -98,7 +96,7 @@ function patchPatient (patient: User): void {
     Cookie: cookies
   };
 
-  const res = http.patch(host + `/${loginEmail}`, JSON.stringify(payload), { headers, tags: { name: 'UpdatePatient' } });
+  const res = http.patch(host + `/patients/${loginEmail}`, JSON.stringify(payload), { headers, tags: { name: 'UpdatePatient' } });
 
   // Check for expected status codes
   check(res, {
@@ -116,7 +114,7 @@ function logoutPatient (patient: User): void {
     Cookie: cookies
   };
 
-  const res = http.del(host + '/logout', null, { headers, tags: { name: 'LogoutPatient' } });
+  const res = http.del(host + '/patients/logout', null, { headers, tags: { name: 'LogoutPatient' } });
 
   // Check for expected status codes
   check(res, {

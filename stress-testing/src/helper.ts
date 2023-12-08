@@ -9,3 +9,5 @@ export interface User {
   email: string
   cookies: any
 }
+
+export const host: string = 'http://localhost:3000/api/v1';
