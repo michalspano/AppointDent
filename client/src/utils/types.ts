@@ -31,7 +31,7 @@ export interface Dentist {
   clinicCountry: string
   clinicCity: string
   clinicStreet: string
-  clinicHouseNumber: string
+  clinicHouseNumber: number
   clinicZipCode: number
   picture: string
 }
@@ -50,7 +50,7 @@ export interface Notification {
   id?: string
 }
 
-export interface Registration {
+export interface DentistRegistration {
   email: string
   password: string
   firstName: string
@@ -61,6 +61,14 @@ export interface Registration {
   clinicHouseNumber: string
   clinicZipCode: string
   picture: string
+}
+
+export interface PatientRegistration {
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  birthDate: number
 }
 
 export enum UserType {
@@ -91,4 +99,9 @@ export enum SessionResponse {
 export interface ServicesUnavailableModalProps {
   onCancel: () => void
   services: string[]
+}
+
+export interface Country {
+  name: string
+  code: string
 }

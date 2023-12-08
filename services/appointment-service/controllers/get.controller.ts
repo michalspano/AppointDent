@@ -210,7 +210,7 @@ const getAppointmentsByDentistId = async (req: Request, res: Response): AsyncRes
   // This is because the tests for this endpoint use a query parameter.
   if (sessionKey === undefined || utils.isForbiddenId(email)) {
     return res.status(400).json({ message: 'Bad request: missing session key or email.' });
-  } else if (dentistId === undefined || ['undefined', 'null', ''].includes(dentistId.trim())) {
+  } else if (utils.isForbiddenId(dentistId)) {
     return res.status(400).json({ message: 'Bad request: missing dentist id.' });
   }
 
@@ -356,6 +356,94 @@ const getAppointment = async (req: Request, res: Response): AsyncResObj => {
 };
 
 /**
+ * @description a controller function that is used to get the number of appointments.
+ * The `onlyAvailable` flag is used to filter only the unbooked appointments. By default,
+ * it gets the count of all appointments.
+ * This route is protected and shall only be used by administrators.
+ *
+ * @see UserType
+ * @see whoisByToken
+ *
+ * @param req the request object.
+ * @param res the response object.
+ * @returns A promise that resolves to a response object.
+ */
+const getAppointmentCount = async (req: Request, res: Response): AsyncResObj => {
+  if (database === undefined) {
+    return res.status(500).json({
+      message: 'Internal server error: database connection failed.'
+    });
+  }
+
+  if (client === undefined) {
+    return res.status(503).json({
+      message: 'Service unavailable: MQTT connection failed.'
+    });
+  }
+
+  const email: string | undefined = req.query.adminId as string;
+  const sessionKey: string | undefined = req.cookies.sessionKey;
+
+  if (sessionKey === undefined || utils.isForbiddenId(email)) {
+    return res.status(400).json({ message: 'Bad request: missing session key or email.' });
+  }
+
+  // Use the `WHOIS` topic to determine the role of the user.
+  // This, in turn, determines whether the user has the required privileges.
+  // Note: this could perhaps be a stand-alone topic for an admin.
+  const TOPIC: string = utils.MQTT_PAIRS.whois.req;
+  const RESPONSE_TOPIC: string = utils.MQTT_PAIRS.whois.res;
+
+  const reqId: string = utils.genReqId();
+  client.publish(TOPIC, `${reqId}/${sessionKey}/*`);
+  client.subscribe(RESPONSE_TOPIC);
+
+  try {
+    const result: WhoisResponse = await utils.whoisByToken(
+      reqId.toString(),
+      RESPONSE_TOPIC
+    );
+
+    if (result.status !== SessionResponse.Success) {
+      return res.status(401).json({ message: 'Unauthorized: invalid session.' });
+    }
+
+    /* Ensure that the user is an admin.
+     * There shall only be one account with the Admin type. hence this simple check.
+     * TODO: add proper checking (i.e., comparing matching email and type) if there's
+     * more admins added to the system. */
+    if (result.type !== UserType.Admin) {
+      return res.status(403).json({ message: 'Forbidden: missing administrator privileges.' });
+    }
+  } catch (err: Error | unknown) {
+    return res.status(504).json({ message: 'Service timeout: unable to verify session.' });
+  }
+
+  let getOnlyAvailable: boolean;
+  try {
+    getOnlyAvailable = utils.parseBinaryQueryParam(req.query.onlyAvailable);
+  } catch (err: Error | unknown) {
+    return res.status(400).json({ message: 'Bad request: invalid query parameter.' });
+  }
+
+  // Verification successful, proceed with the request.
+  let count: number;
+  try {
+    const rawCount: Record<string, number> = database.prepare(`
+      SELECT COUNT(*) FROM appointments
+      ${getOnlyAvailable ? 'WHERE patientId IS NULL' : ''}
+    `).get() as Record<string, number>;
+    count = Object.values(rawCount)[0]; // extract the first value (the count)
+  } catch (err: Error | unknown) {
+    return res.status(500).json({
+      message: 'Internal server error: fail performing selection.'
+    });
+  }
+
+  return res.status(200).json({ count });
+};
+
+/**
  * @description Wrappers for the controllers.
  *
  * @example
@@ -383,10 +471,15 @@ const appointment = (req: Request, res: Response): void => {
   void getAppointment(req, res);
 };
 
+const appointmentCount = (req: Request, res: Response): void => {
+  void getAppointmentCount(req, res);
+};
+
 // Export the controllers.
 export default {
   allAppointments,
   appointmentsByPatientId,
   appointmentsByDentistId,
-  appointment
+  appointment,
+  appointmentCount
 };

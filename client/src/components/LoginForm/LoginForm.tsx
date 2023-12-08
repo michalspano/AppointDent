@@ -33,7 +33,7 @@ export default function LoginForm (): JSX.Element {
           const response = await Api.post('/admins/login', { email: email(), password: password() }, { withCredentials: true })
           // If admin login is successful, user is redirected to admin-specific page
           if (response.status === 200) {
-            window.location.replace('/notifications') // TODO: add the admin route when we have it
+            window.location.replace('/admin-page') // TODO: add the admin route when we have it
           }
         } catch (error) { // Error handling of both patient and dentist login fails
           console.error('Error during login', error)
