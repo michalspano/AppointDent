@@ -176,7 +176,7 @@ enum ForbiddenIds {
  * @param id the id to check
  * @returns a boolean value
  */
-export const isForbiddenId = (id: string): boolean => {
+export const isForbiddenId = (id?: string): boolean => {
   if (id === undefined) return true;
   return Object.values(ForbiddenIds).includes(id.toUpperCase().trim()) || id === '';
 };

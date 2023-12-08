@@ -1,72 +1,102 @@
-import { createSignal, type JSX, createEffect, onCleanup, Show } from 'solid-js'
-import default_doctor from '../../assets/default_doctor.jpg'
 import { Api } from '../../utils/api'
-import { UserType, type Appointment, type DentistRegistration, type WhoisResponse } from '../../utils/types'
+import { isPatient } from '../../utils'
+import { useParams, useNavigate, useSearchParams } from '@solidjs/router'
+import default_doctor from '../../assets/default_doctor.jpg'
 import BookingConfirmationPopup from './BookingConfirmation'
-import { useParams, useNavigate } from '@solidjs/router'
+import { type Signal, createSignal, type JSX, createEffect, onCleanup, Show, onMount } from 'solid-js'
+import {
+  type WhoisResponse,
+  type Appointment,
+  type AppointmentResponse,
+  type GroupedAppointments,
+  type FilterInterval
+} from '../../utils/types'
 
 export default function AppointmentsList (): JSX.Element {
   const navigate = useNavigate()
+  const FETCH_INTERVAL: Readonly<number> = 5000
+  const [queryParams] = useSearchParams()
 
-  const isPatient = async (): Promise<boolean> => {
-    try {
-      const response: WhoisResponse = (await Api.get('/sessions/whois', { withCredentials: true })).data
-      if (response.type === UserType.Patient) {
-        return true
-      } else {
-        return false
-      }
-    } catch (error: any) {
-      console.error('Error getting user role', error)
-      return false
-    }
-  }
-
+  /**
+   * Continuous monitor for the user's authentication status.
+   */
   createEffect(async () => {
-    const params = useParams<{ email: string }>()
-    setDentistEmail(atob(params.email))
     const authResult: boolean = await isPatient()
-    if (!authResult) {
-      navigate('/calendar', { replace: true })
-    }
-    await fetchAppointments()
-    await fetchDentist()
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    setInterval(async () => {
-      await fetchAppointments()
-    }, 5000)
+    if (!authResult) navigate('/calendar', { replace: true })
   })
 
+  /**
+   * The onMount hook is called when the component is mounted.
+   * This logic is extracted from the createEffect hook to avoid
+   * calling the API multiple times.
+   */
+  onMount(() => {
+    /* This is just a detail, but FilterInterval doesn't permit null values
+     * hence an empty string is used instead. This is not checked by TS and
+     * is only to ensure consistency. */
+    setTimeRange({
+      start: queryParams.from ?? '',
+      end: queryParams.to ?? ''
+    })
+    const params: Record<string, string> = useParams<{ email: string }>()
+    setDentistEmail(atob(params.email))
+
+    // Fetch resources in a loop
+    void fetchAppointments(); void fetchDentist()
+    setInterval(() => { void fetchAppointments() }, FETCH_INTERVAL)
+  })
+  /**
+   * Fetches all available appointments for the dentist. If a valid time range is specified,
+   * then only the appointments within the given time range are fetched.
+   */
   async function fetchAppointments (): Promise<void> {
     try {
-      const patientResponse = await Api.get('sessions/whois', {
-        withCredentials: true
-      })
-      const patientEmail = patientResponse.data.email
+      const patientResponse: WhoisResponse = (await Api.get('sessions/whois', { withCredentials: true })).data
+      const patientEmail: string = patientResponse.email?.toString() ?? ''
 
-      // Obtain all available appointments for the dentist
-      const requestURL: string = `/appointments/dentists/${dentistEmail()}?userId=${patientEmail}&onlyAvailable=true`
-      const response = await Api.get(requestURL, { withCredentials: true })
-      const appointments = response.data
-      const formattedAppointments = appointments.map((appointment: any) => ({
-        id: appointment.id,
-        title: appointment.patientId !== null ? appointment.patientId : '',
-        start: new Date(appointment.start_timestamp * 1000).toLocaleString('sv-SE'),
-        end: new Date(appointment.end_timestamp * 1000).toLocaleString('sv-SE')
-      }))
+      const hasInterval: boolean = (timeRange().start !== '') &&
+                                   (timeRange().end !== '')
 
-      const groupedAppointments = formattedAppointments.reduce((acc: any, appointment: any) => {
-        const day = appointment.start.slice(0, 10)
-        if (acc[day] === undefined) {
-          acc[day] = []
-        }
-        acc[day].push(appointment)
-        return acc
-      }, {})
-      const groupedAppointmentsArray = Object.entries(groupedAppointments).map(([day, appointments]) => ({
-        day,
-        appointments
-      }))
+      // Formatted request URL with all *default* parameters
+      let requestURL: string = `/appointments/dentists/${dentistEmail()}` +
+                                `?userId=${patientEmail}&onlyAvailable=true`
+
+      // If the time range is given, add the query parameters to the request URL
+      // Afterwards, fetch the appointments based on the query parameters
+      if (hasInterval) {
+        const filterSubquery: string = `&from=${timeRange().start}&to=${timeRange().end}`
+        requestURL += filterSubquery
+      }
+
+      const appointments: AppointmentResponse[] = (
+        await Api.get(requestURL, { withCredentials: true })
+      ).data ?? []
+
+      // Format each 'raw' response of AppointmentResponse type to the Appointment type
+      const formattedAppointments: Appointment[] =
+        appointments.map((appointment: AppointmentResponse) => ({
+          title: '', // can be set to empty because it's not used in the view
+          id: appointment.id,
+          start: new Date(appointment.start_timestamp * 1000).toLocaleString('sv-SE').toString(),
+          end: new Date(appointment.end_timestamp * 1000).toLocaleString('sv-SE').toString()
+        }))
+
+      // Group appointments by day
+      const groupedAppointments: Record<string, Appointment[]> =
+        formattedAppointments.reduce((acc: Record<string, Appointment[]>, appointment: Appointment) => {
+          const day: string = appointment.start.slice(0, 10)
+          if (acc[day] === undefined) acc[day] = []
+          acc[day].push(appointment)
+          return acc
+        }, {})
+
+      // Dump to an array for sorting
+      const groupedAppointmentsArray: GroupedAppointments[] =
+        Object.entries(groupedAppointments).map(([day, appointments]) => (
+          { day, appointments }
+        ))
+
+      // Sort the grouped appointments by day
       groupedAppointmentsArray.sort((a, b) => (a.day > b.day ? 1 : -1))
       setAvailableDays(groupedAppointmentsArray)
     } catch (error) {
@@ -74,6 +104,7 @@ export default function AppointmentsList (): JSX.Element {
     }
   }
 
+  // TODO: add proper types.
   async function fetchDentist (): Promise<void> {
     try {
       const response = await Api.get(`/dentists/${dentistEmail()}`)
@@ -87,6 +118,7 @@ export default function AppointmentsList (): JSX.Element {
     }
   }
 
+  // TODO: add proper types.
   async function bookAppointment (appointment: Appointment): Promise<void> {
     const appointmentId = appointment.id
     const patientResponse = await Api.get('sessions/whois', {
@@ -104,11 +136,10 @@ export default function AppointmentsList (): JSX.Element {
     }
   }
 
-  interface GroupedAppointments {
-    day: string
-    appointments: unknown
-  }
-
+  /* Declaration of signals */
+  const [timeRange, setTimeRange]: Signal<FilterInterval> = createSignal<FilterInterval>({
+    start: '', end: ''
+  })
   const [availableDays, setAvailableDays] = createSignal<GroupedAppointments[]>([])
   const [availableTime, setAvailableTime] = createSignal<Appointment[]>([])
   const [selectedDate, setSelectedDate] = createSignal<string>('')
@@ -121,8 +152,11 @@ export default function AppointmentsList (): JSX.Element {
   const [dentistLocation, setDentistLocation] = createSignal<string>()
   const [dentistImage, setDentistImage] = createSignal<string>()
 
+  // TODO: add proper types to all function below.
   const formatDate = (date: string): string => {
-    const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' }
+    const options: Intl.DateTimeFormatOptions = {
+      day: 'numeric', month: 'short', year: 'numeric'
+    }
     return new Date(date).toLocaleDateString('sv-SE', options)
   }
 
@@ -142,7 +176,7 @@ export default function AppointmentsList (): JSX.Element {
     const isMatchingDay = (entry: { day: any }): boolean => entry.day === appointment.day
     const selectedDayData = availableDaysData.find(isMatchingDay)
     if (selectedDayData !== undefined) {
-      setAvailableTime(selectedDayData.appointments as Appointment[])
+      setAvailableTime(selectedDayData.appointments)
     }
   }
   const onTimeSelect = (appointment: any): void => {
@@ -207,7 +241,7 @@ export default function AppointmentsList (): JSX.Element {
               </div>
             )}
             {(selectedDate() !== '') && (selectedTime() !== '') && (
-              <button class='bg-secondary rounded-lg text-white p-4 mr-3 mt-6 ml-4 text-black px-8' onClick={onBookAppointment}>
+              <button class='bg-secondary rounded-lg text-white p-4 mr-3 mt-6 ml-4 px-8' onClick={onBookAppointment}>
                 Book Appointment
               </button>
             )}
