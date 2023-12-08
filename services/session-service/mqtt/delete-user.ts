@@ -6,6 +6,11 @@ import { type Statement } from 'better-sqlite3';
 
 const TOPIC = 'DELUSER';
 const RESPONSE_TOPIC = 'DELUSERRES';
+const sessionQuery: Statement<any> | Statement<[any]> | undefined = database?.prepare('SELECT expiry FROM sessions WHERE hash = ?');
+const userDeleteQuery = database?.prepare('DELETE FROM users WHERE email = ?');
+const sessionDeleteQuery = database?.prepare('DELETE FROM sessions WHERE hash = ?');
+const userQuery: Statement<any> | Statement<[any]> | undefined = database?.prepare('SELECT session_hash FROM users WHERE email = ?');
+
 /**
  * Delete user from database.
  * @param user The user object to be deleted.
@@ -15,21 +20,17 @@ export async function deleteUser (request: DeleteUserRequest): Promise<void> {
   await new Promise<void>((resolve, reject) => {
     try {
       // Retrieve the session hash for the user from the database
-      const userQuery: Statement<any> | Statement<[any]> | undefined = database?.prepare('SELECT session_hash FROM users WHERE email = ?');
       const userResult: User = userQuery?.get(request.email) as User;
 
       if (userResult === undefined) { reject(new Error('No such user')); return; }
 
       // Retrieve the session expiry from the database
-      const sessionQuery: Statement<any> | Statement<[any]> | undefined = database?.prepare('SELECT expiry FROM sessions WHERE hash = ?');
       const sessionResult: unknown = sessionQuery?.get(userResult.session_hash);
       // Get the current timestamp
       const timestamp = Math.round(Date.now() / 1000);
       // Can not authenticate user if the session is undefined or expired
       if (sessionResult === undefined || (sessionResult as Session).expiry < timestamp) { reject(new Error('Cannot authenticate user')); return; }
-      const userDeleteQuery = database?.prepare('DELETE FROM users WHERE email = ?');
       const userDeleteResult = userDeleteQuery?.run(request.email);
-      const sessionDeleteQuery = database?.prepare('DELETE FROM sessions WHERE hash = ?');
       const sessionDeleteResult = sessionDeleteQuery?.run(userResult.session_hash);
       if (userDeleteResult?.changes === 0 || sessionDeleteResult?.changes === 0) {
         // If no rows were affected, then dentist with the given email was not found
