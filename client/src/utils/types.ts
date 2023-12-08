@@ -87,3 +87,8 @@ export enum SessionResponse {
   Fail = 0,
   Success = 1
 }
+
+export interface ServicesUnavailableModalProps {
+  onCancel: () => void
+  services: string[]
+}

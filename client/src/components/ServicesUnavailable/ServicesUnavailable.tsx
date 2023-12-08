@@ -16,10 +16,12 @@ function getKilledServicesNames (statusObject: object): string[] {
     .map(([serviceName]) => serviceName)
 }
 
-createEffect(async () => {
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  setInterval(async () => {
-    await servicesErr()
+createEffect(() => {
+  setInterval(() => {
+    servicesErr()
+      .catch((error) => {
+        console.error(error)
+      })
   }, 5000)
 })
 

@@ -1,18 +1,14 @@
 import { For } from 'solid-js'
 import './ServicesUnavailable.css'
 import { type JSX } from 'solid-js/jsx-runtime'
-
-interface ModalProps {
-  onCancel: () => void
-  services: string[]
-}
+import type { ServicesUnavailableModalProps } from '../../utils/types'
 
 const transformString = (input: string): string => {
   const words = input.split('-')
   return words.map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
 }
 
-export default function ServicesUnavailableModal (props: ModalProps): JSX.Element {
+export default function ServicesUnavailableModal (props: ServicesUnavailableModalProps): JSX.Element {
   return (
     <div class="fixed inset-0 flex items-center justify-center z-50 text-black bg-transparent-black">
       <div class="bg-white p-10 rounded-lg shadow-xl text-black w-96">
