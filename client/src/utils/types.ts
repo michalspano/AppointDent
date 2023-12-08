@@ -131,6 +131,11 @@ export enum SessionResponse {
   Success = 1
 }
 
+export interface ServicesUnavailableModalProps {
+  onCancel: () => void
+  services: string[]
+}
+
 export interface Country {
   name: string
   code: string
