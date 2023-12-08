@@ -42,12 +42,12 @@ async function spawnService (serviceName: string, servicesPath: string, retryOnB
         child.stderr?.on('data', (data) => {
           console.error(`${serviceName}: ${data}`);
         });
-
-        child.on('close', (code: number | null) => {
-          if (code !== 0) {
-            throw new Error(`${serviceName}: Exited with non-zero code`);
-          }
-        });
+        // Comment during implementation of #91.
+        // child.on('close', (code: number | null) => {
+        //   if (code !== 0) {
+        //     throw new Error(`${serviceName}: Exited with non-zero code`);
+        //   }
+        // });
       } else if (retryOnBuildFault) {
         /**
          * In the event of an initial fault, we attempt to recover the system using a fault recovery
@@ -97,16 +97,20 @@ async function spawnServices (servicesPath: string, services: string[]): Promise
         });
       });
 
-      ['SIGINT', 'SIGTERM', 'SIGQUIT', 'exit'].forEach((event: string) => {
-        process.on(event, () => {
-          while (children.length > 0) {
-            const child = children.pop();
-            child?.process.kill();
-            console.log('Killed ' + child?.name + ' with code SIGTERM');
-          }
-          process.exit(0);
-        });
-      });
+      // Comment during implementation of #91.
+      // When a child process fails, this method kills the server;
+      // however, in #91, the system should be able to notify the client if a service is unavailable without crashing the system.
+
+      // ['SIGINT', 'SIGTERM', 'SIGQUIT', 'exit'].forEach((event: string) => {
+      //   process.on(event, () => {
+      //     while (children.length > 0) {
+      //       const child = children.pop();
+      //       child?.process.kill();
+      //       console.log('Killed ' + child?.name + ' with code SIGTERM');
+      //     }
+      //     process.exit(0);
+      //   });
+      // });
       resolve();
     }).catch((err) => {
       reject(Error(`Fatal error occurred while spawning services: ${err}`));
