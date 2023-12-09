@@ -10,7 +10,10 @@ import { type Statement } from 'better-sqlite3';
  * The logic behind the query is to generate a set of empty rows with a
  * timestamp identifier, this becomes our empty time series that we then fill using
  * a left join on the requests table and group it by the previously generated empty
- * time series.
+ * time series. Do note that there is repainting, this is because we place requests
+ * in a group based on the nearest rounded minute, this is an important aspect to
+ * consider when looking at the chart in the frontend, without this it might look
+ * slightly strange.
  *
  * @param req request object
  * @param res response object

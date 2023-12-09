@@ -10,8 +10,6 @@
     "session": "npm run build && k6 run dist/session.js",
     "create-appointment" : "npm run build && k6 run dist/createappointment.js",
     "book-appointment" : "npm run build && k6 run dist/bookappointment.js",
-    "live-appointment" : "npm run build && k6 run dist/liveappointment.js",
-    "small-appointment" : "npm run build && k6 run dist/smallappointment.js",
     "notification" : "npm run build && k6 run dist/notification.js"
   },
   "keywords": [],
