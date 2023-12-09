@@ -383,7 +383,7 @@ const getAppointmentCount = async (req: Request, res: Response): AsyncResObj => 
   const sessionKey: string | undefined = req.cookies.sessionKey;
 
   if (sessionKey === undefined) {
-    return res.status(400).json({ message: 'Bad request: missing session key or email.' });
+    return res.status(400).json({ message: 'Bad request: missing session key.' });
   }
 
   // Use the `WHOIS` topic to determine the role of the user.
