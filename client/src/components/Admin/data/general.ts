@@ -1,10 +1,18 @@
 import { Api } from '../../../utils/api'
 import { type AnalyticsResponse, type ChartData } from '../../../utils/types'
 
-export async function getChartData (type: string, method: string, loggedInOnly: boolean): Promise<ChartData> {
+/**
+ * Used to fetch data from the admin service regarding the system usage
+ * @param category Free text search query for request/category of request
+ * @param method Free text HTTP method
+ * @param loggedInOnly Restrict to only logged in users or not
+ * @returns Data from the statistics API
+ */
+export async function getChartData (category: string, method: string, loggedInOnly: boolean): Promise<ChartData> {
   const labels: string[] = []
   const data: number[] = []
-  const rawData: AnalyticsResponse[] = (await Api.get(`/admins/requests?timeframe=600&method=${method}&search=${type}&loggedInOnly=${loggedInOnly}`, { withCredentials: true })).data
+  // At the moment we retrieve only 10 minutes data, later on it can be extended and made customizable
+  const rawData: AnalyticsResponse[] = (await Api.get(`/admins/requests?timeframe=600&method=${method}&search=${category}&loggedInOnly=${loggedInOnly}`, { withCredentials: true })).data
 
   for (let i = 0; i < rawData.length; i++) {
     let timeString: string = ''
