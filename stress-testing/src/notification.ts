@@ -1,25 +1,15 @@
 import http from 'k6/http';
 import { check } from 'k6';
+import { type User, generateUniqueEmail, host } from './helper';
 
-const host = 'http://localhost:3000/api/v1/dentists';
 export const options = {
   stages: [
-    { duration: '30s', target: 3000 },
-    { duration: '1m', target: 5000 }
+    { duration: '1m', target: 1000 },
+    { duration: '1m', target: 3000 },
+    { duration: '1m', target: 4000 },
+    { duration: '30s', target: 0 }
   ]
 };
-
-interface User {
-  email: string
-  cookies: any
-}
-
-// Function to generate a unique email address for each virtual user
-function generateUniqueEmail (): string {
-  const timestamp = Date.now();
-  const randomString = Math.random().toString(36).substring(7); // Generate a random string
-  return `test${timestamp}_${randomString}@example.com`;
-}
 
 // Simulate dentist registration
 function registerDentist (): User {
@@ -40,7 +30,7 @@ function registerDentist (): User {
     'Content-Type': 'application/json'
   };
 
-  const res = http.post(host + '/register', JSON.stringify(payload), { headers, tags: { name: 'RegisterDentist' } });
+  const res = http.post(host + '/dentists/register', JSON.stringify(payload), { headers, tags: { name: 'RegisterDentist' } });
 
   // Check for expected status codes
   check(res, {
@@ -48,7 +38,6 @@ function registerDentist (): User {
     'Status is not 401': (r) => r.status !== 401
   });
 
-  // Add the registered email to the array
   const dentist: User = { email: payload.email, cookies: undefined };
 
   return dentist;
@@ -56,7 +45,7 @@ function registerDentist (): User {
 
 // Simulate dentist login
 function loginDentist (dentist: User): User {
-  const loginEmail = dentist.email;
+  const loginEmail: string = dentist.email;
   const payload = {
     email: loginEmail,
     password: 'Password123!'
@@ -66,7 +55,7 @@ function loginDentist (dentist: User): User {
     'Content-Type': 'application/json'
   };
 
-  const res = http.post(host + '/login', JSON.stringify(payload), { headers, tags: { name: 'LoginDentist' } });
+  const res = http.post(host + '/dentists/login', JSON.stringify(payload), { headers, tags: { name: 'LoginDentist' } });
 
   // Check for expected status codes
   check(res, {
@@ -78,13 +67,14 @@ function loginDentist (dentist: User): User {
   return dentist;
 }
 
+// Simulate getting notifications from a dentist
 function getNotifications (dentist: User): void {
   const headers = {
     'Content-Type': 'application/json',
     Cookies: dentist.cookies
   };
 
-  const res = http.get(`http://localhost:3000/api/v1/notifications/${dentist.email}`, { headers, tags: { name: 'GetDentistNotifications' } });
+  const res = http.get(host + `/notifications/${dentist.email}`, { headers, tags: { name: 'GetDentistNotifications' } });
 
   // Check for expected status codes
   check(res, {
@@ -99,5 +89,6 @@ export default function (): void {
 
   // Simulate dentist login
   dentist = loginDentist(dentist);
+  // Simulate getting notifications
   getNotifications(dentist);
 }

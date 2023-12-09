@@ -26,7 +26,6 @@ export const loginController = async (req: Request, res: Response): Promise<Resp
 
   try {
     const result = database.prepare('SELECT email FROM patients WHERE email = ?').get(req.body.email);
-    console.log(result);
 
     if (result === undefined) {
       return res.sendStatus(404);

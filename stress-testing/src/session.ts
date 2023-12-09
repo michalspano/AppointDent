@@ -1,25 +1,16 @@
 import http from 'k6/http';
 import { check } from 'k6';
+import { type User, generateUniqueEmail, host } from './helper';
 
 export const options = {
   stages: [
-    { duration: '1s', target: 3000 }, // Ramp up to 100 virtual users in 1 minute
-    { duration: '1m', target: 3000 } // Ramp up to 200 virtual users in 1 minute
+    { duration: '1m', target: 1000 },
+    { duration: '1m', target: 3000 },
+    { duration: '1m', target: 4000 },
+    { duration: '30s', target: 0 }
 
   ]
 };
-const host = 'http://localhost:3000/api/v1/dentists';
-interface User {
-  email: string
-  cookies: any
-}
-
-// Function to generate a unique email address for each virtual user
-function generateUniqueEmail (): string {
-  const timestamp = Date.now();
-  const randomString = Math.random().toString(36).substring(7); // Generate a random string
-  return `test${timestamp}_${randomString}@example.com`;
-}
 
 // Simulate dentist registration
 function registerDentist (): User {
@@ -40,7 +31,7 @@ function registerDentist (): User {
     'Content-Type': 'application/json'
   };
 
-  const res = http.post(host + '/register', JSON.stringify(payload), { headers, tags: { name: 'RegisterDentist' } });
+  const res = http.post(host + '/dentists/register', JSON.stringify(payload), { headers, tags: { name: 'RegisterDentist' } });
 
   // Check for expected status codes
   check(res, {
@@ -56,7 +47,7 @@ function registerDentist (): User {
 
 // Simulate dentist login
 function loginDentist (dentist: User): User {
-  const loginEmail = dentist.email;
+  const loginEmail: string = dentist.email;
   const payload = {
     email: loginEmail,
     password: 'Password123!'
@@ -66,7 +57,7 @@ function loginDentist (dentist: User): User {
     'Content-Type': 'application/json'
   };
 
-  const res = http.post(host + '/login', JSON.stringify(payload), { headers, tags: { name: 'LoginDentist' } });
+  const res = http.post(host + '/dentists/login', JSON.stringify(payload), { headers, tags: { name: 'LoginDentist' } });
 
   // Check for expected status codes
   check(res, {
@@ -80,14 +71,14 @@ function loginDentist (dentist: User): User {
 
 // Simulate who is logged in
 function whois (user: User): void {
-  const cookies = user.cookies;
+  const cookies: string = user.cookies;
 
   const headers = {
     'Content-Type': 'application/json',
     Cookie: cookies
   };
 
-  const res = http.get('http://localhost:3000/api/v1/sessions/whois', { headers });
+  const res = http.get(host + '/sessions/whois', { headers });
 
   // Check for expected status codes
   check(res, {
@@ -102,5 +93,6 @@ export default function (): void {
   // Simulate user login
   user = loginDentist(user);
 
+  // Simulate getting who is logged in
   whois(user);
 }

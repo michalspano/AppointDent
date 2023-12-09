@@ -1,25 +1,15 @@
 import http from 'k6/http';
 import { check } from 'k6';
+import { type User, generateUniqueEmail, host } from './helper';
 
-const host = 'http://localhost:3000/api/v1/dentists';
 export const options = {
   stages: [
-    { duration: '30s', target: 2000 },
-    { duration: '1m', target: 5000 }
+    { duration: '1m', target: 1000 },
+    { duration: '1m', target: 3000 },
+    { duration: '1m', target: 4000 },
+    { duration: '30s', target: 0 }
   ]
 };
-
-interface User {
-  email: string
-  cookies: any
-}
-
-// Function to generate a unique email address for each virtual user
-function generateUniqueEmail (): string {
-  const timestamp = Date.now();
-  const randomString = Math.random().toString(36).substring(7); // Generate a random string
-  return `test${timestamp}_${randomString}@example.com`;
-}
 
 // Function to simulate user registration
 function registerDentist (): User {
@@ -41,7 +31,7 @@ function registerDentist (): User {
   };
 
   // Make a POST request to your registration endpoint
-  const res = http.post(host + '/register', JSON.stringify(payload), { headers, tags: { name: 'RegisterDentist' } });
+  const res = http.post(host + '/dentists/register', JSON.stringify(payload), { headers, tags: { name: 'RegisterDentist' } });
 
   // Check for expected status codes
   check(res, {
@@ -68,7 +58,7 @@ function loginDentist (user: User): User {
   };
 
   // Make a POST request to your login endpoint
-  const res = http.post(host + '/login', JSON.stringify(payload), { headers, tags: { name: 'LoginDentist' } });
+  const res = http.post(host + '/dentists/login', JSON.stringify(payload), { headers, tags: { name: 'LoginDentist' } });
 
   // Check for expected status codes
   check(res, {
@@ -80,7 +70,7 @@ function loginDentist (user: User): User {
   return user;
 }
 
-// Function to simulate appointment creation
+// Simulate appointment creation
 function createAppointment (user: User): string {
   const dentistEmail: string = user.email;
   const cookies: string = user.cookies;
@@ -96,15 +86,13 @@ function createAppointment (user: User): string {
     Cookies: cookies
   };
 
-  // Make a POST request to your login endpoint
-  const res = http.post('http://localhost:3000/api/v1/appointments', JSON.stringify(payload), { headers, tags: { name: 'CreateAppointment' } });
+  const res = http.post(host + '/appointments', JSON.stringify(payload), { headers, tags: { name: 'CreateAppointment' } });
   // Check for expected status codes
   check(res, {
     'Status is 201': (r) => r.status === 201,
     'Status is not 401': (r) => r.status !== 401
   });
 
-  // Parse the response body as JSON if it's a string
   const responseBody: any = res.body;
 
   // Parse the JSON response
@@ -115,7 +103,7 @@ function createAppointment (user: User): string {
   return appointmentId;
 }
 
-// Function to simulate getting all appointments from a dentist
+// Simulate getting all appointments from a dentist
 function getAppointments (user: User): void {
   const dentistEmail: string = user.email;
   const cookies: string = user.cookies;
@@ -125,8 +113,7 @@ function getAppointments (user: User): void {
     Cookies: cookies
   };
 
-  // Make a POST request to your login endpoint
-  const res = http.get(`http://localhost:3000/api/v1/appointments/dentists/${dentistEmail}?userId=${dentistEmail}`, { headers, tags: { name: 'GetDentistAppointments' } });
+  const res = http.get(host + `/appointments/dentists/${dentistEmail}?userId=${dentistEmail}`, { headers, tags: { name: 'GetDentistAppointments' } });
   // Check for expected status codes
   check(res, {
     'Status is 200': (r) => r.status === 200,
@@ -134,7 +121,7 @@ function getAppointments (user: User): void {
   });
 }
 
-// Function to simulate appointment creation
+// Simulate appointment deletion
 function deleteAppointment (user: User, appointmentId: string): void {
   const dentistEmail: string = user.email;
   const cookies: string = user.cookies;
@@ -144,8 +131,7 @@ function deleteAppointment (user: User, appointmentId: string): void {
     Cookies: cookies
   };
 
-  // Make a POST request to your login endpoint
-  const res = http.del(`http://localhost:3000/api/v1/appointments/${appointmentId}?dentistId=${dentistEmail}`, null, { headers, tags: { name: 'DeleteAppointment' } });
+  const res = http.del(host + `/appointments/${appointmentId}?dentistId=${dentistEmail}`, null, { headers, tags: { name: 'DeleteAppointment' } });
   // Check for expected status codes
   check(res, {
     'Status is 200': (r) => r.status === 200,

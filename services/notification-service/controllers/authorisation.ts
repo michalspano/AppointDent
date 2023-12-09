@@ -32,7 +32,7 @@ export const authoriseUser = async function (req: Request, res: Response): Promi
   // In this way, the notification-service does not care about other responses that are meant for
   // other services.
   const reqId = String(Math.round(Math.random() * 1000)); // random id between 0 and 999
-  client?.subscribe(RES_TOPIC);
+  client.subscribe(RES_TOPIC);
   client.publish(REQ_TOPIC, `${reqId}/${req.params.email}/${sessionKey}/*`);
 
   try {

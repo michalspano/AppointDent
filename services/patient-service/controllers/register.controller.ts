@@ -35,17 +35,17 @@ export const registerController = async (req: Request, res: Response): Promise<R
 
   // To check if the email is already registered
   if (checkEmailRegistered(email)) {
-    return res.sendStatus(400);
+    return res.status(409).json('Email is already registered.');
   }
 
+  let query;
   try {
   // To insert user into the database
-    const query = database.prepare(`
+    query = database.prepare(`
     INSERT INTO patients 
     (email, birthDate, lastName, firstName) 
     VALUES (?, ?, ?, ?)
   `);
-    query.run(email, birthDate, lastName, firstName);
   } catch (err) {
     console.log(err);
     return res.sendStatus(400);
@@ -63,12 +63,13 @@ export const registerController = async (req: Request, res: Response): Promise<R
     const mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
     // To handle unsuccessful authorization
     if (mqttResult === '0') {
-      return res.sendStatus(401);
+      return res.status(401).json('Email is already registered');
     }
   } catch (error) {
     console.error('Error in registerController:', error);
     return res.sendStatus(500);
   }
+  query.run(email, birthDate, lastName, firstName);
 
   return res.sendStatus(201);
 };
