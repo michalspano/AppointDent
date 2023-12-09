@@ -29,7 +29,6 @@ export const login = async (req: Request, res: Response): Promise<Response<any, 
 
   try {
     const result = database.prepare('SELECT email FROM dentists WHERE email = ?').get(req.body.email);
-    console.log(result);
 
     if (result === undefined) {
       return res.sendStatus(404);

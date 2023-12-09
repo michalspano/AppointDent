@@ -76,11 +76,6 @@ export const register = async (req: Request, res: Response): Promise<Response<an
   }
 
   /**
-   * Execute SQL query on db.
-   */
-  query.run(...values);
-
-  /**
    * If everything worked we should now be able to tell the session service to reqgister a new user.
    */
   const reqId = Math.floor(Math.random() * 1000); // Generates a random integer between 0 and 999
@@ -95,6 +90,11 @@ export const register = async (req: Request, res: Response): Promise<Response<an
     return res.status(504).json({ message: 'Service Timeout' });
   }
 
+  /**
+   * Execute SQL query on db.
+   */
+  query.run(...values);
+
   return res.sendStatus(201);
 };
 
@@ -103,6 +103,7 @@ export const register = async (req: Request, res: Response): Promise<Response<an
  * @param email email to check
  * @returns if the user is registered or not
  */
+
 function checkEmailRegistered (email: string): boolean {
   // Check if the email is already registered
   const checkEmailQuery = database?.prepare(`
