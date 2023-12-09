@@ -500,10 +500,6 @@ const getAppointmentCount = async (req: Request, res: Response): AsyncResObj => 
       return res.status(401).json({ message: 'Unauthorized: invalid session.' });
     }
 
-    /* Ensure that the user is an admin.
-     * There shall only be one account with the Admin type. hence this simple check.
-     * TODO: add proper checking (i.e., comparing matching email and type) if there's
-     * more admins added to the system. */
     if (result.type !== UserType.Admin) {
       return res.status(403).json({ message: 'Forbidden: missing administrator privileges.' });
     }
