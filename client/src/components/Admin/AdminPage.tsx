@@ -1,15 +1,30 @@
 import { createSignal, Show, type JSX, onCleanup } from 'solid-js'
-import './AdminPage.css'
 import { Graph } from './Graph/Graph'
 import { getAvailableAppointments } from './data/appointments'
+import { type Tab } from '../../utils/types'
 
-export interface Tab {
-  tab: string
-  title: string
-}
-void getAvailableAppointments()
 // Define the Admin component
 export default function Admin (): JSX.Element {
+// TabButton component to handle tab clicks
+  function TabButton (props: {
+    tab: string
+    activeTab: () => string
+    setActiveTab: (value: string) => void
+    children: string
+  }): JSX.Element {
+    const { tab, setActiveTab, children } = props
+    return (
+    <button
+      class={activeTab() === tab ? 'px-4 py-2 mr-4 btn bg-secondary text-white rounded-md shadow-md hover:bg-secondary transition' : 'px-4 py-2 mr-4 btn bg-primary text-white rounded-md shadow-md hover:bg-secondary transition'}
+      onClick={() => {
+        setActiveTab(tab)
+      }}
+    >
+      {children}
+    </button>
+    )
+  }
+
   // State to track the active tab
   const [activeTab, setActiveTab] = createSignal('appointments')
   const [availableAppointments, setAvailableAppointments] = createSignal(-1)
@@ -95,25 +110,5 @@ export default function Admin (): JSX.Element {
         </Show>
       </div>
     </div>
-  )
-}
-
-// TabButton component to handle tab clicks
-function TabButton (props: {
-  tab: string
-  activeTab: () => string
-  setActiveTab: (value: string) => void
-  children: string
-}): JSX.Element {
-  const { tab, setActiveTab, children } = props
-  return (
-    <button
-      class="custom-button mr-4"
-      onClick={() => {
-        setActiveTab(tab)
-      }}
-    >
-      {children}
-    </button>
   )
 }

@@ -11,7 +11,7 @@ export function Graph (props: ChartType): JSX.Element {
    * Used to automatically fetch chart data from analytics endpoint
    */
   const autoFetch = setInterval(() => {
-    getChartData(props.category, props.method, props.loggedInOnly).then((result) => {
+    getChartData(props.category, props.method, props.loggedInOnly).then((result: ChartData) => {
       chartData = result
       chartInstance.data.datasets = [{ label: '', data: chartData.data, borderWidth: 1 }]
       chartInstance.data.labels = chartData.labels
@@ -25,7 +25,7 @@ export function Graph (props: ChartType): JSX.Element {
     clearInterval(autoFetch)
   })
   onMount(() => {
-    getChartData(props.category, props.method, props.loggedInOnly).then((result) => {
+    getChartData(props.category, props.method, props.loggedInOnly).then((result: ChartData) => {
       chartData = result
       chartInstance = new Chart(chartRef, {
         type: 'line',

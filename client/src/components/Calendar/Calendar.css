@@ -33,11 +33,11 @@
   }
 
 
-  label {
+  .calendarLabel {
     color: white;
   }
 
-  button {
+  .calendarBtn {
     color: white;
   }
 

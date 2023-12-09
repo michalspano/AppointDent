@@ -4,7 +4,6 @@ import database from '../db/config';
  * JS before running it. To be able to test the service, we need to
  * have the whole service transpiled anyway, so ts-node is not
  * a suitable option. */
-database?.exec('DROP TABLE IF EXISTS admins;');
-database?.exec('DROP TABLE IF EXISTS requests;');
 console.log(`Dropping the database ${database?.name}...`);
+database?.exec('DROP TABLE IF EXISTS requests;');
 database?.exec('DROP TABLE IF EXISTS admins;');
