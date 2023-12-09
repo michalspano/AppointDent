@@ -380,11 +380,9 @@ const getAppointmentCount = async (req: Request, res: Response): AsyncResObj => 
       message: 'Service unavailable: MQTT connection failed.'
     });
   }
-
-  const email: string | undefined = req.query.adminId as string;
   const sessionKey: string | undefined = req.cookies.sessionKey;
 
-  if (sessionKey === undefined || utils.isForbiddenId(email)) {
+  if (sessionKey === undefined) {
     return res.status(400).json({ message: 'Bad request: missing session key or email.' });
   }
 

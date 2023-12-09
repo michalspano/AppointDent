@@ -53,15 +53,20 @@ export function routeProxy (req: Request, res: Response, next: NextFunction): vo
   if (clientCookie !== undefined) {
     clientHash = crypto.createHash('sha256').update(clientCookie).digest('hex');
   }
+  console.log('!!');
+  console.log(req.url);
+  console.log(req.url.includes('admins/requests'));
+  if (!req.url.includes('admins')) {
+    const analyticsEntry: AnalyticsData = {
+      method: req.method,
+      path: req.url,
+      agent: req.get('User-Agent') as string,
+      clientHash
+    };
+    console.log(analyticsEntry);
+    void axios.post(DATA_COLLECTOR_API + '/requests', analyticsEntry);
+  }
 
-  const analyticsEntry: AnalyticsData = {
-    method: req.method,
-    path: req.path,
-    agent: req.get('User-Agent') as string,
-    clientHash
-  };
-
-  void axios.post(DATA_COLLECTOR_API + '/requests', analyticsEntry);
   const service = pathParts[1];
   const target: httpProxy | undefined = proxies[service];
 

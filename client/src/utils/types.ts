@@ -88,20 +88,36 @@ export enum SessionResponse {
   Success = 1
 }
 
+/**
+ * Category of the request (patients, dentist etc.)
+ * HTTP method
+ * And if we should only regard logged in users.
+ */
 export interface ChartType {
-  type: string
-  timeframe: string
+  category: string
+  method: string
+  loggedInOnly: boolean
 }
+
+/**
+ * Labels is the x axis and data is the y axis, admin component
+ */
 export interface ChartData {
   data: number[]
   labels: string[]
 }
 
+/**
+ * Response from the statistics API
+ */
 export interface AnalyticsResponse {
-  id: string
-  timestamp: number
-  method: string
-  path: string
-  agent: string
-  clientHash: string
+  count: number
+  interval: number
+}
+
+/**
+ * The number of available appointments in the system
+ */
+export interface AvailableAppointmentsCount {
+  count: number
 }

@@ -1,97 +1,71 @@
-import { type AnalyticsData } from '../types/types';
+import { type AnalyticsResponse } from '../types/types';
 import type { Request, Response } from 'express';
 import database from '../db/config';
 import { type Statement } from 'better-sqlite3';
-import { client } from '../mqtt/mqtt';
-import { getServiceResponse } from './helper';
 
-// One year
-const MAX_INTERVAL_IN_SECONDS = 3600 * 24 * 365;
-const WHOIS_TOPIC = 'WHOIS';
-const WHOIS_RESPONSE_TOPIC = 'WHOISRES';
-async function getAnalyticsData (req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
-  if (database === undefined) {
-    return res.status(500).json({ message: 'Internal server error: database connection failed.' });
-  }
-  if (req.params.id === undefined) {
-    return res.status(400).json({ message: 'Missing id' });
-  }
-  const sessionKey: string | undefined = req.cookies.sessionKey;
-
-  if (sessionKey === undefined) {
-    return res.status(400).json({ message: 'Bad request: missing session key.' });
-  }
-
-  const reqId = Math.floor(Math.random() * 1000);
-  client?.subscribe(WHOIS_RESPONSE_TOPIC);
-  client?.publish(WHOIS_TOPIC, reqId + '/' + sessionKey + '/*');
-  let mqttResult: string = '';
-
-  try {
-    mqttResult = await getServiceResponse(reqId.toString(), WHOIS_RESPONSE_TOPIC);
-  } catch (error) {
-    console.error('Error in registerController:', error);
-  }
-  const mqttResultArr = mqttResult.split('/');
-  if (mqttResultArr[1] === '0') return res.sendStatus(403);
-  if (mqttResultArr[2] !== 'a') return res.status(403).json({ message: 'Unauthorized user type' });
-
-  /* A query can fail because of a bad request (e.g. invalid object),
-   * or that something is wrong with the database (an internal server error).
-   * TODO: add proper error handling, so that the latter case is appropriately
-   * handled with a 500 status code. */
-  let result: AnalyticsData;
-  try {
-    result = database.prepare('SELECT * FROM requests WHERE id = ?').get(req.params.id) as AnalyticsData;
-  } catch (err: Error | unknown) {
-    return res.status(500).json({
-      message: 'Internal server error: fail performing selection.'
-    });
-  }
-  if (result === undefined) return res.sendStatus(404);
-  return res.status(200).json(result);
-};
-
+/**
+ * This function is used to fetch analytics data from the database. It uses a somewhat complex
+ * SQL query.
+ *
+ * The logic behind the query is to generate a set of empty rows with a
+ * timestamp identifier, this becomes our empty time series that we then fill using
+ * a left join on the requests table and group it by the previously generated empty
+ * time series.
+ *
+ * @param req request object
+ * @param res response object
+ * @returns response object
+ */
 async function getAllAnalyticsData (req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
   if (database === undefined) {
     return res.status(500).json({ message: 'Internal server error: database connection failed.' });
   }
-  if (req.query.start === undefined) return res.status(400).json({ message: 'Start time needs to be set' });
-  if (req.query.end === undefined) return res.status(400).json({ message: 'Start time needs to be set' });
-  const start = parseInt(req.query.start as string);
-  const end = parseInt(req.query.end as string);
-  const interval = start - end;
-  if (interval > MAX_INTERVAL_IN_SECONDS) return res.status(400).json({ message: 'Interval too large' });
-  const sessionKey: string | undefined = req.cookies.sessionKey;
+  if (req.query.timeframe === undefined) return res.status(400).json({ message: 'Timeframe needs to be set' });
+  if (req.query.method === undefined) return res.status(400).json({ message: 'Method needs to be set' });
+  if (req.query.search === undefined) return res.status(400).json({ message: 'Search needs to be set' });
+  if (req.query.loggedInOnly === undefined) return res.status(400).json({ message: 'loggedInOnly needs to be set' });
 
-  if (sessionKey === undefined) {
-    return res.status(400).json({ message: 'Bad request: missing session key.' });
-  }
-  const reqId = Math.floor(Math.random() * 1000);
-  client?.subscribe(WHOIS_RESPONSE_TOPIC);
-  client?.publish(WHOIS_TOPIC, reqId + '/' + sessionKey + '/*');
-  let mqttResult: string = '';
+  const method: string = req.query.method as string;
+  const search: string = req.query.search as string;
+  const timeframe = parseInt(req.query.timeframe as string);
+  const now = Math.round(Date.now() / 1000);
+  const toWhere = now - timeframe;
+  /**
+   * If loggedInOnly is set it will only consider logged in users
+   * and return values based on users and not requests
+   */
+  const loggedInOnlyClause = req.query.loggedInOnly === 'true'
+    ? 'COUNT(DISTINCT request.clientHash)'
+    : 'COUNT(request.timestamp)';
 
-  try {
-    mqttResult = await getServiceResponse(reqId.toString(), WHOIS_RESPONSE_TOPIC);
-  } catch (error) {
-    console.error('Error in registerController:', error);
-  }
-  const mqttResultArr = mqttResult.split('/');
-  if (mqttResultArr[1] === '0') return res.sendStatus(403);
-  if (mqttResultArr[2] !== 'a') return res.status(403).json({ message: 'Unauthorized user type' });
-
-  /* A query can fail because of a bad request (e.g. invalid object),
-   * or that something is wrong with the database (an internal server error).
-   * TODO: add proper error handling, so that the latter case is appropriately
-   * handled with a 500 status code. */
+  /**
+   * Rounds timestamp to the nearest minute and then
+   * groups them together in accordance with the
+   * specified interval.
+   */
   const stmt: Statement = database.prepare(`
-    SELECT * FROM requests WHERE timestamp < ? AND timestamp > ?
-  `);
-  let result: AnalyticsData[];
+  WITH RECURSIVE intervals(interval) AS ( -- Define the name of the CTE
+    SELECT ? AS interval -- This is the start of the search
+    UNION ALL -- Ensure all computed intervals are added to result set
+    SELECT interval + 60 FROM intervals WHERE interval + 60 < ? -- Generate an interval 60 seconds from the start search
+  )
+  SELECT
+    intervals.interval, -- The row generated by CTE
+    ${loggedInOnlyClause} as count -- Depending on what we count (hash or ts) we set this here.
+  FROM
+    intervals -- We perform the operation on the generated CTE
+  LEFT JOIN requests AS request /* Perform a left join on the actual requests data, 
+  we use a left join to ensure that intervals generated by CTE is always included no matter what.*/
+    ON request.timestamp BETWEEN intervals.interval AND intervals.interval + 59 -- As long as the timestamp is within criteria, we join.
+    AND request.path LIKE ? -- And matches the sought path
+    AND request.method LIKE ? -- As well as the method.
+  GROUP BY intervals.interval; -- Finally we group the results by the interval generated in CTE.
+`);
+  let result: AnalyticsResponse[];
   try {
-    result = stmt.all(start, end) as AnalyticsData[];
+    result = stmt.all(toWhere, now, `%${search}%`, `%${method}%`) as AnalyticsResponse[];
   } catch (err: Error | unknown) {
+    console.error(err);
     return res.status(500).json({
       message: 'Internal server error: fail performing selection.'
     });
@@ -99,10 +73,6 @@ async function getAllAnalyticsData (req: Request, res: Response): Promise<Respon
   if (result.length === 0) return res.sendStatus(404);
   return res.status(200).json(result);
 };
-
-export function getRequest (req: Request, res: Response): void {
-  void getAnalyticsData(req, res);
-}
 
 export function getAllRequests (req: Request, res: Response): void {
   void getAllAnalyticsData(req, res);

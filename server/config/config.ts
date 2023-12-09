@@ -1,12 +1,23 @@
 import cors from 'cors';
 import morgan from 'morgan';
-import express, { type Express, type Request } from 'express';
+import express, { type NextFunction, type Express, type Request, type Response } from 'express';
 import cookieParser from 'cookie-parser';
 import queueMiddleware from 'express-queue';
 
 const app: Express = express();
+const queue = queueMiddleware({ maxQueue: -1, activeLimit: 1 });
 
-app.use(queueMiddleware({ maxQueue: -1, activeLimit: 1 }));
+/**
+ * Admins should not have to wait for other's requests, we let them bypass
+ * @param req request
+ * @param res response
+ * @param next next middleware
+ */
+function bypassQueue (req: Request, res: Response, next: NextFunction): void {
+  if (req.path.includes('admins')) { next(); return; };
+  queue(req, res, next);
+}
+app.use(bypassQueue);
 app.use(morgan('dev')); // Add morgan HTTP request logger.
 
 interface CorsOptions {
