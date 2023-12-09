@@ -38,14 +38,14 @@ export const registerController = async (req: Request, res: Response): Promise<R
     return res.status(409).json('Email is already registered.');
   }
 
+  let query;
   try {
   // To insert user into the database
-    const query = database.prepare(`
+    query = database.prepare(`
     INSERT INTO patients 
     (email, birthDate, lastName, firstName) 
     VALUES (?, ?, ?, ?)
   `);
-    query.run(email, birthDate, lastName, firstName);
   } catch (err) {
     console.log(err);
     return res.sendStatus(400);
@@ -69,6 +69,7 @@ export const registerController = async (req: Request, res: Response): Promise<R
     console.error('Error in registerController:', error);
     return res.sendStatus(500);
   }
+  query.run(email, birthDate, lastName, firstName);
 
   return res.sendStatus(201);
 };
