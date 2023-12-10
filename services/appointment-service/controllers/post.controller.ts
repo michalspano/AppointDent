@@ -11,7 +11,15 @@ import * as utils from '../utils';
 import database from '../db/config';
 import { type Statement } from 'better-sqlite3';
 import type { Request, Response } from 'express';
-import { SessionResponse, type AsyncResObj, UserType, type Appointment, type WhoisResponse } from '../types/types';
+import {
+  UserType,
+  SessionResponse,
+  type AsyncResObj,
+  type Appointment,
+  type WhoisResponse,
+  type PatientSubscription
+} from '../types/types';
+import { type MqttClient } from 'mqtt/*';
 
 const TOPIC: string = utils.MQTT_PAIRS.whois.req;
 const RESPONSE_TOPIC: string = utils.MQTT_PAIRS.whois.res;
@@ -104,6 +112,36 @@ const createAppointment = async (req: Request, res: Response): AsyncResObj => {
     stmt.run(Object.values(appointment));
   } catch (err: Error | unknown) {
     return res.status(400).json({ message: 'Bad request: invalid appointment object.' });
+  }
+
+  /**
+   * Check for all patients that are subscribed to the dentist. If there are any,
+   * publish a notification to them. Herein, we store only the patient's email
+   * in the array, the object with the dentist's email is not needed, we have
+   * the access to it with the `email` variable.
+   * 
+   * @see PatientSubscription
+   */
+  let subscriptions: PatientSubscription[] = [];
+  try {
+    subscriptions = database.prepare(`
+      SELECT patientEmail FROM subscriptions WHERE dentistEmail = ?
+    `).all(email) as PatientSubscription[];
+  } catch (err: Error | unknown) {
+    return res.status(500).json({ message: 'Internal server error: database error.' });
+  }
+
+  try {
+    // Traverse all the subscriptions and publish a notification to each patient.
+    subscriptions.forEach((subscription: PatientSubscription) => {
+      utils.pubNotification(
+        subscription.patientEmail,
+        utils.newAppointmentMsg(email),
+        client as MqttClient
+      );
+    });
+  } catch (err: Error | unknown) {
+    return res.status(503).json((err as Error).message);
   }
 
   // Everything went well, return the created object.
