@@ -1,0 +1,356 @@
+{
+	"info": {
+		"_postman_id": "ba240223-cb4d-4876-af27-7b4b35d7444f",
+		"name": "DBPopulation",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28868794"
+	},
+	"item": [
+		{
+			"name": "Create Dentist",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"let dentCount = pm.collectionVariables.get(\"dentCount\");",
+							"pm.collectionVariables.set(\"dentCount\", ++dentCount);",
+							"",
+							"if (dentCount < 20) {",
+							"    postman.setNextRequest(\"Create Dentist\");",
+							"} else {",
+							"    pm.collectionVariables.set(\"dentCount\", 0);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const clinicAdds = [",
+							"    {",
+							"        street: \"Gibraltargatan\",",
+							"        houseNumber : \"1\",",
+							"        zip: 41132",
+							"    },",
+							"    {",
+							"        street: \"Södra Vägen\",",
+							"        houseNumber : \"27\",",
+							"        zip: 41135",
+							"    },",
+							"    {",
+							"        street: \"Carlandersparken\",",
+							"        houseNumber : \"1\",",
+							"        zip: 41255",
+							"    },",
+							"    {",
+							"        street: \"Kapellplatsen\",",
+							"        houseNumber : \"8\",",
+							"        zip: 41131",
+							"    },",
+							"    {",
+							"        street: \"Vegagatan\",",
+							"        houseNumber : \"55\",",
+							"        zip: 41311",
+							"    },",
+							"    {",
+							"        street: \"Fjärde Långgatan\",",
+							"        houseNumber : \"48\",",
+							"        zip: 41327",
+							"    },",
+							"    {",
+							"        street: \"Kaserntorget\",",
+							"        houseNumber : \"11\",",
+							"        zip: 41118",
+							"    },",
+							"    {",
+							"        street: \"Södra Allégatan\",",
+							"        houseNumber : \"6\",",
+							"        zip: 41301",
+							"    },",
+							"    {",
+							"        street: \"Karl Gustavsgatan\",",
+							"        houseNumber : \"32\",",
+							"        zip: 41131",
+							"    },",
+							"    {",
+							"        street: \"Sjöporten\",",
+							"        houseNumber : \"4\",",
+							"        zip: 41764",
+							"    }",
+							"];",
+							"",
+							"let dentCount = Number(pm.collectionVariables.get(\"dentCount\"));",
+							"if (dentCount % 2 === 0 && dentCount < 20) {",
+							"    pm.collectionVariables.set(\"street\", clinicAdds[Math.trunc(dentCount / 2)].street);",
+							"    pm.collectionVariables.set(\"houseNumber\", clinicAdds[Math.trunc(dentCount / 2)].houseNumber);",
+							"    pm.collectionVariables.set(\"zip\", clinicAdds[Math.trunc(dentCount / 2)].zip);",
+							"}",
+							"",
+							"let dentistEmail = \"dentist\" + (dentCount + 1) + \"@example.com\";",
+							"pm.collectionVariables.set(\"dentEmail\", dentistEmail);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"{{dentEmail}}\",\n  \"password\": \"secretpassword\",\n  \"firstName\": \"{{$randomFirstName}}\",\n  \"lastName\": \"{{$randomLastName}}\",\n  \"clinicCountry\": \"SE\",\n  \"clinicCity\": \"Göteborg\",\n  \"clinicStreet\": \"{{street}}\",\n  \"clinicHouseNumber\": {{houseNumber}},\n  \"clinicZipCode\": {{zip}},\n  \"picture\": \"{{$randomImageDataUri}}\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/api/v1/dentists/register",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"dentists",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let dentCount = pm.collectionVariables.get(\"dentCount\");",
+							"let dentistEmail = \"dentist\" + (dentCount + 1) + \"@example.com\";",
+							"pm.collectionVariables.set(\"dentEmail\", dentistEmail);",
+							"console.log(`login ${dentCount}`);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"postman.setNextRequest(\"Create Appointment\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"{{dentEmail}}\",\n  \"password\": \"secretpassword\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/api/v1/dentists/login",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"dentists",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Appointment",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let startTimestamp = new Date(pm.variables.replaceIn(\"{{$randomDateFuture}}\")).getTime();",
+							"console.log(startTimestamp);",
+							"let endTimeStamp = startTimestamp + 3600000;",
+							"pm.collectionVariables.set(\"startTime\", startTimestamp / 1000);",
+							"pm.collectionVariables.set(\"endTime\", endTimeStamp / 1000);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response code shall be 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response is in JSON format\", function () {",
+							"    pm.response.to.be.json;",
+							"});",
+							"",
+							"// Parse the request and response JSON bodies",
+							"",
+							"var requestJson = JSON.parse(pm.request.body.raw);",
+							"var responseJson = pm.response.json();",
+							"",
+							"// Get the number of keys in the request and response",
+							"var requestKeys = Object.keys(requestJson).length;",
+							"var responseKeys = Object.keys(responseJson).length;",
+							"",
+							"// Compare the number of keys",
+							"// Must be lower by 2, because there's the auto-generated key in the",
+							"// response and patientId is set to NULL automatically.",
+							"pm.test(\"Number of keys in request is lower by 1 than the response\", function () {",
+							"    pm.expect(requestKeys).to.equal(responseKeys - 2);",
+							"});",
+							"",
+							"// Check if the patientId property is set to null",
+							"pm.test(\"Verify patientId is set to null\", function() {",
+							"    pm.expect(responseJson.patientId).to.equal(null);",
+							"});",
+							"",
+							"let appointmentCount = pm.collectionVariables.get(\"appointmentCount\");",
+							"pm.collectionVariables.set(\"appointmentCount\", ++appointmentCount);",
+							"let dentCount = pm.collectionVariables.get(\"dentCount\");",
+							"",
+							"if (appointmentCount < 20) {",
+							"    console.log(appointmentCount);",
+							"    postman.setNextRequest(\"Create Appointment\");",
+							"} else {",
+							"    pm.collectionVariables.set(\"dentCount\", ++dentCount);",
+							"    pm.collectionVariables.set(\"appointmentCount\", 0);",
+							"    if (dentCount < 20) {",
+							"        console.log(dentCount);",
+							"        postman.setNextRequest(\"Login\");",
+							"    } else {",
+							"        pm.collectionVariables.set(\"dentCount\", 0);",
+							"        postman.setNextRequest(null);",
+							"    }",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"start_timestamp\": {{startTime}},\n    \"end_timestamp\": {{endTime}},\n    \"dentistId\": \"{{dentEmail}}\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/api/v1/appointments",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"appointments"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "host",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "street",
+			"value": "Gibraltargatan",
+			"type": "string"
+		},
+		{
+			"key": "houseNumber",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "zip",
+			"value": "41132",
+			"type": "string"
+		},
+		{
+			"key": "dentCount",
+			"value": "0",
+			"type": "string"
+		},
+		{
+			"key": "dentEmail",
+			"value": "dentist1@example.com",
+			"type": "string"
+		},
+		{
+			"key": "appointmentCount",
+			"value": "0",
+			"type": "string"
+		},
+		{
+			"key": "startTime",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "endTime",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
