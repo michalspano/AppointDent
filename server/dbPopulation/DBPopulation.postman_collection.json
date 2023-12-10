@@ -7,6 +7,71 @@
 	},
 	"item": [
 		{
+			"name": "Create Patient",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let patientCount = Number(pm.collectionVariables.get(\"patientCount\"));",
+							"let birthDate = new Date(pm.variables.replaceIn(\"{{$randomDatePast}}\")).getTime();",
+							"pm.collectionVariables.set(\"patientBDate\", birthDate / 1000);",
+							"let patientEmail = \"patient\" + (patientCount + 1) + \"@example.com\";",
+							"pm.collectionVariables.set(\"patientEmail\", patientEmail);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response code shall be 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"let patientCount = pm.collectionVariables.get(\"patientCount\");",
+							"pm.collectionVariables.set(\"patientCount\", ++patientCount);",
+							"",
+							"if (patientCount < 20) {",
+							"    postman.setNextRequest(\"Create Patient\");",
+							"} else {",
+							"    pm.collectionVariables.set(\"patientCount\", 0);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"{{patientEmail}}\",\n    \"password\": \"secretpassword\",\n    \"birthDate\": \"{{patientBDate}}\",\n    \"lastName\": \"{{$randomLastName}}\",\n    \"firstName\": \"{{$randomFirstName}}\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/api/v1/patients/register",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"patients",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Create Dentist",
 			"event": [
 				{
@@ -346,6 +411,21 @@
 		},
 		{
 			"key": "endTime",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "patientCount",
+			"value": "0",
+			"type": "string"
+		},
+		{
+			"key": "patientEmail",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "patientBDate",
 			"value": "",
 			"type": "string"
 		}
