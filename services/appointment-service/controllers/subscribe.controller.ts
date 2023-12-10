@@ -95,9 +95,21 @@ const subToDentist = async (req: Request, res: Response): AsyncResObj => {
 
   try {
     /**
-     * Assuming that the ids are unique, we don't have to check for the
-     * number of changes. Similarly, existing entries are not checked,
-     * because a patient can resubscribe to a dentist. */
+     * Check if the subscription already exists. The user can mistakenly click on the
+     * button multiple times, so we need to check if the subscription already exists,
+     * so that the database is not filled with duplicate entries, and hence negatively
+     * affecting the performance.
+     */
+    const result: Subscription = database.prepare('SELECT * FROM subscriptions' +
+                                ' WHERE dentistEmail = ? AND patientEmail = ?').get(
+      dentistEmail, patientEmail
+    ) as Subscription;
+
+    if (result !== undefined) {
+      return res.status(409).json({ message: 'Conflict: subscription already exists.' });
+    }
+
+    // Proceed with the creation iff the subscription does not exist.
     database.prepare('INSERT INTO subscriptions VALUES (?, ?)').run(
       Object.values(subscription)
     );
@@ -107,7 +119,7 @@ const subToDentist = async (req: Request, res: Response): AsyncResObj => {
     });
   }
 
-  return res.status(200).json(subscription);
+  return res.status(201).json(subscription);
 };
 
 /**
@@ -182,16 +194,14 @@ const unsubFromDentist = async (req: Request, res: Response): AsyncResObj => {
 
   // Verification step successful, delete the subscription entry.
   try {
-    database.prepare('DELETE FROM subscriptions WHERE dentistId = ? AND patientId = ?').run(
+    database.prepare('DELETE FROM subscriptions WHERE dentistEmail = ? AND patientEmail = ?').run(
       dentistEmail, patientEmail
     );
   } catch (error: Error | unknown) {
-    return res.status(500).json({
-      message: 'Internal server error: database error.'
-    });
+    return res.status(500).json({ message: 'Internal server error: database error.' });
   }
 
-  return res.status(204);
+  return res.sendStatus(204);
 };
 
 /**
