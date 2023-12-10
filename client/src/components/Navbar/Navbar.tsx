@@ -8,6 +8,18 @@ import location from '../../assets/location.png'
 import { Api } from '../../utils/api'
 import profile from '../../assets/profile.png'
 import ServicesUnavailable from '../ServicesUnavailable/ServicesUnavailable'
+import { type NotificationData } from '../Notifications/types'
+
+export interface NotificationsResponse {
+  length: any
+  email: any
+  data: NotificationData[]
+}
+
+export interface NotificationCountData {
+  currentCount: number
+  parsedCurrentCount: number
+}
 
 const logout = async (): Promise<void> => {
   const endpoints = ['/dentists/logout', '/patients/logout', '/admins/logout']
@@ -59,18 +71,21 @@ const [showNotificationDot, setShowNotificationDot] = createSignal(false)
 const fetchNotificationCount = async (): Promise<void> => {
   try {
     const currentCount = localStorage.getItem('notificationsCount')
-    const parsedCurrentCount = currentCount !== null ? (parseInt(currentCount, 10)) : 0 // Convert to number, default to 0 if not a valid number
+    const parsedCurrentCount = currentCount !== null ? parseInt(currentCount, 10) : 0
 
-    const notificationResponse = await Api.get('sessions/whois', { withCredentials: true })
+    const notificationResponse = await Api.get<NotificationsResponse>('sessions/whois', { withCredentials: true })
     const userEmail = notificationResponse.data.email
-    const response = await Api.get(`notifications/${userEmail}`, { withCredentials: true })
-    const count = response.data.length
-    localStorage.setItem('notificationsCount', count)
 
-    const temp = (count - parsedCurrentCount)
+    const response = await Api.get<NotificationsResponse>(`notifications/${userEmail}`, { withCredentials: true })
+
+    const count = response.data.length
+
+    localStorage.setItem('notificationsCount', count.toString())
+
+    const temp = count - parsedCurrentCount
 
     const counter = localStorage.getItem('counter')
-    const parsedCounter = counter !== null ? (parseInt(counter, 10)) : 0
+    const parsedCounter = counter !== null ? parseInt(counter, 10) : 0
 
     const totalCounter = temp + parsedCounter
     localStorage.setItem('counter', totalCounter.toString())
@@ -86,7 +101,7 @@ createEffect(async () => {
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   setInterval(async () => {
     await fetchNotificationCount()
-  }, 10000)
+  }, 1000)
   onCleanup(() => {})
 })
 

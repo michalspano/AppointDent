@@ -30,7 +30,6 @@ export default function Notification (props: NotificationProps): JSX.Element {
       <div class="mt-2 whitespace-normal">
         {props.message}
       </div>
-      <div class="border-b border-gray-300 mt-4 border-line"></div>
     </div>
   )
 }
