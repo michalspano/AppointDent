@@ -1,117 +1,114 @@
-import { createSignal, type JSX, Show } from 'solid-js'
-import './AdminPage.css'
-
-export interface Place {
-  tab: string
-  title: string
-}
+import { createSignal, Show, type JSX, onCleanup } from 'solid-js'
+import { Graph } from './Graph/Graph'
+import { getAvailableAppointments } from './data/appointments'
+import { type Tab } from '../../utils/types'
 
 // Define the Admin component
 export default function Admin (): JSX.Element {
-  // State to track the active tab
-  const [activeTab, setActiveTab] = createSignal('general')
-
-  // Function to render tab buttons based on the data
-  const tabComponent = (item: Place): JSX.Element => {
-    return (
-        <TabButton tab={item.tab} activeTab={activeTab} setActiveTab={setActiveTab}>
-          {item.title}
-        </TabButton>
-    )
-  }
-
-  // Data for tabs
-  const data = [
-    { tab: 'general', title: 'General' },
-    { tab: 'patients', title: 'Patients' },
-    { tab: 'appointments', title: 'Appointments' },
-    { tab: 'dentists', title: 'Dentists' }
-  ]
-  return (
-    <div class="flex flex-col p-8">
-        <div class="flex items-center">
-      <h2 class="text-2xl font-bold px-2">Statistics</h2>
-        {data.map(item => tabComponent(item))}
-      </div>
-
-      <Show when={activeTab() === 'general'}>
-      <div class="flex items-center justify-center mt-8">
-        <GeneralContent />
-        </div>
-      </Show>
-      <Show when={activeTab() === 'patients'}>
-      <div class="flex items-center justify-center mt-8">
-        <PatientsContent />
-        </div>
-      </Show>
-      <Show when={activeTab() === 'appointments'}>
-      <div class="flex items-center justify-center mt-8">
-        <AppointmentsContent />
-        </div>
-      </Show>
-      <Show when={activeTab() === 'dentists'}>
-        <div class="flex items-center justify-center mt-8">
-        <DentistsContent />
-        </div>
-      </Show>
-    </div>
-  )
-}
-
 // TabButton component to handle tab clicks
-function TabButton (props: {
-  tab: string
-  activeTab: () => string
-  setActiveTab: (value: string) => void
-  children: string
-}): JSX.Element {
-  const { tab, setActiveTab, children } = props
-
-  // Custom button styling with an event handler
-  return (
+  function TabButton (props: {
+    tab: string
+    activeTab: () => string
+    setActiveTab: (value: string) => void
+    children: string
+  }): JSX.Element {
+    const { tab, setActiveTab, children } = props
+    return (
     <button
-      class="custom-button mr-4"
+      class={activeTab() === tab ? 'px-4 py-2 mr-4 btn bg-secondary text-white rounded-md shadow-md hover:bg-secondary transition' : 'px-4 py-2 mr-4 btn bg-primary text-white rounded-md shadow-md hover:bg-secondary transition'}
       onClick={() => {
         setActiveTab(tab)
       }}
     >
       {children}
     </button>
-  )
-}
+    )
+  }
 
-// To replace with graph components
-function GeneralContent (): JSX.Element {
-  return <GraphComponentContainer>
-    General Graph Component
-    </GraphComponentContainer>
-}
+  // State to track the active tab
+  const [activeTab, setActiveTab] = createSignal('appointments')
+  const [availableAppointments, setAvailableAppointments] = createSignal(-1)
+  // Function to render tab buttons based on the data
+  const tabComponent = (item: Tab): JSX.Element => {
+    return (
+      <TabButton tab={item.tab} activeTab={activeTab} setActiveTab={setActiveTab}>
+        {item.title}
+      </TabButton>
+    )
+  }
 
-function PatientsContent (): JSX.Element {
-  return <GraphComponentContainer>
-    Graph Component for Patients
-    </GraphComponentContainer>
-}
+  // Data for tabs
+  const categories = [
+    { tab: 'general', title: 'General' },
+    { tab: 'patients', title: 'Patients' },
+    { tab: 'appointments', title: 'Appointments' },
+    { tab: 'dentists', title: 'Dentists' }
+  ]
 
-function AppointmentsContent (): JSX.Element {
-  return <GraphComponentContainer>
-    Graph Component for Appointments
-    </GraphComponentContainer>
-}
+  // Keep track on the number of available appointments
+  const autoFetchAppointments = setInterval(() => {
+    getAvailableAppointments().then((result: number) => {
+      setAvailableAppointments(result)
+    }).catch((err) => {
+      console.error(err)
+      setAvailableAppointments(0)
+    })
+  }, 5000)
 
-// add placeholders
-function DentistsContent (): JSX.Element {
-  return <GraphComponentContainer>
-  Graph Component for Dentists
-  </GraphComponentContainer>
-}
-
-// Container component for graph components with styling
-function GraphComponentContainer (props: { children: string }): JSX.Element {
-  const containerClasses = 'h-96 w-4/5 border-2 border-gray-500 rounded-lg relative shadow-lg px-8 py-8 text-gray-500 mt-4 flex items-center justify-center'
+  // Destroy interval upon destruction of component
+  onCleanup(() => {
+    clearInterval(autoFetchAppointments)
+  })
   return (
-      <div class={containerClasses}>
-        {props.children}
+    <div class="p-8">
+      <p class="text-2xl font-bold px-2">Statistics</p>
+      <div class="flex items-center mt-2 flex-wrap gap-y-4">
+        {categories.map(item => tabComponent(item))}
       </div>
+      <Show when={activeTab() === 'appointments'}>
+        <p class="mt-4">Available appointments: <Show when={availableAppointments() === -1} fallback={<span class="font-bold">{availableAppointments()}</span>}>...</Show></p>
+      </Show>
+      <div class="flex items-center justify-center flex-wrap">
+        <Show when={activeTab() === 'general'}>
+          <div class="sm:w-full md:w-3/6 p-3">
+            <p class="font-bold">System requests</p>
+            <Graph category={'/'} method={''} loggedInOnly={true} />
+          </div>
+        </Show>
+
+        <Show when={activeTab() === 'appointments'}>
+          <div class="md:w-3/6 sm:w-full p-3">
+            <p class="font-bold">Booked appointments <span class="text-sm">(users)</span></p>
+            <Graph category={'toBook=true'} method={'PATCH'} loggedInOnly={true} />
+          </div>
+          <div class="md:w-3/6 sm:w-full p-3">
+            <p class="font-bold">Viewed appointments <span class="text-sm">(users)</span></p>
+            <Graph category={'/appointments/dentists'} method={'GET'} loggedInOnly={true} />
+          </div>
+        </Show>
+
+        <Show when={activeTab() === 'dentists'}>
+          <div class="sm:w-full md:w-3/6 p-3">
+            <p class="font-bold">Dentist registration requests</p>
+            <Graph category={'/dentists/register'} method={'POST'} loggedInOnly={false} />
+          </div>
+          <div class="sm:w-full md:w-3/6 p-3">
+            <p class="font-bold">Dentist login requests</p>
+            <Graph category={'/dentist/login'} method={'POST'} loggedInOnly={false} />
+          </div>
+        </Show>
+
+        <Show when={activeTab() === 'patients'}>
+          <div class="sm:w-full md:w-3/6 p-3">
+            <p class="font-bold">Patient registration requests</p>
+            <Graph category={'/patients/register'} method={'POST'} loggedInOnly={false} />
+          </div>
+          <div class="sm:w-full md:w-3/6 p-3">
+            <p class="font-bold">Patient login requests</p>
+            <Graph category={'/patients/login'} method={'POST'} loggedInOnly={false} />
+          </div>
+        </Show>
+      </div>
+    </div>
   )
 }

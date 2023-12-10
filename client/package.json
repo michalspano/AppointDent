@@ -17,6 +17,7 @@
     "@fullcalendar/timegrid": "^6.1.9",
     "@solidjs/router": "^0.8.4",
     "axios": "^1.6.2",
+    "chart.js": "^4.4.1",
     "country-list": "^2.3.0",
     "leaflet": "^1.9.4",
     "leaflet.markercluster": "^1.5.3",

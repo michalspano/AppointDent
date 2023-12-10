@@ -5,4 +5,5 @@ import database from '../db/config';
  * have the whole service transpiled anyway, so ts-node is not
  * a suitable option. */
 console.log(`Dropping the database ${database?.name}...`);
+database?.exec('DROP TABLE IF EXISTS requests;');
 database?.exec('DROP TABLE IF EXISTS admins;');

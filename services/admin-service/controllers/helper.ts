@@ -20,7 +20,7 @@ export async function getServiceResponse (reqId: string, RESPONSE_TOPIC: string)
           clearTimeout(timeout);
           client?.unsubscribe(topic);
           client?.removeListener('message', eventHandler);
-          resolve(message.toString().split('/')[1]);
+          resolve(message.toString());
         }
       }
     };

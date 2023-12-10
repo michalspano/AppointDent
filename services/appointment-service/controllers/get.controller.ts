@@ -66,7 +66,7 @@ const getAllAppointments = async (req: Request, res: Response): AsyncResObj => {
     const result: SessionResponse = await utils.verifySession(
       reqId.toString(),
       RESPONSE_TOPIC
-    ) as SessionResponse;
+    );
     if (result !== SessionResponse.Success) {
       return res.status(401).json({ message: 'Unauthorized: invalid session.' });
     }
@@ -418,7 +418,7 @@ const getAppointment = async (req: Request, res: Response): AsyncResObj => {
     const result: SessionResponse = await utils.verifySession(
       reqId.toString(),
       RESPONSE_TOPIC
-    ) as SessionResponse;
+    );
     if (result !== SessionResponse.Success) {
       return res.status(401).json({ message: 'Unauthorized: invalid session.' });
     }
@@ -474,12 +474,10 @@ const getAppointmentCount = async (req: Request, res: Response): AsyncResObj => 
       message: 'Service unavailable: MQTT connection failed.'
     });
   }
-
-  const email: string | undefined = req.query.adminId as string;
   const sessionKey: string | undefined = req.cookies.sessionKey;
 
-  if (sessionKey === undefined || utils.isForbiddenId(email)) {
-    return res.status(400).json({ message: 'Bad request: missing session key or email.' });
+  if (sessionKey === undefined) {
+    return res.status(400).json({ message: 'Bad request: missing session key.' });
   }
 
   // Use the `WHOIS` topic to determine the role of the user.
@@ -502,10 +500,6 @@ const getAppointmentCount = async (req: Request, res: Response): AsyncResObj => 
       return res.status(401).json({ message: 'Unauthorized: invalid session.' });
     }
 
-    /* Ensure that the user is an admin.
-     * There shall only be one account with the Admin type. hence this simple check.
-     * TODO: add proper checking (i.e., comparing matching email and type) if there's
-     * more admins added to the system. */
     if (result.type !== UserType.Admin) {
       return res.status(403).json({ message: 'Forbidden: missing administrator privileges.' });
     }
