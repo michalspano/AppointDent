@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "d8e239a8-f3cb-40f3-b143-c2657768f64f",
-		"name": "Test9decmain",
+		"_postman_id": "ffbc72c4-6c73-4598-99a6-b6693d1d8852",
+		"name": "Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "28264405"
+		"_exporter_id": "31133349"
 	},
 	"item": [
 		{
@@ -3913,7 +3913,7 @@
 							"response": []
 						},
 						{
-							"name": "GET (OK)",
+							"name": "GET (success)",
 							"event": [
 								{
 									"listen": "test",
@@ -4465,12 +4465,12 @@
 											"// Prase JSON response",
 											"var jsonData = pm.response.json();",
 											"",
-											"pm.test(\"Response contains 'dentistId' attribute\", function () {",
-											"    pm.expect(jsonData).to.have.property('dentistId');",
+											"pm.test(\"Response contains 'dentistEmail' attribute\", function () {",
+											"    pm.expect(jsonData).to.have.property('dentistEmail');",
 											"});",
 											"",
-											"pm.test(\"Response contains 'patientId' attribute\", function () {",
-											"    pm.expect(jsonData).to.have.property('patientId');",
+											"pm.test(\"Response contains 'patientEmail' attribute\", function () {",
+											"    pm.expect(jsonData).to.have.property('patientEmail');",
 											"});",
 											"",
 											"pm.test(\"'dentistId' is not NULL\", function (){",
