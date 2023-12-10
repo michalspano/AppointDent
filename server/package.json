@@ -15,6 +15,10 @@
     "newman-server": "run-p --race start-broker start newman-wait",
     "newman-wait": "wait-on http://localhost:3000/ http://localhost:3002 http://localhost:3003 http://localhost:3004 http://localhost:3005 http://localhost:3006 && npm run newman",
     "newman": "newman run tests/Test.postman_collection.json -e tests/Test.postman_environment.json",
+    "populate-db": "cross-env CUSTOM_DB_APPOINTMENTS=db/appointments.db CUSTOM_DB_ADMINS=db/admins.db CUSTOM_DB_DENTISTS=db/dentists.db CUSTOM_DB_NOTIFICATIONS=db/notifications.db CUSTOM_DB_PATIENTS=db/patients.db CUSTOM_DB_SESSIONS=db/sessions.db run-p dropdb:services newman-pop-server",
+    "newman-pop-server": "run-p --race start-broker start newman-pop-wait",
+    "newman-pop-wait": "wait-on http://localhost:3000/ http://localhost:3002 http://localhost:3003 http://localhost:3004 http://localhost:3005 http://localhost:3006 && npm run newman-pop",
+    "newman-pop": "newman run dbPopulation/DBPopulation.postman_collection.json",
     "lint": "eslint **/*.ts",
     "lint:fix": "eslint **/*.ts --fix"
   },

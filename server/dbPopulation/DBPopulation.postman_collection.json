@@ -137,7 +137,8 @@
 					"script": {
 						"exec": [
 							"let dentCount = pm.collectionVariables.get(\"dentCount\");",
-							"let dentistEmail = \"dentist\" + (dentCount + 1) + \"@example.com\";",
+							"let emailNum = Number(dentCount) + 1",
+							"let dentistEmail = \"dentist\" + emailNum + \"@example.com\";",
 							"pm.collectionVariables.set(\"dentEmail\", dentistEmail);",
 							"console.log(`login ${dentCount}`);"
 						],
@@ -194,7 +195,6 @@
 					"script": {
 						"exec": [
 							"let startTimestamp = new Date(pm.variables.replaceIn(\"{{$randomDateFuture}}\")).getTime();",
-							"console.log(startTimestamp);",
 							"let endTimeStamp = startTimestamp + 3600000;",
 							"pm.collectionVariables.set(\"startTime\", startTimestamp / 1000);",
 							"pm.collectionVariables.set(\"endTime\", endTimeStamp / 1000);"
