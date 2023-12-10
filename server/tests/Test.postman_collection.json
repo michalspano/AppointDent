@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "6c287a3d-a04d-4ee6-9d2b-c23633b65fff",
-		"name": "Test",
+		"_postman_id": "d8e239a8-f3cb-40f3-b143-c2657768f64f",
+		"name": "Test9decmain",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "31133349"
+		"_exporter_id": "28264405"
 	},
 	"item": [
 		{
@@ -5177,7 +5177,7 @@
 												"method": "GET",
 												"header": [],
 												"url": {
-													"raw": "{{host}}/api/v1/appointments/admins/count?adminId={{patientEmailSample}}",
+													"raw": "{{host}}/api/v1/appointments/admins/count",
 													"host": [
 														"{{host}}"
 													],
@@ -5187,12 +5187,6 @@
 														"appointments",
 														"admins",
 														"count"
-													],
-													"query": [
-														{
-															"key": "adminId",
-															"value": "{{patientEmailSample}}"
-														}
 													]
 												}
 											},
@@ -5281,7 +5275,7 @@
 												"method": "GET",
 												"header": [],
 												"url": {
-													"raw": "{{host}}/api/v1/appointments/admins/count?adminId={{dentistEmailSample}}",
+													"raw": "{{host}}/api/v1/appointments/admins/count",
 													"host": [
 														"{{host}}"
 													],
@@ -5291,12 +5285,6 @@
 														"appointments",
 														"admins",
 														"count"
-													],
-													"query": [
-														{
-															"key": "adminId",
-															"value": "{{dentistEmailSample}}"
-														}
 													]
 												}
 											},
@@ -5376,7 +5364,7 @@
 													"});",
 													"",
 													"pm.test(\"Contains correct response message\", function () {",
-													"    pm.expect(pm.response.json().message).to.equal(\"Bad request: missing session key or email.\");",
+													"    pm.expect(pm.response.json().message).to.equal(\"Bad request: missing session key.\");",
 													"});"
 												],
 												"type": "text/javascript"
@@ -5390,7 +5378,7 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{host}}/api/v1/appointments/admins/count?adminId={{adminEmailSample}}",
+											"raw": "{{host}}/api/v1/appointments/admins/count",
 											"host": [
 												"{{host}}"
 											],
@@ -5400,12 +5388,6 @@
 												"appointments",
 												"admins",
 												"count"
-											],
-											"query": [
-												{
-													"key": "adminId",
-													"value": "{{adminEmailSample}}"
-												}
 											]
 										}
 									},
@@ -5448,7 +5430,7 @@
 											}
 										],
 										"url": {
-											"raw": "{{host}}/api/v1/appointments/admins/count?adminId={{adminEmailSample}}",
+											"raw": "{{host}}/api/v1/appointments/admins/count",
 											"host": [
 												"{{host}}"
 											],
@@ -5458,76 +5440,12 @@
 												"appointments",
 												"admins",
 												"count"
-											],
-											"query": [
-												{
-													"key": "adminId",
-													"value": "{{adminEmailSample}}"
-												}
 											]
 										}
 									},
 									"response": []
 								}
 							]
-						},
-						{
-							"name": "GET COUNT (empty email)",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"Response code shall be 400\", function () {",
-											"    pm.response.to.have.status(400);",
-											"});",
-											"",
-											"pm.test(\"Response is an object\", function () {",
-											"    pm.expect(pm.response.json()).to.be.an('object');",
-											"});",
-											"",
-											"pm.test(\"Response contains 'message' attribute\", function () {",
-											"    pm.expect(pm.response.json()).to.have.property('message');",
-											"});",
-											"",
-											"pm.test(\"Contains correct response message\", function () {",
-											"    pm.expect(pm.response.json().message).to.equal(\"Bad request: missing session key or email.\");",
-											"});"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Cookie",
-										"value": "sessionKey={{empty}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{host}}/api/v1/appointments/admins/count?adminId={{empty}}",
-									"host": [
-										"{{host}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"appointments",
-										"admins",
-										"count"
-									],
-									"query": [
-										{
-											"key": "adminId",
-											"value": "{{empty}}"
-										}
-									]
-								}
-							},
-							"response": []
 						},
 						{
 							"name": "GET COUNT (invalid query param)",
@@ -5560,7 +5478,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host}}/api/v1/appointments/admins/count?adminId={{adminEmailSample}}&onlyAvailable=false_",
+									"raw": "{{host}}/api/v1/appointments/admins/count?onlyAvailable=false_",
 									"host": [
 										"{{host}}"
 									],
@@ -5572,10 +5490,6 @@
 										"count"
 									],
 									"query": [
-										{
-											"key": "adminId",
-											"value": "{{adminEmailSample}}"
-										},
 										{
 											"key": "onlyAvailable",
 											"value": "false_"
@@ -5613,7 +5527,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host}}/api/v1/appointments/admins/count?adminId={{adminEmailSample}}&onlyAvailable=true",
+									"raw": "{{host}}/api/v1/appointments/admins/count?onlyAvailable=true",
 									"host": [
 										"{{host}}"
 									],
@@ -5625,10 +5539,6 @@
 										"count"
 									],
 									"query": [
-										{
-											"key": "adminId",
-											"value": "{{adminEmailSample}}"
-										},
 										{
 											"key": "onlyAvailable",
 											"value": "true"
@@ -5666,7 +5576,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host}}/api/v1/appointments/admins/count?adminId={{adminEmailSample}}",
+									"raw": "{{host}}/api/v1/appointments/admins/count",
 									"host": [
 										"{{host}}"
 									],
@@ -5676,12 +5586,6 @@
 										"appointments",
 										"admins",
 										"count"
-									],
-									"query": [
-										{
-											"key": "adminId",
-											"value": "{{adminEmailSample}}"
-										}
 									]
 								}
 							},
@@ -5715,7 +5619,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host}}/api/v1/appointments/admins/count?adminId={{adminEmailSample}}&onlyAvailable=false",
+									"raw": "{{host}}/api/v1/appointments/admins/count?onlyAvailable=false",
 									"host": [
 										"{{host}}"
 									],
@@ -5727,10 +5631,6 @@
 										"count"
 									],
 									"query": [
-										{
-											"key": "adminId",
-											"value": "{{adminEmailSample}}"
-										},
 										{
 											"key": "onlyAvailable",
 											"value": "false"
@@ -10065,6 +9965,98 @@
 			"name": "admin-service",
 			"item": [
 				{
+					"name": "POST NOT SAVED /requests",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Analytics object created\", () => {",
+									"    pm.response.to.have.status(201);",
+									"})",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"method\": \"GET\",\n    \"path\": \"/appointments\",\n    \"agent\": \"Linux\",\n    \"clientHash\" : \"secureHash\"\n}"
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/admins/requests",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admins",
+								"requests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /requests",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Analytics object created\", () => {",
+									"    pm.response.to.have.status(201);",
+									"})",
+									"",
+									"pm.test(\"Id Set\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"requestId\", jsonData.id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"method\": \"GET\",\n    \"path\": \"/appointments\",\n    \"agent\": \"Linux\",\n    \"clientHash\" : \"secureHash\"\n}"
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/admins/requests",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admins",
+								"requests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "POST api/admins/login",
 					"event": [
 						{
@@ -10101,6 +10093,161 @@
 								"v1",
 								"admins",
 								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /requests 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Analytics object created\", () => {",
+									"    pm.response.to.have.status(201);",
+									"})",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"method\": \"GET\",\n    \"path\": \"/appointments\",\n    \"agent\": \"Linux\",\n    \"clientHash\" : \"secureHash\"\n}"
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/admins/requests",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admins",
+								"requests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST /requests 3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Analytics object created\", () => {",
+									"    pm.response.to.have.status(201);",
+									"})",
+									"",
+									"pm.test(\"Timestamp set\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"start_ts\",jsonData.timestamp+1);",
+									"    pm.environment.set(\"end_ts\",jsonData.timestamp-3600);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"method\": \"GET\",\n    \"path\": \"/appointments\",\n    \"agent\": \"Linux\",\n    \"clientHash\" : \"secureHash\"\n}"
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/admins/requests",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admins",
+								"requests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Interval /requests",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Analytics object created\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"pm.test(\"Intervals working\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.length).to.equal(5)",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/api/v1/admins/requests?timeframe=300&method=GET&search=requests&loggedInOnly=false",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admins",
+								"requests"
+							],
+							"query": [
+								{
+									"key": "timeframe",
+									"value": "300"
+								},
+								{
+									"key": "method",
+									"value": "GET"
+								},
+								{
+									"key": "search",
+									"value": "requests"
+								},
+								{
+									"key": "loggedInOnly",
+									"value": "false"
+								}
 							]
 						}
 					},

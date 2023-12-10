@@ -47,7 +47,7 @@ export const login = async (req: Request, res: Response): Promise<Response<any, 
   client.publish(TOPIC, `${reqId}/${request.email}/${request.password}/*`);
   let mqttResult;
   try {
-    mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
+    mqttResult = (await getServiceResponse(reqId.toString(), RESPONSE_TOPIC)).split('/')[1];
   } catch (error) {
     return res.status(504).json({ message: 'Service Timeout' });
   }
@@ -89,7 +89,7 @@ const insertAdminCredentials = async (): Promise<boolean> => {
 
   try {
     const mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
-    return mqttResult === '1'; // return if insertion to sessions is successful
+    return mqttResult.split('/')[1] === '1'; // return if insertion to sessions is successful
   } catch (error) {
     console.error('Error in registerController:', error);
   }

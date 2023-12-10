@@ -205,7 +205,7 @@ export default function DentistCalendar (): JSX.Element {
             }}
           >
             <div class='flex flex-col'>
-              <label>Start:</label>
+              <label class="calendarLabel">Start:</label>
               <input
                 type='datetime-local'
                 placeholder=''
@@ -218,7 +218,7 @@ export default function DentistCalendar (): JSX.Element {
               />
             </div>
             <div class='flex flex-col'>
-              <label>End:</label>
+              <label class="calendarLabel">End:</label>
               <input
                 type='datetime-local'
                 value={newAppointment().end}
@@ -231,7 +231,7 @@ export default function DentistCalendar (): JSX.Element {
             </div>
             <div class='flex flex-row mt-3'>
               <button
-                class='bg-secondary rounded text-white p-2 mr-3'
+                class='bg-secondary calendarBtn rounded text-white p-2 mr-3'
                 type='button'
                 onClick={() => {
                   // Reset the new appointment state to empty values
@@ -247,7 +247,7 @@ export default function DentistCalendar (): JSX.Element {
               >
                 Cancel
               </button>
-              <button class='bg-secondary rounded text-white p-2 ' type='submit'>
+              <button class='calendarBtn bg-secondary rounded text-white p-2 ' type='submit'>
                 Add Event
               </button>
             </div>
