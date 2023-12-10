@@ -123,7 +123,12 @@ export async function addDentistsToCluster (cluster: leaflet.MarkerClusterGroup,
 
   // No time range is given, proceed to add all dentists
   if (timeRange === undefined) {
-    for (const dentist of dentists) void addNewDentist(dentist, cluster)
+    for (const dentist of dentists) {
+      await new Promise((resolve) => {
+        setTimeout(resolve, 2000)
+      })
+      void addNewDentist(dentist, cluster)
+    }
     return
   }
 
@@ -146,13 +151,16 @@ export async function addDentistsToCluster (cluster: leaflet.MarkerClusterGroup,
 
   // Retain dentists that have an appointment in within the specified
   // time range.
-  appointments.forEach((appointment: AppointmentResponse) => {
+  for (let i = 0; i < appointments.length; i++) {
+    await new Promise((resolve) => {
+      setTimeout(resolve, 2000)
+    })
     void addNewDentist(
       dentists.find((dentist: Dentist) =>
-        dentist.email === appointment.dentistId
+        dentist.email === appointments[i].dentistId
       ) as Dentist,
       cluster,
       timeRange
     )
-  })
+  }
 }
