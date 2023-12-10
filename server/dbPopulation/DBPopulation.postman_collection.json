@@ -139,8 +139,7 @@
 							"let dentCount = pm.collectionVariables.get(\"dentCount\");",
 							"let emailNum = Number(dentCount) + 1",
 							"let dentistEmail = \"dentist\" + emailNum + \"@example.com\";",
-							"pm.collectionVariables.set(\"dentEmail\", dentistEmail);",
-							"console.log(`login ${dentCount}`);"
+							"pm.collectionVariables.set(\"dentEmail\", dentistEmail);"
 						],
 						"type": "text/javascript"
 					}
@@ -240,13 +239,11 @@
 							"let dentCount = pm.collectionVariables.get(\"dentCount\");",
 							"",
 							"if (appointmentCount < 20) {",
-							"    console.log(appointmentCount);",
 							"    postman.setNextRequest(\"Create Appointment\");",
 							"} else {",
 							"    pm.collectionVariables.set(\"dentCount\", ++dentCount);",
 							"    pm.collectionVariables.set(\"appointmentCount\", 0);",
 							"    if (dentCount < 20) {",
-							"        console.log(dentCount);",
 							"        postman.setNextRequest(\"Login\");",
 							"    } else {",
 							"        pm.collectionVariables.set(\"dentCount\", 0);",
