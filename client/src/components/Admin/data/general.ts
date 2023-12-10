@@ -6,7 +6,7 @@ import { type AnalyticsResponse, type ChartData } from '../../../utils/types'
  * @param timestamp UNIX timestamp
  * @returns returns a time string in format HH:MM:SS
  */
-async function createTimeString (timestamp: number): Promise<string> {
+function createTimeString (timestamp: number): string {
   const date: Date = new Date((timestamp) * 1000)
   const hours: string = ('0' + date.getHours()).slice(-2)
   const minutes: string = ('0' + date.getMinutes()).slice(-2)
@@ -33,7 +33,7 @@ export async function getChartData (category: string, method: string, loggedInOn
   { withCredentials: true })).data
 
   for (let i = 0; i < rawData.length; i++) {
-    const timeString: string = await createTimeString(rawData[i].interval)
+    const timeString: string = createTimeString(rawData[i].interval)
     labels.push(timeString)
     data.push(rawData[i].count)
   }
