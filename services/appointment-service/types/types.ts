@@ -26,9 +26,16 @@ export interface Appointment {
  * when a subscription is made between a patient and a dentist.
  */
 export interface Subscription {
-  dentistId: string
-  patientId: string
+  dentistEmail: string
+  patientEmail: string
 };
+
+/**
+ * @description a custom type that resolves a partial Subscription
+ * type with the patientId property being given.
+ * Set the type of patientId to string.
+ */
+export type PatientSubscription = Partial<Subscription> & { patientEmail: string };
 
 /**
  * @description a custom type that denotes the response type
