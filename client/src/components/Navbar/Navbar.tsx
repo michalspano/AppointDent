@@ -3,7 +3,7 @@ import './Navbar.css'
 import logo from '../../assets/logo.png'
 import { For, Show, createEffect, createSignal, onCleanup } from 'solid-js'
 import { patientRoutes } from './routes'
-import { fadeIn, fadeOut, hamburger, notify, slideIn, slideOut, toggleHamburger, toggleNotification } from './animation'
+import { hamburger, slideIn, slideOut, toggleHamburger, toggleNotification } from './animation'
 import location from '../../assets/location.png'
 import { Api } from '../../utils/api'
 import profile from '../../assets/profile.png'
@@ -135,21 +135,14 @@ export default function Navbar (): JSX.Element {
                         <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
                     </svg>
                     {showNotificationDot() && (
-                  <div class="notification-container">
-                    <div class="notification-counter">{notificationCount()}</div>
+                  <div class="absolute top-1 right-0 -mt-2">
+                  <div class="bg-error text-white w-4 h-4 flex items-center justify-center rounded-md text-xs font-semibold ml-2">
+                      {notificationCount()}
                   </div>
+              </div>
                     )}
                 </button>
             </a>
-            <div class="inset-y-0 right-0 absolute top-10">
-                <Show when={notify()}>
-                    <div class={fadeIn() ? 'notification fade-in-element' : fadeOut() ? 'notification fade-out-element' : 'notification'}>
-                        <div class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
-                            <p class="block px-4 py-2 text-sm text-primary">No notifications!</p>
-                        </div>
-                    </div>
-                </Show>
-            </div>
         </div>
         <div class="relative ml-2 md:ml-4">
                 <div>

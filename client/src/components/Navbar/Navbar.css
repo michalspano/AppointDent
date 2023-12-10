@@ -65,21 +65,3 @@ a {
 .hamburger svg {
   stroke:white;
 }
-
-.notification-container {
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  top: 0px;
-}
-
-.notification-counter {   
-  position: relative;
-  top: -2px;
-  left: 12px;
-  background-color: rgba(212, 19, 13, 1);
-  color: #fff;
-  border-radius: 3px;
-  padding: 1px 3px;
-  font: 8px Verdana;
-}
