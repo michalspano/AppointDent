@@ -119,7 +119,7 @@ const createAppointment = async (req: Request, res: Response): AsyncResObj => {
    * publish a notification to them. Herein, we store only the patient's email
    * in the array, the object with the dentist's email is not needed, we have
    * the access to it with the `email` variable.
-   * 
+   *
    * @see PatientSubscription
    */
   let subscriptions: PatientSubscription[] = [];

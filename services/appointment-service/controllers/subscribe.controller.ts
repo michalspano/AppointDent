@@ -88,10 +88,7 @@ const subToDentist = async (req: Request, res: Response): AsyncResObj => {
   }
 
   // Verification step successful, create a subscription entry.
-  const subscription: Subscription = {
-    dentistEmail: dentistEmail,
-    patientEmail: patientEmail
-  };
+  const subscription: Subscription = { dentistEmail, patientEmail };
 
   try {
     /**
