@@ -1,7 +1,6 @@
 /**
  * Response data type from geocoding API
  */
-
 export interface Place {
   boundingBox: [string, string, string, string]
   class: string
@@ -31,16 +30,43 @@ export interface Dentist {
   clinicCountry: string
   clinicCity: string
   clinicStreet: string
-  clinicHouseNumber: string
+  clinicHouseNumber: number
   clinicZipCode: number
   picture: string
 }
 
+/**
+ * @description the interface for the appointment object used in the fullcalendar
+ * component on the client's side.
+ */
 export interface Appointment {
   id: string
   title: string // The patient name (to work with fullcalendar, it has to be named title)
   start: string // The start time (to work with fullcalendar, it has to be named start)
   end: string// The end time (to work with fullcalendar, it has to be named end)
+}
+
+/**
+ * @description the interface for the appointment object retrieved from the database.
+ * The id is a UUID (Universally Unique Identifier) and is
+ * generated using the crypto module from node.js (here, the type is string; there's no
+ * crypto in the browser).
+ */
+export interface AppointmentResponse {
+  id: string
+  start_timestamp: number
+  end_timestamp: number
+  dentistId: string
+  patientId?: string
+};
+
+/**
+ * An interface that represents a grouped appointment.
+ * That is, a day that has one or more appointments.
+ */
+export interface GroupedAppointments {
+  day: string
+  appointments: Appointment[]
 }
 
 export interface Notification {
@@ -50,7 +76,7 @@ export interface Notification {
   id?: string
 }
 
-export interface Registration {
+export interface DentistRegistration {
   email: string
   password: string
   firstName: string
@@ -61,6 +87,23 @@ export interface Registration {
   clinicHouseNumber: string
   clinicZipCode: string
   picture: string
+}
+
+/**
+ * @description the filter object is used to filter the appointments
+ * based on a particular time interval, namely [start, end].
+ */
+export interface FilterInterval {
+  start: string
+  end: string
+}
+
+export interface PatientRegistration {
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  birthDate: number
 }
 
 export enum UserType {
@@ -86,4 +129,14 @@ export interface WhoisResponse {
 export enum SessionResponse {
   Fail = 0,
   Success = 1
+}
+
+export interface ServicesUnavailableModalProps {
+  onCancel: () => void
+  services: string[]
+}
+
+export interface Country {
+  name: string
+  code: string
 }

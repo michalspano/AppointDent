@@ -24,5 +24,6 @@ export const mqttClient = {
         void heartbeat(client, serviceName, 1000);
       }
     });
+    client.setMaxListeners(5000);
   }
 };

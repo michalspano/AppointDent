@@ -1,8 +1,9 @@
 import axios from 'axios'
-import * as leaflet from 'leaflet'
-import { type Place, type Dentist } from '../../utils/types'
-import { Api } from '../../utils/api'
 import 'leaflet.markercluster'
+import * as leaflet from 'leaflet'
+import { Api } from '../../utils/api'
+import { getUser, parseDateStringToInt } from '../../utils'
+import { type Place, type Dentist, type FilterInterval, type AppointmentResponse } from '../../utils/types'
 
 /**
  * Used to convert addresses into long and lat for the map.
@@ -14,7 +15,6 @@ async function geoCodeAddress (address: string): Promise<Place> {
   return await new Promise((resolve, reject) => {
     axios.get(`https://geocode.maps.co/search?q=${address}`).then((result) => {
       const data: Place = result.data[0]
-      console.log(data)
       resolve(data)
     }).catch((err) => {
       console.error(err)
@@ -24,20 +24,38 @@ async function geoCodeAddress (address: string): Promise<Place> {
 }
 
 /**
- * This function has the responsibility of taking a user to the page where they can see a dentist's appointments
+ * This function has the responsibility of taking a user to the page where they
+ * can see a dentist's appointments. Furthermore, it adds the additional functionality
+ * of filtering the appointments by a time range.
+ *
  * @param email email of the dentist to see appointments with
+ * @param timeRange time range to filter the appointments by
+ * @default undefined if no time range is specified
  */
-function openAvailableSlots (email: string): void {
-  window.location.replace('/book-appointment/' + btoa(email))
+function openAvailableSlots (email: string, timeRange?: FilterInterval): void {
+  const DEFAULT_URL: string = '/book-appointment/' + btoa(email)
+
+  // If the time range is not defined, redirect to the default url.
+  if (timeRange === undefined) { window.location.replace(DEFAULT_URL); return }
+
+  const from: number = parseDateStringToInt(timeRange.start)
+  const to: number = parseDateStringToInt(timeRange.end)
+
+  window.location.replace(`${DEFAULT_URL}?from=${from}&to=${to}`)
 }
 
 /**
  * In this function we geocode the address as well as insert the marker into the cluster group
  * We add the event handler to initiate when a marker has been selected.
  * @param dentist dentist that is going to be inserted
- * @param markerCluster the cluster group which acts as a middleware between the map and the markers.
+ * @param markerCluster the cluster group which acts as a middleware
+ *  between the map and the markers.
+ * @param timeRange time range to filter the appointments by
+ * @default undefined if no time range is specified
+ *
+ * TODO: extract hardcoded values to standalone variables/containers
  */
-async function addNewDentist (dentist: Dentist, markerCluster: leaflet.MarkerClusterGroup): Promise<void> {
+async function addNewDentist (dentist: Dentist, markerCluster: leaflet.MarkerClusterGroup, timeRange?: FilterInterval): Promise<void> {
   const dentistCombinedAddress: string = dentist.clinicStreet + ' ' + dentist.clinicHouseNumber + ' ' + dentist.clinicZipCode + ' ' + dentist.clinicCity
   geoCodeAddress(dentistCombinedAddress).then((result: Place) => {
     const dentistCard = `
@@ -73,7 +91,10 @@ async function addNewDentist (dentist: Dentist, markerCluster: leaflet.MarkerClu
     pin.on('popupopen', () => {
       const showSlotsButton = document.getElementById('showSlotsButton')
       showSlotsButton?.addEventListener('click', (e) => {
-        openAvailableSlots((e.target as HTMLInputElement)?.value)
+        // Pass the time range if it is defined.
+        timeRange === undefined
+          ? openAvailableSlots((e.target as HTMLInputElement)?.value)
+          : openAvailableSlots((e.target as HTMLInputElement)?.value, timeRange)
       })
     })
   }).catch((err) => {
@@ -82,24 +103,64 @@ async function addNewDentist (dentist: Dentist, markerCluster: leaflet.MarkerClu
 }
 
 /**
- * This function calls the dentist API and plots them on a map
+ * This function calls the dentist API and plots them on a map.
+ * Furthermore, it can filter the dentists by a time range of their appointments.
+ *
  * @param map leaflet map
+ * @param timeRange time range to filter the dentists by
+ * @default undefined if no time range is specified
  */
-export async function addDentistsToMap (map: leaflet.Map): Promise<void> {
-  // We create this big cluster which will act as a middleware for which markers to show
-  const cluster = leaflet.markerClusterGroup({
-    maxClusterRadius: 80 // Max amount of pixels for a cluster
-  })
+export async function addDentistsToCluster (cluster: leaflet.MarkerClusterGroup, timeRange?: FilterInterval): Promise<void> {
+  // Get all dentists from the API
+  let dentists: Dentist[]
+  try {
+    dentists = (await Api.get('dentists')).data as Dentist[]
+  } catch (error: any) {
+    alert('Problem with getting dentists...')
+    console.error(error)
+    return
+  }
 
-  Api.get('dentists').then((result) => {
-    const dentists: Dentist[] = result.data
-    for (let i = 0; i < dentists.length; i++) {
-      // Add each dentist to the cluster
-      void addNewDentist(dentists[i], cluster)
+  // No time range is given, proceed to add all dentists
+  if (timeRange === undefined) {
+    for (const dentist of dentists) {
+      await new Promise((resolve) => {
+        setTimeout(resolve, 2000)
+      })
+      void addNewDentist(dentist, cluster)
     }
-    map.addLayer(cluster) // Add the cluster as a layer
-  }).catch((err) => {
-    alert(err)
-    console.error(err)
-  })
+    return
+  }
+
+  // If the time range is specified, proceed to apply the filter
+  let appointments: AppointmentResponse[]
+  try {
+    // Parse the values required for the API call.
+    const userId: string = (await getUser())?.email as string
+    const from: number = parseDateStringToInt(timeRange.start)
+    const to: number = parseDateStringToInt(timeRange.end)
+
+    const query: string = `appointments/?userId=${userId}&from=${from}&to=${to}`
+    appointments = (await Api.get(query, { withCredentials: true }
+    )).data as AppointmentResponse[]
+  } catch (error: any) {
+    alert('Problem with filtering appointments...')
+    console.error(error)
+    return
+  }
+
+  // Retain dentists that have an appointment in within the specified
+  // time range.
+  for (let i = 0; i < appointments.length; i++) {
+    await new Promise((resolve) => {
+      setTimeout(resolve, 2000)
+    })
+    void addNewDentist(
+      dentists.find((dentist: Dentist) =>
+        dentist.email === appointments[i].dentistId
+      ) as Dentist,
+      cluster,
+      timeRange
+    )
+  }
 }

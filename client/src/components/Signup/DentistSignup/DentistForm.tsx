@@ -3,7 +3,10 @@ import logo from '../../../assets/logo.png'
 import { A } from '@solidjs/router'
 import { createSignal } from 'solid-js'
 import { Api } from '../../../utils/api'
-import type { Registration } from '../../../utils/types'
+import type { DentistRegistration, Country } from '../../../utils/types'
+import { validateAddress, validateUserInfo } from '../utils'
+import { AxiosError } from 'axios'
+import * as CountryList from 'country-list'
 
 export default function DentistForm (): JSX.Element {
   const [email, setEmail] = createSignal('')
@@ -18,8 +21,14 @@ export default function DentistForm (): JSX.Element {
   const [picture, setPicture] = createSignal('')
   const [error, setError] = createSignal<string | null>(null)
 
-  const signUp = (): void => {
-    const registrationData: Registration = {
+  const allCountriesNames = CountryList.getNameList()
+  const allCountries: Country[] = []
+  for (const key in allCountriesNames) {
+    allCountries.push({ name: key, code: CountryList.getCode(key) as string })
+  }
+
+  const signUp = async (): Promise<void> => {
+    const registrationData: DentistRegistration = {
       email: email(),
       password: password(),
       firstName: firstName(),
@@ -35,32 +44,52 @@ export default function DentistForm (): JSX.Element {
       setError('Please fill in all fields.')
       return
     }
+    if (validateUserInfo(registrationData) !== null) {
+      setError(validateUserInfo(registrationData) as string)
+      return
+    }
+    const addressValidation = await validateAddress(registrationData)
+    if (addressValidation !== null) {
+      setError(addressValidation)
+      return
+    }
     Api
       .post('/dentists/register', registrationData)
       .then(async () => {
-        // enable automatic login when user registers
+      // enable automatic login when user registers
         await login()
-      })
-
-      .catch((error: any) => {
-        setError('Something went wrong, try again.')
+      }).catch((error: any) => {
+        const resError: string | AxiosError = error instanceof AxiosError ? error : 'Something went wrong, Please try again.'
+        if (resError instanceof AxiosError) {
+          if (resError.response !== undefined) {
+            setError(resError.response.data as string)
+          }
+        } else {
+          setError(resError)
+        }
         console.error('Error during sign up', error)
       })
   }
 
+  const signUpWrapper = (): void => {
+    void signUp()
+  }
+
   const handleUpload = async (): Promise<string> => {
-    const fileInput = document.querySelector('input[type=file]')
+    const fileInput: HTMLInputElement | null = document.querySelector('input[type=file]')
 
     if (fileInput != null) {
-      const file = fileInput?.files[0]
-      const reader = new FileReader()
-      const baseString = await new Promise<string | ArrayBuffer | null>((resolve) => {
-        reader.onloadend = function () {
-          resolve(reader.result)
-        }
-        reader.readAsDataURL(file)
-      })
-      return baseString as string ?? ''
+      if (fileInput.files != null) {
+        const file = fileInput?.files[0]
+        const reader = new FileReader()
+        const baseString = await new Promise<string | ArrayBuffer | null>((resolve) => {
+          reader.onloadend = function () {
+            resolve(reader.result)
+          }
+          reader.readAsDataURL(file)
+        })
+        return baseString as string ?? ''
+      }
     }
     throw new Error('File input element not found.')
   }
@@ -101,7 +130,7 @@ export default function DentistForm (): JSX.Element {
           <div class="flex flex-row">
             <input
               class="input h-12 w-full px-3 py-2 mb-3 md:mb-0 mr-2 border rounded-xl"
-              type="text"
+              type="select"
               placeholder="First name"
               onChange={(event) => setFirstName(event.target.value)}
             />
@@ -115,12 +144,17 @@ export default function DentistForm (): JSX.Element {
           <label class="text-black block pl-2 text-xs font-extralight pb-1">
                 Address of the clinic
           </label>
-           <input
+           <select
               class="input h-12 w-full px-3 py-2 mb-3  mr-2  border rounded-xl"
-              type="text"
-              placeholder="Country"
               onChange={(event) => setClinicCountry(event.target.value)}
-            />
+            >
+              <option value="none" selected disabled hidden>Select your Country</option>
+              {
+              allCountries.map((country) => (
+                <option value={country.code}>{country.name}</option>
+              ))
+            }
+          </select>
           <div class="flex flex-row">
             <input
               class="input h-12 w-full px-3 py-2 mb-3  mr-2  border rounded-xl"
@@ -164,7 +198,7 @@ export default function DentistForm (): JSX.Element {
             />
 
         {error() !== null && <p class="text-error">{error()}</p>}
-        <button type="submit" class="log-in-btn h-12 mb-6 bg-secondary rounded-xl text-base" onclick={signUp} >
+        <button type="submit" class="log-in-btn h-12 mb-6 bg-secondary rounded-xl text-base" onclick={signUpWrapper} >
             Create account
             </button>
         <p class="font-extralight">Already have an account?

@@ -3,9 +3,16 @@ import logo from '../../../assets/logo.png'
 import { A } from '@solidjs/router'
 import { createSignal } from 'solid-js'
 import { Api } from '../../../utils/api'
+import { validateUserInfo } from '../utils'
+import { AxiosError } from 'axios'
+import type { PatientRegistration } from '../../../utils/types'
 
 export default function PatientForm (): JSX.Element {
-  const today = new Date().toISOString().split('T')[0]
+  const oneTimeStampDay: number = 24 * 60 * 60 * 1000
+  // The result of the new Date().toISOString() returns a date along with the time of the day, seperated by a 'T'.
+  // We exlcude the time of the day by spliting the Date string by 'T'.
+  // The result of date is saved in the first element of the String array returned.
+  const yesterday = new Date(Date.now() - oneTimeStampDay).toISOString().split('T')[0]
   const [email, setEmail] = createSignal('')
   const [password, setPassword] = createSignal('')
   const [dateOfBirth, setDateOfBirth] = createSignal('')
@@ -14,16 +21,21 @@ export default function PatientForm (): JSX.Element {
   const [error, setError] = createSignal<string | null>(null)
 
   const signup = async (): Promise<void> => {
-    const requiredFields: any = {
+    const requiredFields: PatientRegistration = {
       email: email(),
       password: password(),
       firstName: firstName(),
       lastName: lastName(),
-      birthDate: dateOfBirth()
+      birthDate: new Date(dateOfBirth()).getTime()
     }
 
     if (Object.values(requiredFields).some((field) => field === '')) {
       setError('Please fill in all fields.')
+      return
+    }
+
+    if (validateUserInfo(requiredFields) !== null) {
+      setError(validateUserInfo(requiredFields) as string)
       return
     }
 
@@ -32,11 +44,16 @@ export default function PatientForm (): JSX.Element {
         await login()
       })
       .catch((error: any) => {
-        setError('Something went wrong, try again.')
-        console.log('Server response:', error.response)
+        const resError: string | AxiosError = error instanceof AxiosError ? error : 'Something went wrong, Please try again.'
+        if (resError instanceof AxiosError) {
+          if (resError.response !== undefined) {
+            setError(resError.response.data as string)
+          }
+        } else {
+          setError(resError)
+        }
+        console.error('Error during sign up', error)
       })
-
-    setError(null)
   }
 
   const login = async (): Promise<void> => {
@@ -89,7 +106,7 @@ export default function PatientForm (): JSX.Element {
           <input
               class="input h-12 w-full px-3 py-2 mb-6 border rounded-xl"
               type="date"
-              max={today}
+              max={yesterday}
               placeholder="Date of birth"
               onChange={(event) => setDateOfBirth(event.target.value)}
             />

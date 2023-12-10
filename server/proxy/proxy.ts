@@ -9,6 +9,7 @@ type ProxyTargets = Record<string, string>;
  * now will be the "fallback" (default) values.
  */
 const proxyTargets: ProxyTargets = {
+  server: 'http://localhost:3000',
   sessions: 'http://localhost:3001',
   patients: 'http://localhost:3002',
   appointments: 'http://localhost:3003',
@@ -43,8 +44,10 @@ export function routeProxy (req: Request, res: Response, next: NextFunction): vo
     const newPath = pathParts.slice(2).join('/');
     req.url = newPath;
     req.originalUrl = newPath;
-    target.web(req, res, {}, (err: Error) => {
-      throw new Error(err.message);
+    const proxytimeout: number = parseInt(process.env.PROXY_TIMEOUT ?? '60000');
+    target.web(req, res, { timeout: proxytimeout, proxyTimeout: proxytimeout }, (err: Error) => {
+      console.error('Error proxying to target:', err.message);
+      res.status(502).send('Bad Gateway');
     });
   } else {
     next();

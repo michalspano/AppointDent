@@ -9,5 +9,6 @@ export const mqttClient = {
     client.on('connect', () => {
       if (client != null) void heartbeat(client, serviceName, 1000);
     });
+    client.setMaxListeners(5000);
   }
 };

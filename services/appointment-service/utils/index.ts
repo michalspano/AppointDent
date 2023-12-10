@@ -8,6 +8,7 @@
 import { client } from '../mqtt/mqtt';
 import { randomBytes } from 'crypto';
 import { SessionResponse, type WhoisResponse, type UserType } from '../types/types';
+import type { MqttClient } from 'mqtt/*';
 
 /**
  * @description the default timeout for the MQTT client to wait for a response.
@@ -175,7 +176,29 @@ enum ForbiddenIds {
  * @param id the id to check
  * @returns a boolean value
  */
-export const isForbiddenId = (id: string): boolean => {
+export const isForbiddenId = (id?: string): boolean => {
   if (id === undefined) return true;
   return Object.values(ForbiddenIds).includes(id.toUpperCase().trim()) || id === '';
+};
+
+export const pubNotification = (email: string, message: string, client: MqttClient): void => {
+  const payload = `${email}/${message}/*`;
+  try {
+    client.publish('NOTREQ', payload);
+  } catch (err) {
+    console.log(err);
+    throw new Error('Error while publishing notification.');
+  }
+};
+
+export const formatDateTime = (timestamp: number): string => {
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  };
+  return new Date(timestamp * 1000).toLocaleDateString('sv-SE', options).slice(0, 16);
 };

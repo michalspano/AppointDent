@@ -59,7 +59,7 @@ a {
 
 .zAbove {
   position: relative;
-  z-index: 2;
+  z-index: 1000;
 }
 
 .hamburger svg {

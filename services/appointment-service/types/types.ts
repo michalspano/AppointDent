@@ -29,7 +29,8 @@ export interface Appointment {
  */
 export enum UserType {
   Dentist = 'd',
-  Patient = 'p'
+  Patient = 'p',
+  Admin = 'a'
 };
 
 /**
@@ -40,6 +41,7 @@ export enum UserType {
 export interface WhoisResponse {
   status: SessionResponse
   email: string | undefined
+  // the same as: email?: string (documented for clarity)
   type: UserType | undefined
 };
 
@@ -62,3 +64,9 @@ export enum SessionResponse {
  * @see https://expressjs.com/en/api.html#res
  */
 export type AsyncResObj = Promise<Response<any, Record<string, any>>>;
+
+/**
+ * @description a time range: [from, to] in the from of two Unix
+ * timestamps, therefore type number and NOT Date.
+ */
+export interface UnixTimestampRange { from?: number, to?: number };

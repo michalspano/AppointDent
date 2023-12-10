@@ -1,0 +1,13 @@
+.custom-button {
+    padding: 0.5rem 1rem;
+    color: #5e5959;
+    font-size: 1.25rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 0.375rem;
+  
+    transition: box-shadow 0.3s ease-in-out;
+  }
+  
+  .custom-button:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }

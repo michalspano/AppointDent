@@ -9,7 +9,7 @@ import database from '../db/config';
 import { client } from '../mqtt/mqtt';
 import * as utils from '../utils';
 import type { Request, Response } from 'express';
-import { SessionResponse, type AsyncResObj, UserType, type WhoisResponse, type Appointment } from '../types/types';
+import { SessionResponse, type AsyncResObj, UserType, type WhoisResponse, type Appointment, type UnixTimestampRange } from '../types/types';
 
 /**
  * @description A controller function to get all unbooked appointments.
@@ -20,8 +20,13 @@ import { SessionResponse, type AsyncResObj, UserType, type WhoisResponse, type A
  * when the user has a valid session. The session is verified by the session
  * service.
  *
+ * Furthermore, there's the possibility to filter the appointments with a date range.
+ * Use the `from` and `to` query parameters to filter the appointments. If these are not
+ * given, all appointments are returned.
+ *
  * @see verifySession
  * @see SessionResponse
+ * @see UnixTimestampRange
  * @see allAppointments
  *
  * @returns Promise that resolves to a response object.
@@ -41,6 +46,8 @@ const getAllAppointments = async (req: Request, res: Response): AsyncResObj => {
 
   const email: string | undefined = req.query.userId as string;
   const sessionKey: string | undefined = req.cookies.sessionKey;
+  // Read the [from, to] interval from the query parameters.
+  const { from, to }: { from?: string, to?: string } = req.query;
 
   if (sessionKey === undefined || utils.isForbiddenId(email)) {
     return res.status(400).json({ message: 'Bad request: missing session key or email.' });
@@ -69,12 +76,49 @@ const getAllAppointments = async (req: Request, res: Response): AsyncResObj => {
     });
   }
 
+  const interval: UnixTimestampRange = {};
+  // If both `from` and `to` not given, then a custom range is not used.
+  const hasRange: boolean = from !== undefined && to !== undefined;
+
+  if (hasRange) {
+    /**
+     * Note to developers: `parseInt` will strop all non-numeric characters.
+     * So, if the user passes a string like '123abc', it will be parsed as '123'.
+     * This is likely be altered in the future, but for now, this is the intended
+     * behavior.
+     */
+    const fromRaw: number = parseInt(from as string);
+    const toRaw: number = parseInt(to as string);
+
+    /**
+     * An interval is only valid iff: (i) both `from` and `to` are numbers,
+     * (ii) `from` is smaller than `to`. In case that holds, `interval` is
+     * populated accordingly.
+     */
+    if (isNaN(fromRaw) || isNaN(toRaw)) {
+      return res.status(400).json({ message: 'Bad request: to and from must be numbers.' });
+    } else if (fromRaw > toRaw) {
+      return res.status(400).json({ message: 'Bad request: from must be smaller than to.' });
+    } else {
+      interval.from = fromRaw;
+      interval.to = toRaw;
+    }
+  }
+
   // Session has been validated, proceed with the request.
   let result: Appointment[];
   try {
-    result = database.prepare(`
+    const rawQuery: string = `
       SELECT * FROM appointments WHERE patientId IS NULL
-    `).all() as Appointment[];
+      ${hasRange ? ' AND start_timestamp >= ? AND end_timestamp <= ?' : ''}
+    `;
+
+    // In case the range is provided, then the query must be prepared with the range.
+    // Type `any` is used because the array does not mutate.
+    const options: Array<number | undefined> = !hasRange
+      ? []
+      : [interval.from, interval.to];
+    result = database.prepare(rawQuery).all(options) as Appointment[];
   } catch (err: Error | unknown) {
     return res.status(500).json({
       message: 'Internal server error: fail performing selection.'
@@ -113,9 +157,7 @@ const getAppointmentsByPatientId = async (req: Request, res: Response): AsyncRes
   const email: string | undefined = req.params.email;
   const sessionKey: string | undefined = req.cookies.sessionKey;
 
-  // 'undefined', 'null' are used for testing purposes.
-  // This is because the tests for this endpoint use a query parameter.
-  if (sessionKey === undefined || email === undefined || ['undefined', 'null', ''].includes(email.trim())) {
+  if (sessionKey === undefined || utils.isForbiddenId(email)) {
     return res.status(400).json({ message: 'Bad request: missing session key or email.' });
   }
 
@@ -181,8 +223,13 @@ const getAppointmentsByPatientId = async (req: Request, res: Response): AsyncRes
  * the dentist only. If a patient attempts to use this flag, it is ignored, and only
  * unbooked appointments are returned anyway.
  *
+ * Furthermore, there's the possibility to filter the appointments with a date range.
+ * Use the `from` and `to` query parameters to filter the appointments. If these are not
+ * given, all appointments are returned.
+ *
  * @see whoisByToken
  * @see WhoisResponse
+ * @see UnixTimestampRange
  * @see appointmentsByDentistId
  *
  * @param req the request object.
@@ -205,12 +252,14 @@ const getAppointmentsByDentistId = async (req: Request, res: Response): AsyncRes
   const dentistId: string | undefined = req.params.email;
   const email: string | undefined = req.query.userId as string;
   const sessionKey: string | undefined = req.cookies.sessionKey;
+  // Read the [from, to] interval from the query parameters.
+  const { from, to }: { from?: string, to?: string } = req.query;
 
   // 'undefined', 'null' are used for testing purposes.
   // This is because the tests for this endpoint use a query parameter.
   if (sessionKey === undefined || utils.isForbiddenId(email)) {
     return res.status(400).json({ message: 'Bad request: missing session key or email.' });
-  } else if (dentistId === undefined || ['undefined', 'null', ''].includes(dentistId.trim())) {
+  } else if (utils.isForbiddenId(dentistId)) {
     return res.status(400).json({ message: 'Bad request: missing dentist id.' });
   }
 
@@ -261,18 +310,63 @@ const getAppointmentsByDentistId = async (req: Request, res: Response): AsyncRes
     }
   }
 
+  const interval: UnixTimestampRange = {};
+  // If both `from` and `to` not given, then a custom range is not used.
+  const hasRange: boolean = from !== undefined && to !== undefined;
+
+  if (hasRange) {
+    /**
+     * Note to developers: `parseInt` will strop all non-numeric characters.
+     * So, if the user passes a string like '123abc', it will be parsed as '123'.
+     * This is likely be altered in the future, but for now, this is the intended
+     * behavior.
+     */
+    const fromRaw: number = parseInt(from as string);
+    const toRaw: number = parseInt(to as string);
+
+    /**
+     * An interval is only valid iff: (i) both `from` and `to` are numbers,
+     * (ii) `from` is smaller than `to`. In case that holds, `interval` is
+     * populated accordingly.
+     */
+    if (isNaN(fromRaw) || isNaN(toRaw)) {
+      return res.status(400).json({ message: 'Bad request: to and from must be numbers.' });
+    } else if (fromRaw > toRaw) {
+      return res.status(400).json({ message: 'Bad request: from must be smaller than to.' });
+    } else {
+      interval.from = fromRaw;
+      interval.to = toRaw;
+    }
+  }
+
   let result: Appointment[];
   try {
-    result = database.prepare(`
+    /**
+     * The query is different based on the following:
+     * (i) whether to filter booked appointments or not,
+     * (ii) whether to filter by a date range or not.
+     * These two flags can be combined and both have default values
+     * (i.e., can be omitted).
+     */
+    const rawQuery: string = `
       SELECT * FROM appointments WHERE dentistId = ?
-      ${getOnlyAvailable ? 'AND patientId IS NULL' : ''}
-    `).all(dentistId) as Appointment[];
+      ${getOnlyAvailable ? ' AND patientId IS NULL' : ''}
+      ${hasRange ? ' AND start_timestamp >= ? AND end_timestamp <= ?' : ''}
+    `;
+
+    // In case the range is provided, then the query must be prepared with the range.
+    // Type `any` is used because the array does not mutate.
+    const options: any[] = !hasRange
+      ? [dentistId]
+      : [dentistId, interval.from, interval.to];
+    result = database.prepare(rawQuery).all(options) as Appointment[];
   } catch (err: Error | unknown) {
     return res.status(500).json({
       message: 'Internal server error: fail performing selection.'
     });
   }
 
+  // All went well, return the retrieved result.
   return res.status(200).json(result);
 };
 
@@ -356,6 +450,94 @@ const getAppointment = async (req: Request, res: Response): AsyncResObj => {
 };
 
 /**
+ * @description a controller function that is used to get the number of appointments.
+ * The `onlyAvailable` flag is used to filter only the unbooked appointments. By default,
+ * it gets the count of all appointments.
+ * This route is protected and shall only be used by administrators.
+ *
+ * @see UserType
+ * @see whoisByToken
+ *
+ * @param req the request object.
+ * @param res the response object.
+ * @returns A promise that resolves to a response object.
+ */
+const getAppointmentCount = async (req: Request, res: Response): AsyncResObj => {
+  if (database === undefined) {
+    return res.status(500).json({
+      message: 'Internal server error: database connection failed.'
+    });
+  }
+
+  if (client === undefined) {
+    return res.status(503).json({
+      message: 'Service unavailable: MQTT connection failed.'
+    });
+  }
+
+  const email: string | undefined = req.query.adminId as string;
+  const sessionKey: string | undefined = req.cookies.sessionKey;
+
+  if (sessionKey === undefined || utils.isForbiddenId(email)) {
+    return res.status(400).json({ message: 'Bad request: missing session key or email.' });
+  }
+
+  // Use the `WHOIS` topic to determine the role of the user.
+  // This, in turn, determines whether the user has the required privileges.
+  // Note: this could perhaps be a stand-alone topic for an admin.
+  const TOPIC: string = utils.MQTT_PAIRS.whois.req;
+  const RESPONSE_TOPIC: string = utils.MQTT_PAIRS.whois.res;
+
+  const reqId: string = utils.genReqId();
+  client.publish(TOPIC, `${reqId}/${sessionKey}/*`);
+  client.subscribe(RESPONSE_TOPIC);
+
+  try {
+    const result: WhoisResponse = await utils.whoisByToken(
+      reqId.toString(),
+      RESPONSE_TOPIC
+    );
+
+    if (result.status !== SessionResponse.Success) {
+      return res.status(401).json({ message: 'Unauthorized: invalid session.' });
+    }
+
+    /* Ensure that the user is an admin.
+     * There shall only be one account with the Admin type. hence this simple check.
+     * TODO: add proper checking (i.e., comparing matching email and type) if there's
+     * more admins added to the system. */
+    if (result.type !== UserType.Admin) {
+      return res.status(403).json({ message: 'Forbidden: missing administrator privileges.' });
+    }
+  } catch (err: Error | unknown) {
+    return res.status(504).json({ message: 'Service timeout: unable to verify session.' });
+  }
+
+  let getOnlyAvailable: boolean;
+  try {
+    getOnlyAvailable = utils.parseBinaryQueryParam(req.query.onlyAvailable);
+  } catch (err: Error | unknown) {
+    return res.status(400).json({ message: 'Bad request: invalid query parameter.' });
+  }
+
+  // Verification successful, proceed with the request.
+  let count: number;
+  try {
+    const rawCount: Record<string, number> = database.prepare(`
+      SELECT COUNT(*) FROM appointments
+      ${getOnlyAvailable ? 'WHERE patientId IS NULL' : ''}
+    `).get() as Record<string, number>;
+    count = Object.values(rawCount)[0]; // extract the first value (the count)
+  } catch (err: Error | unknown) {
+    return res.status(500).json({
+      message: 'Internal server error: fail performing selection.'
+    });
+  }
+
+  return res.status(200).json({ count });
+};
+
+/**
  * @description Wrappers for the controllers.
  *
  * @example
@@ -383,10 +565,15 @@ const appointment = (req: Request, res: Response): void => {
   void getAppointment(req, res);
 };
 
+const appointmentCount = (req: Request, res: Response): void => {
+  void getAppointmentCount(req, res);
+};
+
 // Export the controllers.
 export default {
   allAppointments,
   appointmentsByPatientId,
   appointmentsByDentistId,
-  appointment
+  appointment,
+  appointmentCount
 };

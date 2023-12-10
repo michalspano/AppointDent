@@ -7,6 +7,7 @@ import { fadeIn, fadeOut, hamburger, notify, slideIn, slideOut, toggleHamburger,
 import location from '../../assets/location.png'
 import { Api } from '../../utils/api'
 import profile from '../../assets/profile.png'
+import ServicesUnavailable from '../ServicesUnavailable/ServicesUnavailable'
 
 const logout = async (): Promise<void> => {
   const endpoints = ['/dentists/logout', '/patients/logout', '/admins/logout']
@@ -124,6 +125,7 @@ export default function Navbar (): JSX.Element {
                 </div>
                 </div>
             </div>
+            <ServicesUnavailable />
                 <div class="flex items-center sm:static sm:inset-auto ">
             <a href="/notifications">
                 <button onClick={toggleNotification} type="button" class="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none">
