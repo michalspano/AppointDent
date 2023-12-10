@@ -145,6 +145,10 @@ const bookAppointment = async (req: Request, res: Response): AsyncResObj => {
     });
   }
 
+  // When an appointment is unbooked, send a notification to all patients
+  // that are subscribed to this dentist.
+  // TODO: add this.
+
   // As the appointment has been booked or canceled right now, we also want to
   // send a notification to the patient that just booked  or canceled it.
   // we also neeed to let the dentist know that their appointment was booked or canceled.
