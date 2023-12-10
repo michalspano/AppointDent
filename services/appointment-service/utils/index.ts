@@ -32,6 +32,19 @@ export const MQTT_PAIRS: Readonly<Record<string, Record<string, string>>> = Obje
 });
 
 /**
+ * @description a helper function that generates a notification message
+ * for a patient when an appointment is created.
+ * 
+ * @see controllers/post.controller.ts
+ *
+ * @param email an email of a dentist that created an appointment slot.
+ * @returns a formatted string that represents a notification message.
+ */
+export const newAppointmentMsg = (email: string): string => {
+  return `A new appointment by dentist ${email} has been created.`;
+};
+
+/**
  * @description a helper function to convert the raw query parameter into a
  * boolean value. If the query parameter is not valid, an error is thrown.
  * It it's simply not given, assign the default value `true`.
@@ -181,16 +194,30 @@ export const isForbiddenId = (id?: string): boolean => {
   return Object.values(ForbiddenIds).includes(id.toUpperCase().trim()) || id === '';
 };
 
+/**
+ * @description helper function that publishes a notification to a user
+ * based on their email.
+ * 
+ * @see MqttClient
+ * 
+ * @param email an identifier of a user
+ * @param message a message to be delivered
+ * @param client an instance of an MQTT client
+ */
 export const pubNotification = (email: string, message: string, client: MqttClient): void => {
-  const payload = `${email}/${message}/*`;
+  const payload: string = `${email}/${message}/*`;
   try {
     client.publish('NOTREQ', payload);
-  } catch (err) {
+  } catch (err: Error | unknown) {
     console.log(err);
     throw new Error('Error while publishing notification.');
   }
 };
 
+/**
+ * @param timestamp a UNIX timestamp in milliseconds.
+ * @returns a formatted string representing the date and time.
+ */
 export const formatDateTime = (timestamp: number): string => {
   const options: Intl.DateTimeFormatOptions = {
     weekday: 'long',
