@@ -34,7 +34,7 @@ export const MQTT_PAIRS: Readonly<Record<string, Record<string, string>>> = Obje
 /**
  * @description a helper function that generates a notification message
  * for a patient when an appointment is created.
- * 
+ *
  * @see controllers/post.controller.ts
  *
  * @param email an email of a dentist that created an appointment slot.
@@ -197,9 +197,9 @@ export const isForbiddenId = (id?: string): boolean => {
 /**
  * @description helper function that publishes a notification to a user
  * based on their email.
- * 
+ *
  * @see MqttClient
- * 
+ *
  * @param email an identifier of a user
  * @param message a message to be delivered
  * @param client an instance of an MQTT client
