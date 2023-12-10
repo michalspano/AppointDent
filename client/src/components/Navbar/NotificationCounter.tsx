@@ -1,6 +1,7 @@
 import { createEffect, createSignal, type Accessor, onCleanup } from 'solid-js'
 import { Api } from '../../utils/api'
 import { type NotificationData } from '../Notifications/types'
+import { type WhoisResponse } from '../../utils/types'
 
 export interface NotificationsResponse {
   length: number
@@ -25,12 +26,12 @@ export const useNotification = (): {
       const currentCount: string | null = localStorage.getItem('notificationsCount')
       const parsedCurrentCount: number = currentCount !== null ? parseInt(currentCount, 10) : 0
 
-      const notificationResponse = await Api.get<NotificationsResponse>('sessions/whois', { withCredentials: true })
-      const userEmail: string = notificationResponse.data.email
+      const whoIs: WhoisResponse = (await Api.get('sessions/whois', { withCredentials: true })).data
+      const userEmail: string | undefined = whoIs.email
 
-      const response = await Api.get<NotificationsResponse>(`notifications/${userEmail}`, { withCredentials: true })
+      const response: NotificationsResponse = (await Api.get(`notifications/${userEmail}`, { withCredentials: true })).data
 
-      const count: number = response.data.length
+      const count: number = response.length
 
       localStorage.setItem('notificationsCount', count.toString())
 
