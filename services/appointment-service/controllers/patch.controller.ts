@@ -8,11 +8,17 @@
 import * as utils from '../utils';
 import { client } from '../mqtt/mqtt';
 import database from '../db/config';
+import { type UUID } from 'crypto';
 import type Database from 'better-sqlite3';
 import { type Statement } from 'better-sqlite3';
 import type { Request, Response } from 'express';
-import { type AsyncResObj, SessionResponse, UserType, type Appointment, type WhoisResponse } from '../types/types';
-import { type UUID } from 'crypto';
+import {
+  UserType,
+  SessionResponse,
+  type AsyncResObj,
+  type Appointment,
+  type WhoisResponse
+} from '../types/types';
 
 const TOPIC: string = utils.MQTT_PAIRS.whois.req;
 const RESPONSE_TOPIC: string = utils.MQTT_PAIRS.whois.res;
