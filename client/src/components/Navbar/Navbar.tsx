@@ -13,6 +13,9 @@ import { useNotification } from './NotificationCounter'
 const logout = async (): Promise<void> => {
   const endpoints = ['/dentists/logout', '/patients/logout', '/admins/logout']
 
+  localStorage.removeItem('notificationCount')
+  localStorage.removeItem('counter')
+
   for (const endpoint of endpoints) {
     try {
       await Api.delete(endpoint, { withCredentials: true })
