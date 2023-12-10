@@ -22,24 +22,24 @@ export const useNotification = (): {
 
   const fetchNotificationCount = async (): Promise<void> => {
     try {
-      const currentCount = localStorage.getItem('notificationsCount')
-      const parsedCurrentCount = currentCount !== null ? parseInt(currentCount, 10) : 0
+      const currentCount: string | null = localStorage.getItem('notificationsCount')
+      const parsedCurrentCount: number = currentCount !== null ? parseInt(currentCount, 10) : 0
 
       const notificationResponse = await Api.get<NotificationsResponse>('sessions/whois', { withCredentials: true })
-      const userEmail = notificationResponse.data.email
+      const userEmail: string = notificationResponse.data.email
 
       const response = await Api.get<NotificationsResponse>(`notifications/${userEmail}`, { withCredentials: true })
 
-      const count = response.data.length
+      const count: number = response.data.length
 
       localStorage.setItem('notificationsCount', count.toString())
 
-      const temp = count - parsedCurrentCount
+      const temp: number = count - parsedCurrentCount
 
-      const counter = localStorage.getItem('counter')
-      const parsedCounter = counter !== null ? parseInt(counter, 10) : 0
+      const counter: string | null = localStorage.getItem('counter')
+      const parsedCounter: number = counter !== null ? parseInt(counter, 10) : 0
 
-      const totalCounter = temp + parsedCounter
+      const totalCounter: number = temp + parsedCounter
       localStorage.setItem('counter', totalCounter.toString())
       setNotificationCount(totalCounter)
       setShowNotificationDot(totalCounter > 0)
