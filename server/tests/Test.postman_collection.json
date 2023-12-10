@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "48f2e391-6463-4abe-b0a9-82fc6c3bf00b",
+		"_postman_id": "6c287a3d-a04d-4ee6-9d2b-c23633b65fff",
 		"name": "Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "31133349"
@@ -3913,7 +3913,7 @@
 							"response": []
 						},
 						{
-							"name": "GET (success)",
+							"name": "GET (OK)",
 							"event": [
 								{
 									"listen": "test",
@@ -3975,6 +3975,1111 @@
 										{
 											"key": "id",
 											"value": "{{appointmentId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "SUB [patient]",
+					"item": [
+						{
+							"name": "check-type",
+							"item": [
+								{
+									"name": "switch-to-dentist",
+									"item": [
+										{
+											"name": "POST /api/dentists/login",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Response code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"email\": \"{{dentistEmailSample}}\",\n  \"password\": \"pass123pass456\"\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{host}}/api/v1/dentists/login",
+													"host": [
+														"{{host}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"dentists",
+														"login"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "SUB (invalid type)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response code shall be 403\", function () {",
+													"    pm.response.to.have.status(403);",
+													"});",
+													"",
+													"pm.test(\"Response is an object\", function () {",
+													"    pm.expect(pm.response.json()).to.be.an('object');",
+													"});",
+													"",
+													"pm.test(\"Response contains 'message' attribute\", function () {",
+													"    pm.expect(pm.response.json()).to.have.property('message');",
+													"});",
+													"",
+													"pm.test(\"Contains correct response message\", function () {",
+													"    pm.expect(pm.response.json().message).to.equal(\"Forbidden: only patients can subscribe to dentists.\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"url": {
+											"raw": "{{host}}/api/v1/appointments/subscribe/:email/:patientEmail",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"appointments",
+												"subscribe",
+												":email",
+												":patientEmail"
+											],
+											"variable": [
+												{
+													"key": "email",
+													"value": "{{dentistEmailSample}}"
+												},
+												{
+													"key": "patientEmail",
+													"value": "{{patientEmailSample}}"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "switch-to-patient",
+							"item": [
+								{
+									"name": "POST/api/patients/login",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"email\": \"{{patientEmailSample}}\",\n    \"password\": \"complicatedpassword\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{host}}/api/v1/patients/login",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"patients",
+												"login"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "check-auth",
+							"item": [
+								{
+									"name": "SUB (empty session)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response code shall be 400\", function () {",
+													"    pm.response.to.have.status(400);",
+													"});",
+													"",
+													"pm.test(\"Response is an object\", function () {",
+													"    pm.expect(pm.response.json()).to.be.an('object');",
+													"});",
+													"",
+													"pm.test(\"Response contains 'message' attribute\", function () {",
+													"    pm.expect(pm.response.json()).to.have.property('message');",
+													"});",
+													"",
+													"pm.test(\"Contains correct response message\", function () {",
+													"    pm.expect(pm.response.json().message).to.equal(\"Bad request: missing session key.\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableCookies": true
+									},
+									"request": {
+										"method": "POST",
+										"header": [],
+										"url": {
+											"raw": "{{host}}/api/v1/appointments/subscribe/:email/:patientEmail",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"appointments",
+												"subscribe",
+												":email",
+												":patientEmail"
+											],
+											"variable": [
+												{
+													"key": "email",
+													"value": "{{dentistEmailSample}}"
+												},
+												{
+													"key": "patientEmail",
+													"value": "{{patientEmailSample}}"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "SUB (invalid session)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response code shall be 401\", function () {",
+													"    pm.response.to.have.status(401);",
+													"});",
+													"",
+													"pm.test(\"Response is an object\", function () {",
+													"    pm.expect(pm.response.json()).to.be.an('object');",
+													"});",
+													"",
+													"pm.test(\"Response contains 'message' attribute\", function () {",
+													"    pm.expect(pm.response.json()).to.have.property('message');",
+													"});",
+													"",
+													"pm.test(\"Contains correct response message\", function () {",
+													"    pm.expect(pm.response.json().message).to.equal(\"Unauthorized: invalid session.\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableCookies": false
+									},
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Cookie",
+												"value": "sessionKey=123",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{host}}/api/v1/appointments/subscribe/:email/:patientEmail",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"appointments",
+												"subscribe",
+												":email",
+												":patientEmail"
+											],
+											"variable": [
+												{
+													"key": "email",
+													"value": "{{dentistEmailSample}}"
+												},
+												{
+													"key": "patientEmail",
+													"value": "{{patientEmailSample}}"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "SUB (empty dentist email)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response code shall be 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response is an object\", function () {",
+											"    pm.expect(pm.response.json()).to.be.an('object');",
+											"});",
+											"",
+											"pm.test(\"Response contains 'message' attribute\", function () {",
+											"    pm.expect(pm.response.json()).to.have.property('message');",
+											"});",
+											"",
+											"pm.test(\"Contains correct response message\", function () {",
+											"    pm.expect(pm.response.json().message).to.equal(\"Bad request: invalid dentist email.\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/v1/appointments/subscribe/:email/:patientEmail",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"appointments",
+										"subscribe",
+										":email",
+										":patientEmail"
+									],
+									"variable": [
+										{
+											"key": "email",
+											"value": "{{empty}}"
+										},
+										{
+											"key": "patientEmail",
+											"value": "{{patientEmailSample}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SUB (empty patient email)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response code shall be 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response is an object\", function () {",
+											"    pm.expect(pm.response.json()).to.be.an('object');",
+											"});",
+											"",
+											"pm.test(\"Response contains 'message' attribute\", function () {",
+											"    pm.expect(pm.response.json()).to.have.property('message');",
+											"});",
+											"",
+											"pm.test(\"Contains correct response message\", function () {",
+											"    pm.expect(pm.response.json().message).to.equal(\"Bad request: invalid patient email.\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/v1/appointments/subscribe/:email/:patientEmail",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"appointments",
+										"subscribe",
+										":email",
+										":patientEmail"
+									],
+									"variable": [
+										{
+											"key": "email",
+											"value": "{{dentistEmailSample}}"
+										},
+										{
+											"key": "patientEmail",
+											"value": "{{empty}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SUB (invalid patient email)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response code shall be 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});",
+											"",
+											"pm.test(\"Response is an object\", function () {",
+											"    pm.expect(pm.response.json()).to.be.an('object');",
+											"});",
+											"",
+											"pm.test(\"Response contains 'message' attribute\", function () {",
+											"    pm.expect(pm.response.json()).to.have.property('message');",
+											"});",
+											"",
+											"pm.test(\"Contains correct response message\", function () {",
+											"    pm.expect(pm.response.json().message).to.equal(\"Forbidden: invalid email.\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/v1/appointments/subscribe/:email/:patientEmail",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"appointments",
+										"subscribe",
+										":email",
+										":patientEmail"
+									],
+									"variable": [
+										{
+											"key": "email",
+											"value": "{{dentistEmailSample}}"
+										},
+										{
+											"key": "patientEmail",
+											"value": "{{patientEmailSample}}12312",
+											"description": "Malformed."
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SUB (OK)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response code shall be 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Response is in JSON format\", function () {",
+											"    pm.response.to.be.json;",
+											"});",
+											"",
+											"// Prase JSON response",
+											"var jsonData = pm.response.json();",
+											"",
+											"pm.test(\"Response contains 'dentistId' attribute\", function () {",
+											"    pm.expect(jsonData).to.have.property('dentistId');",
+											"});",
+											"",
+											"pm.test(\"Response contains 'patientId' attribute\", function () {",
+											"    pm.expect(jsonData).to.have.property('patientId');",
+											"});",
+											"",
+											"pm.test(\"'dentistId' is not NULL\", function (){",
+											"    pm.expect(jsonData.dentistId).to.not.be.null;",
+											"});",
+											"",
+											"pm.test(\"'patientId' is not NULL\", function (){",
+											"    pm.expect(jsonData.patientId).to.not.be.null;",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/v1/appointments/subscribe/:email/:patientEmail",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"appointments",
+										"subscribe",
+										":email",
+										":patientEmail"
+									],
+									"variable": [
+										{
+											"key": "email",
+											"value": "{{dentistEmailSample}}"
+										},
+										{
+											"key": "patientEmail",
+											"value": "{{patientEmailSample}}",
+											"description": "Malformed."
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SUB (CONFLICT)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response code shall be 409\", function () {",
+											"    pm.response.to.have.status(409);",
+											"});",
+											"",
+											"pm.test(\"Response is an object\", function () {",
+											"    pm.expect(pm.response.json()).to.be.an('object');",
+											"});",
+											"",
+											"pm.test(\"Response contains 'message' attribute\", function () {",
+											"    pm.expect(pm.response.json()).to.have.property('message');",
+											"});",
+											"",
+											"pm.test(\"Contains correct response message\", function () {",
+											"    pm.expect(pm.response.json().message).to.equal(\"Conflict: subscription already exists.\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/v1/appointments/subscribe/:email/:patientEmail",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"appointments",
+										"subscribe",
+										":email",
+										":patientEmail"
+									],
+									"variable": [
+										{
+											"key": "email",
+											"value": "{{dentistEmailSample}}"
+										},
+										{
+											"key": "patientEmail",
+											"value": "{{patientEmailSample}}",
+											"description": "Malformed."
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "UNSUB [patient]",
+					"item": [
+						{
+							"name": "check-type",
+							"item": [
+								{
+									"name": "switch-to-dentist",
+									"item": [
+										{
+											"name": "POST /api/dentists/login",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Response code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"email\": \"{{dentistEmailSample}}\",\n  \"password\": \"pass123pass456\"\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{host}}/api/v1/dentists/login",
+													"host": [
+														"{{host}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"dentists",
+														"login"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "UNSUB (invalid type)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response code shall be 403\", function () {",
+													"    pm.response.to.have.status(403);",
+													"});",
+													"",
+													"pm.test(\"Response is an object\", function () {",
+													"    pm.expect(pm.response.json()).to.be.an('object');",
+													"});",
+													"",
+													"pm.test(\"Response contains 'message' attribute\", function () {",
+													"    pm.expect(pm.response.json()).to.have.property('message');",
+													"});",
+													"",
+													"pm.test(\"Contains correct response message\", function () {",
+													"    pm.expect(pm.response.json().message).to.equal(\"Forbidden: only patients can unsubscribe from dentists.\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{host}}/api/v1/appointments/subscribe/:email/:patientEmail",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"appointments",
+												"subscribe",
+												":email",
+												":patientEmail"
+											],
+											"variable": [
+												{
+													"key": "email",
+													"value": "{{dentistEmailSample}}"
+												},
+												{
+													"key": "patientEmail",
+													"value": "{{patientEmailSample}}"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "switch-to-patient",
+							"item": [
+								{
+									"name": "POST/api/patients/login",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response code is 200\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});",
+													"",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"email\": \"{{patientEmailSample}}\",\n    \"password\": \"complicatedpassword\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{host}}/api/v1/patients/login",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"patients",
+												"login"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "check-auth",
+							"item": [
+								{
+									"name": "UNSUB (empty session)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response code shall be 400\", function () {",
+													"    pm.response.to.have.status(400);",
+													"});",
+													"",
+													"pm.test(\"Response is an object\", function () {",
+													"    pm.expect(pm.response.json()).to.be.an('object');",
+													"});",
+													"",
+													"pm.test(\"Response contains 'message' attribute\", function () {",
+													"    pm.expect(pm.response.json()).to.have.property('message');",
+													"});",
+													"",
+													"pm.test(\"Contains correct response message\", function () {",
+													"    pm.expect(pm.response.json().message).to.equal(\"Bad request: missing session key.\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableCookies": true
+									},
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{host}}/api/v1/appointments/subscribe/:email/:patientEmail",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"appointments",
+												"subscribe",
+												":email",
+												":patientEmail"
+											],
+											"variable": [
+												{
+													"key": "email",
+													"value": "{{dentistEmailSample}}"
+												},
+												{
+													"key": "patientEmail",
+													"value": "{{patientEmailSample}}"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "UNSUB (invalid session)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Response code shall be 401\", function () {",
+													"    pm.response.to.have.status(401);",
+													"});",
+													"",
+													"pm.test(\"Response is an object\", function () {",
+													"    pm.expect(pm.response.json()).to.be.an('object');",
+													"});",
+													"",
+													"pm.test(\"Response contains 'message' attribute\", function () {",
+													"    pm.expect(pm.response.json()).to.have.property('message');",
+													"});",
+													"",
+													"pm.test(\"Contains correct response message\", function () {",
+													"    pm.expect(pm.response.json().message).to.equal(\"Unauthorized: invalid session.\");",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disableCookies": false
+									},
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Cookie",
+												"value": "sessionKey=123",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{host}}/api/v1/appointments/subscribe/:email/:patientEmail",
+											"host": [
+												"{{host}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"appointments",
+												"subscribe",
+												":email",
+												":patientEmail"
+											],
+											"variable": [
+												{
+													"key": "email",
+													"value": "{{dentistEmailSample}}"
+												},
+												{
+													"key": "patientEmail",
+													"value": "{{patientEmailSample}}"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "UNSUB (empty dentist email)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response code shall be 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response is an object\", function () {",
+											"    pm.expect(pm.response.json()).to.be.an('object');",
+											"});",
+											"",
+											"pm.test(\"Response contains 'message' attribute\", function () {",
+											"    pm.expect(pm.response.json()).to.have.property('message');",
+											"});",
+											"",
+											"pm.test(\"Contains correct response message\", function () {",
+											"    pm.expect(pm.response.json().message).to.equal(\"Bad request: invalid dentist email.\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/v1/appointments/subscribe/:email/:patientEmail",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"appointments",
+										"subscribe",
+										":email",
+										":patientEmail"
+									],
+									"variable": [
+										{
+											"key": "email",
+											"value": "{{empty}}"
+										},
+										{
+											"key": "patientEmail",
+											"value": "{{patientEmailSample}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "UNSUB (empty patient email)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response code shall be 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"pm.test(\"Response is an object\", function () {",
+											"    pm.expect(pm.response.json()).to.be.an('object');",
+											"});",
+											"",
+											"pm.test(\"Response contains 'message' attribute\", function () {",
+											"    pm.expect(pm.response.json()).to.have.property('message');",
+											"});",
+											"",
+											"pm.test(\"Contains correct response message\", function () {",
+											"    pm.expect(pm.response.json().message).to.equal(\"Bad request: invalid patient email.\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/v1/appointments/subscribe/:email/:patientEmail",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"appointments",
+										"subscribe",
+										":email",
+										":patientEmail"
+									],
+									"variable": [
+										{
+											"key": "email",
+											"value": "{{dentistEmailSample}}"
+										},
+										{
+											"key": "patientEmail",
+											"value": "{{empty}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "UNSUB (invalid patient email)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response code shall be 403\", function () {",
+											"    pm.response.to.have.status(403);",
+											"});",
+											"",
+											"pm.test(\"Response is an object\", function () {",
+											"    pm.expect(pm.response.json()).to.be.an('object');",
+											"});",
+											"",
+											"pm.test(\"Response contains 'message' attribute\", function () {",
+											"    pm.expect(pm.response.json()).to.have.property('message');",
+											"});",
+											"",
+											"pm.test(\"Contains correct response message\", function () {",
+											"    pm.expect(pm.response.json().message).to.equal(\"Forbidden: invalid email.\");",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/v1/appointments/subscribe/:email/:patientEmail",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"appointments",
+										"subscribe",
+										":email",
+										":patientEmail"
+									],
+									"variable": [
+										{
+											"key": "email",
+											"value": "{{dentistEmailSample}}"
+										},
+										{
+											"key": "patientEmail",
+											"value": "{{patientEmailSample}}12312",
+											"description": "Malformed."
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "UNSUB (OK)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response code shall be 204\", function () {",
+											"    pm.response.to.have.status(204);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/v1/appointments/subscribe/:email/:patientEmail",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"appointments",
+										"subscribe",
+										":email",
+										":patientEmail"
+									],
+									"variable": [
+										{
+											"key": "email",
+											"value": "{{dentistEmailSample}}"
+										},
+										{
+											"key": "patientEmail",
+											"value": "{{patientEmailSample}}",
+											"description": "Malformed."
 										}
 									]
 								}
