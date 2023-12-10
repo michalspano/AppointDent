@@ -152,6 +152,25 @@ function loginPatient (patient: User): User {
   return patient;
 }
 
+// Simulate getting all unbooked appointments
+function getAllAppointments (patient: User): void {
+  const patientEmail: string = patient.email;
+  const cookies: string = patient.cookies;
+
+  const headers = {
+    'Content-Type': 'application/json',
+    Cookies: cookies
+  };
+
+  const res = http.get(host + `/appointments/?userId=${patientEmail}`, { headers, tags: { name: 'GetAllAppointments' } });
+
+  // Check for expected status codes
+  check(res, {
+    'Status is 200': (r) => r.status === 200,
+    'Status is not 401': (r) => r.status !== 401
+  });
+}
+
 // Simulate patient booking an appointment
 function bookAppointment (patient: User, appointmentId: string): void {
   const patientEmail: string = patient.email;
@@ -219,6 +238,8 @@ export default function (): void {
   let patient: User = registerPatient();
   // Simulate patient login
   patient = loginPatient(patient);
+  // Simulate patient getting all appointments
+  getAllAppointments(patient);
 
   // Simulate patient booking an appointment
   bookAppointment(patient, appointmentId);
