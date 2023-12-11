@@ -92,7 +92,7 @@ export default function Map (): JSX.Element {
           // TODO: add validation for the maximum date not to exhaust the server
           <div>
             <div class='flex flex-col'>
-              <label>Start:</label>
+              <label class='text-white'>Start:</label>
               <input
                 required
                 type='datetime-local'
@@ -102,7 +102,7 @@ export default function Map (): JSX.Element {
               />
             </div>
             <div class='flex flex-col'>
-              <label>End:</label>
+              <label class='text-white'>End:</label>
               <input
                 required
                 type='datetime-local'

@@ -76,7 +76,7 @@ export default function PatientProfile (patientProp: PatientProfileProps): JSX.E
               <CustomInput class='' max={new Date().toISOString().split('T')[0]} value={patientProp.patientProp.birthDate !== undefined ? new Date(patientProp.patientProp.birthDate).toISOString().split('T')[0] : ''} inputType='date' onChange={(event) => { setPatient('birthDate', Date.parse(new Date(event.target.value).toISOString())) }} disabled={true}/>
           </div>
           {getError() !== null ? <p class="text-error">{(getError() as Error).message}</p> : <></>}
-          <button type="submit" class="p-4 bg-secondary rounded-xl text-base" onClick={() => { void patchPatient(patient) }}>
+          <button type="submit" class="p-4 text-white bg-secondary rounded-xl text-base" onClick={() => { void patchPatient(patient) }}>
              Save changes
           </button>
       </div>
