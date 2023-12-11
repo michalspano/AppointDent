@@ -164,7 +164,7 @@ const bookAppointment = async (req: Request, res: Response): AsyncResObj => {
       // The current user who unbooked the appointment should not be notified.
       subscriptions = database.prepare(`
       SELECT patientEmail FROM subscriptions WHERE dentistEmail = ? AND patientEmail != ?
-    `).all(appointment.dentistId) as PatientSubscription[];
+    `).all(appointment.dentistId, email) as PatientSubscription[];
     } catch (err: Error | unknown) {
       return res.status(500).json({ message: 'Internal server error: database error.' });
     }
