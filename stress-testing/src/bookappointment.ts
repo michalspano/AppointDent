@@ -1,4 +1,4 @@
-import http from 'k6/http';
+import http, { type RefinedResponse } from 'k6/http';
 import { check } from 'k6';
 import { type User, generateUniqueEmail, host } from './helper';
 
@@ -30,7 +30,7 @@ function registerDentist (): User {
     'Content-Type': 'application/json'
   };
 
-  const res = http.post(host + '/dentists/register', JSON.stringify(payload), { headers, tags: { name: 'RegisterDentist' } });
+  const res: RefinedResponse<'text'> = http.post(host + '/dentists/register', JSON.stringify(payload), { headers, tags: { name: 'RegisterDentist' } });
 
   // Check for expected status codes
   check(res, {
@@ -56,7 +56,7 @@ function loginDentist (dentist: User): User {
     'Content-Type': 'application/json'
   };
 
-  const res = http.post(host + '/dentists/login', JSON.stringify(payload), { headers, tags: { name: 'LoginDentist' } });
+  const res: RefinedResponse<'text'> = http.post(host + '/dentists/login', JSON.stringify(payload), { headers, tags: { name: 'LoginDentist' } });
 
   // Check for expected status codes
   check(res, {
@@ -84,7 +84,7 @@ function createAppointment (dentist: User): string {
     Cookies: cookies
   };
 
-  const res = http.post(host + '/appointments', JSON.stringify(payload), { headers, tags: { name: 'CreateAppointment' } });
+  const res: RefinedResponse<'text'> = http.post(host + '/appointments', JSON.stringify(payload), { headers, tags: { name: 'CreateAppointment' } });
   // Check for expected status codes
   check(res, {
     'Status is 201': (r) => r.status === 201,
@@ -115,7 +115,7 @@ function registerPatient (): User {
     'Content-Type': 'application/json'
   };
 
-  const res = http.post(host + '/patients/register', JSON.stringify(payload), { headers, tags: { name: 'RegisterPatient' } });
+  const res: RefinedResponse<'text'> = http.post(host + '/patients/register', JSON.stringify(payload), { headers, tags: { name: 'RegisterPatient' } });
 
   // Check for expected status codes
   check(res, {
@@ -140,7 +140,7 @@ function loginPatient (patient: User): User {
     'Content-Type': 'application/json'
   };
 
-  const res = http.post(host + '/patients/login', JSON.stringify(payload), { headers, tags: { name: 'LoginPatient' } });
+  const res: RefinedResponse<'text'> = http.post(host + '/patients/login', JSON.stringify(payload), { headers, tags: { name: 'LoginPatient' } });
 
   // Check for expected status codes
   check(res, {
@@ -152,6 +152,24 @@ function loginPatient (patient: User): User {
   return patient;
 }
 
+// Simulate getting all unbooked appointments
+function getAllAppointments (patient: User): void {
+  const patientEmail: string = patient.email;
+  const cookies: string = patient.cookies;
+
+  const headers = {
+    'Content-Type': 'application/json',
+    Cookies: cookies
+  };
+
+  const res: RefinedResponse<'text'> = http.get(host + `/appointments/?userId=${patientEmail}`, { headers, tags: { name: 'GetAllAppointments' } });
+  // Check for expected status codes
+  check(res, {
+    'Status is 200': (r) => r.status === 200,
+    'Status is not 401': (r) => r.status !== 401
+  });
+}
+
 // Simulate patient booking an appointment
 function bookAppointment (patient: User, appointmentId: string): void {
   const patientEmail: string = patient.email;
@@ -161,7 +179,7 @@ function bookAppointment (patient: User, appointmentId: string): void {
     Cookies: patient.cookies
   };
 
-  const res = http.patch(host + `/appointments/${appointmentId}?patientId=${patientEmail}&toBook=true`, null, { headers, tags: { name: 'BookAppointment' } });
+  const res: RefinedResponse<'text'> = http.patch(host + `/appointments/${appointmentId}?patientId=${patientEmail}&toBook=true`, null, { headers, tags: { name: 'BookAppointment' } });
 
   // Check for expected status codes
   check(res, {
@@ -179,7 +197,7 @@ function getAppointments (patient: User): void {
     Cookies: patient.cookies
   };
 
-  const res = http.get(host + `/appointments/patients/${patientEmail}`, { headers, tags: { name: 'GetPatientAppointments' } });
+  const res: RefinedResponse<'text'> = http.get(host + `/appointments/patients/${patientEmail}`, { headers, tags: { name: 'GetPatientAppointments' } });
 
   // Check for expected status codes
   check(res, {
@@ -197,7 +215,7 @@ function unbookAppointment (patient: User, appointmentId: string): void {
     Cookies: patient.cookies
   };
 
-  const res = http.patch(host + `/appointments/${appointmentId}?patientId=${patientEmail}&toBook=false`, null, { headers, tags: { name: 'UnbookAppointment' } });
+  const res: RefinedResponse<'text'> = http.patch(host + `/appointments/${appointmentId}?patientId=${patientEmail}&toBook=false`, null, { headers, tags: { name: 'UnbookAppointment' } });
 
   // Check for expected status codes
   check(res, {
@@ -219,6 +237,8 @@ export default function (): void {
   let patient: User = registerPatient();
   // Simulate patient login
   patient = loginPatient(patient);
+  // Simulate patient getting all appointments
+  getAllAppointments(patient);
 
   // Simulate patient booking an appointment
   bookAppointment(patient, appointmentId);
