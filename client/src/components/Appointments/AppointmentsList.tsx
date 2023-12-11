@@ -43,23 +43,24 @@ export default function AppointmentsList (): JSX.Element {
     const params: Record<string, string> = useParams<{ email: string }>()
     setDentistEmail(atob(params.email))
 
+    // Fetch the dentist's information
+    void fetchDentist()
+
     /**
      * Fetch patient's email address.
      * Determine if the patient is subscribed to the selected dentist.
      * This check is carried when the component is mounted. The status
-     * shall only be handled when patient's email is fetched.
+     * shall and the appointments shall only be fetched if the patient
+     * is fetched successfully.
      */
     fetchPatientEmail().then((email: string) => {
-      setPatientEmail(email); void handleSubStatus()
+      setPatientEmail(email)
+      void handleSubStatus()
+      void fetchAppointments()
+      setInterval(() => { void fetchAppointments() }, FETCH_INTERVAL)
     }).catch((error: Error) => {
-      console.error('Error fetching patient email:', error)
+      console.error(error.message)
     })
-
-    /**
-     * Fetches the dentist's information in a continuous manner.
-     */
-    void fetchAppointments(); void fetchDentist()
-    setInterval(() => { void fetchAppointments() }, FETCH_INTERVAL)
   })
 
   /**

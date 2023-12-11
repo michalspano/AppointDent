@@ -67,10 +67,15 @@ export const isPatient = async (): Promise<boolean> => {
  * @returns the patient's email address in a string format.
  */
 export async function fetchPatientEmail (): Promise<string> {
-  const patientResponse: WhoisResponse = (
-    await Api.get('sessions/whois', { withCredentials: true })
-  ).data
-  return patientResponse.email?.toString() ?? ''
+  let patientResponse: WhoisResponse
+  try {
+    patientResponse = (
+      await Api.get('sessions/whois', { withCredentials: true })
+    ).data
+  } catch {
+    throw new Error("Couldn't fetch patient's email address.");
+  }
+  return patientResponse.email as string
 }
 
 /**
