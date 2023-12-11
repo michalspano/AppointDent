@@ -10,5 +10,7 @@ CREATE TABLE IF NOT EXISTS appointments (
 
 CREATE TABLE IF NOT EXISTS subscriptions (
     dentistEmail VARCHAR(64) NOT NULL,
+    -- TODO: store the name of the dentist, for the sake of readability;
+    -- the user will be able to identify the dentist by the name, not by the email.
     patientEmail VARCHAR(64) NOT NULL
 );

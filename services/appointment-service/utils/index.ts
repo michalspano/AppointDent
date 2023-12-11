@@ -38,10 +38,11 @@ export const MQTT_PAIRS: Readonly<Record<string, Record<string, string>>> = Obje
  * @see controllers/post.controller.ts
  *
  * @param email an email of a dentist that created an appointment slot.
+ * FIXME: this is not a good way to do this. The name should be displayed instead.
  * @returns a formatted string that represents a notification message.
  */
 export const newAppointmentMsg = (email: string): string => {
-  return `A new appointment by dentist ${email} has been created.`;
+  return `Dentist ${email} has created a new appointment slot.`;
 };
 
 /**
@@ -49,6 +50,7 @@ export const newAppointmentMsg = (email: string): string => {
  * for a patient when an appointment is unbooked.
  *
  * @param email an email of a dentist that created an appointment slot.
+ * FIXME: this is not a good way to do this. The name should be displayed instead.
  * @returns a formatted string that represents a notification message.
  */
 export const newUnbookedAppointmentMsg = (email: string): string => {
