@@ -45,6 +45,17 @@ export const newAppointmentMsg = (email: string): string => {
 };
 
 /**
+ * @description a helper function that generates a notification message
+ * for a patient when an appointment is unbooked.
+ *
+ * @param email an email of a dentist that created an appointment slot.
+ * @returns a formatted string that represents a notification message.
+ */
+export const newUnbookedAppointmentMsg = (email: string): string => {
+  return `Someone has unbooked an appointment with dentist ${email}, and the slot is now available.`;
+};
+
+/**
  * @description a helper function to convert the raw query parameter into a
  * boolean value. If the query parameter is not valid, an error is thrown.
  * It it's simply not given, assign the default value `true`.

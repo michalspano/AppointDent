@@ -6,9 +6,10 @@
  */
 
 import * as utils from '../utils';
-import { client } from '../mqtt/mqtt';
-import database from '../db/config';
 import { type UUID } from 'crypto';
+import database from '../db/config';
+import { client } from '../mqtt/mqtt';
+import type { MqttClient } from 'mqtt';
 import type Database from 'better-sqlite3';
 import { type Statement } from 'better-sqlite3';
 import type { Request, Response } from 'express';
@@ -17,7 +18,8 @@ import {
   SessionResponse,
   type AsyncResObj,
   type Appointment,
-  type WhoisResponse
+  type WhoisResponse,
+  type PatientSubscription
 } from '../types/types';
 
 const TOPIC: string = utils.MQTT_PAIRS.whois.req;
@@ -151,13 +153,44 @@ const bookAppointment = async (req: Request, res: Response): AsyncResObj => {
     });
   }
 
-  // When an appointment is unbooked, send a notification to all patients
-  // that are subscribed to this dentist.
-  // TODO: add this.
+  /**
+   * If a patient has unbooked an appointment, then we need to notify all the
+   * patients that are subscribed to the dentist.
+   * @see PatientSubscription
+   */
+  if (!toBook) {
+    let subscriptions: PatientSubscription[] = [];
+    try {
+      subscriptions = database.prepare(`
+      SELECT patientEmail FROM subscriptions WHERE dentistEmail = ?
+    `).all(email) as PatientSubscription[];
+    } catch (err: Error | unknown) {
+      return res.status(500).json({ message: 'Internal server error: database error.' });
+    }
+    try {
+      /**
+       * Traverse all the subscriptions and publish a notification to each patient.
+       * The notification is not sent to the patient that unbooked the appointment.
+       */
+      subscriptions.forEach((subscription: PatientSubscription) => {
+        if (subscription.patientEmail !== email) {
+          utils.pubNotification(
+            subscription.patientEmail,
+            utils.newUnbookedAppointmentMsg(email),
+            client as MqttClient
+          );
+        }
+      });
+    } catch (err: Error | unknown) {
+      return res.status(503).json((err as Error).message);
+    }
+  }
 
-  // As the appointment has been booked or canceled right now, we also want to
-  // send a notification to the patient that just booked  or canceled it.
-  // we also neeed to let the dentist know that their appointment was booked or canceled.
+  /**
+   * As the appointment has been booked or canceled right now, we also want to
+   * send a notification to the patient that just booked or canceled it.
+   * We also need to let the dentist know that their appointment was booked or canceled.
+   */
   const patientMessage = toBook
     ? `Your booking on ${utils.formatDateTime(appointment.start_timestamp)} was confirmed.`
     : `Your booking on ${utils.formatDateTime(appointment.start_timestamp)} was canceled.`;
