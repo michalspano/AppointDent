@@ -6,12 +6,13 @@
  */
 
 import cors from 'cors';
-import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import express, { type Express, type Request } from 'express';
+import queueMiddleware from 'express-queue';
 
 const app: Express = express();
-app.use(morgan('dev')); // Add morgan HTTP request logger.
+
+app.use(queueMiddleware({ maxQueue: -1, activeLimit: 1 }));
 
 interface CorsOptions {
   origin: boolean

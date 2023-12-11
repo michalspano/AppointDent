@@ -25,6 +25,15 @@ app.get('/', (req, res) => res.sendStatus(200));
 const servicesPath: string = process.env.SERVICES_PATH ?? '../services';
 
 /**
+ * Wrapper function for app.listen
+ */
+async function listen (): Promise<void> {
+  app.listen(port, () => {
+    console.log('Hello from AppointDent!');
+    console.log(`Server is running at http://localhost:${port}`);
+  });
+}
+/**
  * @description a helper function to setup services, parse and spawn them,
  * and setups up the mqtt client.
  * @returns {Promise<void>}
@@ -33,10 +42,14 @@ async function setupServices (): Promise<void> {
   await parseServices(servicesPath, parsedServices);
   await spawnServices(servicesPath, parsedServices);
   void mqttClient.setup(parsedServices, TOPICS);
+  void listen();
 }
-
-app.listen(port, () => {
-  console.log('Hello from AppointDent!');
-  console.log(`Server is running at http://localhost:${port}`);
-  if (!process.argv.includes('--no-spawn')) void setupServices();
-});
+/**
+ * We allow the user to specify whether or not we should spawn
+ * all services.
+ */
+if (!process.argv.includes('--no-spawn')) {
+  void setupServices();
+} else {
+  void listen();
+}

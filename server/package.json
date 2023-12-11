@@ -15,6 +15,10 @@
     "newman-server": "run-p --race start-broker start newman-wait",
     "newman-wait": "wait-on http://localhost:3000/ http://localhost:3002 http://localhost:3003 http://localhost:3004 http://localhost:3005 http://localhost:3006 && npm run newman",
     "newman": "newman run tests/Test.postman_collection.json -e tests/Test.postman_environment.json",
+    "populate-db": "run-p dropdb:services newman-pop-server",
+    "newman-pop-server": "run-p --race start-broker start newman-pop-wait",
+    "newman-pop-wait": "wait-on http://localhost:3000/ http://localhost:3002 http://localhost:3003 http://localhost:3004 http://localhost:3005 http://localhost:3006 && npm run newman-pop",
+    "newman-pop": "newman run dbPopulation/DBPopulation.postman_collection.json",
     "lint": "eslint **/*.ts",
     "lint:fix": "eslint **/*.ts --fix"
   },
@@ -37,6 +41,7 @@
     "wait-on": "^7.1.0"
   },
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.6",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/http-proxy": "^1.17.14",
@@ -44,7 +49,9 @@
     "@types/node": "^20.9.3",
     "@typescript-eslint/eslint-plugin": "^6.9.1",
     "aedes": "^0.50.0",
+    "axios": "^1.6.2",
     "concurrently": "^8.2.2",
+    "cookie-parser": "^1.4.6",
     "dotenv-cli": "^7.3.0",
     "eslint": "^8.52.0",
     "eslint-config-standard-with-typescript": "^39.1.1",
