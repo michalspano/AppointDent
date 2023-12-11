@@ -179,3 +179,20 @@ export interface Tab {
   tab: string
   title: string
 }
+
+export interface NotificationsResponse {
+  length: number
+  email: string
+  data: NotificationData[]
+}
+
+export interface NotificationCountData {
+  currentCount: number
+  parsedCurrentCount: number
+}
+
+export interface NotificationData {
+  id: string
+  timestamp: number
+  message: string
+}
