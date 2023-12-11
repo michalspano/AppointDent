@@ -1,14 +1,13 @@
 import { createSignal, onCleanup, type JSX, createEffect } from 'solid-js'
 import NotificationsList from './NotificationList'
-import { type NotificationData } from './types'
 import { Api } from '../../utils/api'
+import { type NotificationData } from '../../utils/types'
 
 export default function Notifications (): JSX.Element {
   const [notifications, setNotifications] = createSignal<NotificationData[]>([])
 
   createEffect(async () => {
     await fetchNotifications()
-    localStorage.setItem('counter', '0')
   })
 
   /**

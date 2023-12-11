@@ -1,22 +1,14 @@
 import { type JSX } from 'solid-js'
 import './Notification.css'
 import alarmIcon from '../../assets/alarm_icon.svg'
-import { type NotificationData } from './types'
+import { type NotificationData } from '../../utils/types'
 
 interface NotificationProps extends NotificationData {}
 
 // Function to format the timstamp into a localised date and time string value
 function formatDateTime (timestamp: number): string {
-  const options: Intl.DateTimeFormatOptions = {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  }
-  const formatedTimestamp = new Date(timestamp * 1000).toISOString().slice(0, 16)
-  return new Date(formatedTimestamp).toLocaleDateString('sv-SE', options)
+  const date: Date = new Date(timestamp * 1000)
+  return date.toLocaleDateString() + ' ' + (date.toLocaleTimeString())
 }
 
 // Define the notification component

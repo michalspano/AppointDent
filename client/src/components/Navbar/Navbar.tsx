@@ -3,63 +3,73 @@ import './Navbar.css'
 import logo from '../../assets/logo.png'
 import { For, Show, createEffect, createSignal } from 'solid-js'
 import { patientRoutes } from './routes'
-import { hamburger, slideIn, slideOut, toggleHamburger, toggleNotification } from './animation'
+import { hamburger, slideIn, slideOut, toggleHamburger } from './animation'
 import location from '../../assets/location.png'
 import { Api } from '../../utils/api'
 import profile from '../../assets/profile.png'
 import ServicesUnavailable from '../ServicesUnavailable/ServicesUnavailable'
 import { useNotification } from './NotificationCounter'
-
-const logout = async (): Promise<void> => {
-  const endpoints = ['/dentists/logout', '/patients/logout', '/admins/logout']
-
-  localStorage.removeItem('notificationCount')
-  localStorage.removeItem('counter')
-
-  for (const endpoint of endpoints) {
-    try {
-      await Api.delete(endpoint, { withCredentials: true })
-      window.location.replace('/')
-      return // If logout is successful, exit the function
-    } catch (error) {
-      console.error(`Error during logout from ${endpoint}`, error)
-    }
-  }
-}
-
-const userType = async (): Promise<string> => {
-  const response = await Api.get('sessions/whois', { withCredentials: true })
-  return response.data.type
-}
-
-createEffect(async () => {
-  const type = await userType()
-  setType(type)
-  switch (type) {
-    case 'd':
-      setLogoLink('/calendar')
-      break
-
-    case 'p':
-      setRoutes(patientRoutes)
-      setLogoLink('/map')
-      break
-
-    case 'a':
-      setLogoLink('/notifications') // TODO: replace with admin dashboard when it's added on FE
-      break
-
-    default:
-      break
-  }
-})
-
-const [routes, setRoutes] = createSignal<any[]>()
-const [logoLink, setLogoLink] = createSignal<string>('')
-const [type, setType] = createSignal<string>('')
+import { type WhoisResponse } from '../../utils/types'
 
 export default function Navbar (): JSX.Element {
   const { notificationCount, showNotificationDot } = useNotification()
+  const user = async (): Promise<WhoisResponse> => {
+    const response = await Api.get('sessions/whois', { withCredentials: true })
+    return response.data
+  }
+
+  const logout = async (): Promise<void> => {
+    const endpoints = ['/dentists/logout', '/patients/logout', '/admins/logout']
+
+    for (const endpoint of endpoints) {
+      try {
+        await Api.delete(endpoint, { withCredentials: true })
+        window.location.replace('/')
+        return // If logout is successful, exit the function
+      } catch (error) {
+        console.error(`Error during logout from ${endpoint}`, error)
+      }
+    }
+  }
+
+  function showNotifications (): void {
+    user().then((result: WhoisResponse) => { // Retrieve the user type
+      // Before redirecting user, update the notification count.
+      const previousCount: string | null = (localStorage.getItem(`${result.email}/notificationsCount`))
+      localStorage.setItem(`${result.email}/notificationsCount`, (parseInt(previousCount ?? '0') + notificationCount()).toString())
+      // Take them to notification page.
+      window.location.replace('/notifications')
+    }).catch((err: Error) => {
+      console.error(err)
+    })
+  }
+
+  createEffect(async () => {
+    const type = (await user()).type?.toString() as string
+    setType(type)
+    switch (type) {
+      case 'd':
+        setLogoLink('/calendar')
+        break
+
+      case 'p':
+        setRoutes(patientRoutes)
+        setLogoLink('/map')
+        break
+
+      case 'a':
+        setLogoLink('/notifications') // TODO: replace with admin dashboard when it's added on FE
+        break
+
+      default:
+        break
+    }
+  })
+
+  const [routes, setRoutes] = createSignal<any[]>()
+  const [logoLink, setLogoLink] = createSignal<string>('')
+  const [type, setType] = createSignal<string>('')
+
   return <>
   <nav class="bg-primary text-white zAbove">
         <div class="mx-auto px-2 sm:px-6 lg:px-8">
@@ -96,8 +106,7 @@ export default function Navbar (): JSX.Element {
             </div>
             <ServicesUnavailable />
                 <div class="flex items-center sm:static sm:inset-auto ">
-            <a href="/notifications">
-                <button onClick={toggleNotification} type="button" class="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none">
+                <button onClick={() => { showNotifications() }} type="button" class="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none">
                     <span class="absolute -inset-1.5"></span>
                     <span class="sr-only">View notifications</span>
                     <svg class="h-6 w-6 notification" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
@@ -111,7 +120,6 @@ export default function Navbar (): JSX.Element {
               </div>
                     )}
                 </button>
-            </a>
         </div>
         <div class="relative ml-2 md:ml-4">
                 <div>
