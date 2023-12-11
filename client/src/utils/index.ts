@@ -73,7 +73,7 @@ export async function fetchPatientEmail (): Promise<string> {
       await Api.get('sessions/whois', { withCredentials: true })
     ).data
   } catch {
-    throw new Error("Couldn't fetch patient's email address.");
+    throw new Error("Couldn't fetch patient's email address.")
   }
   return patientResponse.email as string
 }
