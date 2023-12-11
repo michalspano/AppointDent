@@ -1,4 +1,4 @@
-import http from 'k6/http';
+import http, { type RefinedResponse } from 'k6/http';
 import { check } from 'k6';
 import { type User, generateUniqueEmail, host } from './helper';
 
@@ -30,7 +30,7 @@ function registerDentist (): User {
     'Content-Type': 'application/json'
   };
 
-  const res = http.post(host + '/dentists/register', JSON.stringify(payload), { headers, tags: { name: 'RegisterDentist' } });
+  const res: RefinedResponse<'text'> = http.post(host + '/dentists/register', JSON.stringify(payload), { headers, tags: { name: 'RegisterDentist' } });
 
   // Check for expected status codes
   check(res, {
@@ -55,7 +55,7 @@ function loginDentist (dentist: User): User {
     'Content-Type': 'application/json'
   };
 
-  const res = http.post(host + '/dentists/login', JSON.stringify(payload), { headers, tags: { name: 'LoginDentist' } });
+  const res: RefinedResponse<'text'> = http.post(host + '/dentists/login', JSON.stringify(payload), { headers, tags: { name: 'LoginDentist' } });
 
   // Check for expected status codes
   check(res, {
@@ -74,7 +74,7 @@ function getAllDentists (): void {
   };
 
   // Make a POST request to your login endpoint
-  const res = http.get(host + '/dentists/', { headers });
+  const res: RefinedResponse<'text'> = http.get(host + '/dentists/', { headers });
 
   // Check for expected status codes
   check(res, {
@@ -88,7 +88,7 @@ function getDentist (dentist: User): void {
     'Content-Type': 'application/json'
   };
 
-  const res = http.get(host + `/dentists/${dentist.email}`, { headers, tags: { name: 'GetDentist' } });
+  const res: RefinedResponse<'text'> = http.get(host + `/dentists/${dentist.email}`, { headers, tags: { name: 'GetDentist' } });
 
   // Check for expected status codes
   check(res, {
@@ -111,7 +111,7 @@ function patchDentist (dentist: User): void {
     Cookie: cookies
   };
 
-  const res = http.patch(host + `/dentists/${loginEmail}`, JSON.stringify(payload), { headers, tags: { name: 'UpdateDentist' } });
+  const res: RefinedResponse<'text'> = http.patch(host + `/dentists/${loginEmail}`, JSON.stringify(payload), { headers, tags: { name: 'UpdateDentist' } });
 
   // Check for expected status codes
   check(res, {
@@ -129,7 +129,7 @@ function logoutDentist (dentist: User): void {
     Cookie: cookies
   };
 
-  const res = http.del(host + '/dentists/logout', null, { headers, tags: { name: 'LogoutDentist' } });
+  const res: RefinedResponse<'text'> = http.del(host + '/dentists/logout', null, { headers, tags: { name: 'LogoutDentist' } });
 
   // Check for expected status codes
   check(res, {

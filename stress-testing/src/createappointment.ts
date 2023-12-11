@@ -1,4 +1,4 @@
-import http from 'k6/http';
+import http, { type RefinedResponse } from 'k6/http';
 import { check } from 'k6';
 import { type User, generateUniqueEmail, host } from './helper';
 
@@ -31,7 +31,7 @@ function registerDentist (): User {
   };
 
   // Make a POST request to your registration endpoint
-  const res = http.post(host + '/dentists/register', JSON.stringify(payload), { headers, tags: { name: 'RegisterDentist' } });
+  const res: RefinedResponse<'text'> = http.post(host + '/dentists/register', JSON.stringify(payload), { headers, tags: { name: 'RegisterDentist' } });
 
   // Check for expected status codes
   check(res, {
@@ -58,7 +58,7 @@ function loginDentist (user: User): User {
   };
 
   // Make a POST request to your login endpoint
-  const res = http.post(host + '/dentists/login', JSON.stringify(payload), { headers, tags: { name: 'LoginDentist' } });
+  const res: RefinedResponse<'text'> = http.post(host + '/dentists/login', JSON.stringify(payload), { headers, tags: { name: 'LoginDentist' } });
 
   // Check for expected status codes
   check(res, {
@@ -86,7 +86,7 @@ function createAppointment (user: User): string {
     Cookies: cookies
   };
 
-  const res = http.post(host + '/appointments', JSON.stringify(payload), { headers, tags: { name: 'CreateAppointment' } });
+  const res: RefinedResponse<'text'> = http.post(host + '/appointments', JSON.stringify(payload), { headers, tags: { name: 'CreateAppointment' } });
   // Check for expected status codes
   check(res, {
     'Status is 201': (r) => r.status === 201,
@@ -113,7 +113,7 @@ function getAppointments (user: User): void {
     Cookies: cookies
   };
 
-  const res = http.get(host + `/appointments/dentists/${dentistEmail}?userId=${dentistEmail}`, { headers, tags: { name: 'GetDentistAppointments' } });
+  const res: RefinedResponse<'text'> = http.get(host + `/appointments/dentists/${dentistEmail}?userId=${dentistEmail}`, { headers, tags: { name: 'GetDentistAppointments' } });
   // Check for expected status codes
   check(res, {
     'Status is 200': (r) => r.status === 200,
@@ -131,7 +131,7 @@ function deleteAppointment (user: User, appointmentId: string): void {
     Cookies: cookies
   };
 
-  const res = http.del(host + `/appointments/${appointmentId}?dentistId=${dentistEmail}`, null, { headers, tags: { name: 'DeleteAppointment' } });
+  const res: RefinedResponse<'text'> = http.del(host + `/appointments/${appointmentId}?dentistId=${dentistEmail}`, null, { headers, tags: { name: 'DeleteAppointment' } });
   // Check for expected status codes
   check(res, {
     'Status is 200': (r) => r.status === 200,
