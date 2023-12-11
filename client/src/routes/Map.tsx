@@ -16,17 +16,17 @@ export default function Map (): JSX.Element {
     start: '', end: ''
   })
   // Cluster that holds all dentists as 'markers'
-  const [cluster]: Signal<leaflet.MarkerClusterGroup> = createSignal<leaflet.MarkerClusterGroup>(
-    leaflet.markerClusterGroup({ maxClusterRadius: 80 })
-  )
+  const cluster: leaflet.MarkerClusterGroup = leaflet.markerClusterGroup({
+    maxClusterRadius: 80
+  })
 
   /**
    * Handles the filter submit event. It resets the current cluster
    * and adds the dentists that are available in the given time interval.
    */
   async function handleFilterSubmit (): Promise<void> {
-    resetCluster(cluster())
-    void addDentistsToCluster(cluster(), filterInterval())
+    resetCluster(cluster)
+    void addDentistsToCluster(cluster, filterInterval())
   }
 
   /**
@@ -34,8 +34,8 @@ export default function Map (): JSX.Element {
    * So, the all possible dentists are added to the cluster.
    */
   async function handleReset (): Promise<void> {
-    resetCluster(cluster())
-    void addDentistsToCluster(cluster())
+    resetCluster(cluster)
+    void addDentistsToCluster(cluster)
   }
 
   /**
@@ -55,12 +55,12 @@ export default function Map (): JSX.Element {
     /**
      * Add the cluster that holds all dentists
      */
-    map.addLayer(cluster())
+    map.addLayer(cluster)
     /**
      * Add all dentists to the map; in the initial call, all dentists are fetched from the database.
      * However, the filter can be applied later to filter the dentists.
      */
-    void addDentistsToCluster(cluster())
+    void addDentistsToCluster(cluster)
   })
   return <>
     <div class="z-10 flex flex-col justify-between items-center absolute top-20 right-5 p-4 bg-primary shadow-xl rounded">

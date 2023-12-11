@@ -68,6 +68,5 @@ export const isPatient = async (): Promise<boolean> => {
  */
 export function resetCluster (cluster: leaflet.MarkerClusterGroup): void {
   cluster.clearLayers()
-  cluster.clearAllEventListeners()
   cluster.refreshClusters()
 }
