@@ -1,4 +1,4 @@
-import http from 'k6/http';
+import http, { type RefinedResponse } from 'k6/http';
 import { check } from 'k6';
 import { type User, generateUniqueEmail, host } from './helper';
 
@@ -30,7 +30,7 @@ function registerDentist (): User {
     'Content-Type': 'application/json'
   };
 
-  const res = http.post(host + '/dentists/register', JSON.stringify(payload), { headers, tags: { name: 'RegisterDentist' } });
+  const res: RefinedResponse<'text'> = http.post(host + '/dentists/register', JSON.stringify(payload), { headers, tags: { name: 'RegisterDentist' } });
 
   // Check for expected status codes
   check(res, {
@@ -55,7 +55,7 @@ function loginDentist (dentist: User): User {
     'Content-Type': 'application/json'
   };
 
-  const res = http.post(host + '/dentists/login', JSON.stringify(payload), { headers, tags: { name: 'LoginDentist' } });
+  const res: RefinedResponse<'text'> = http.post(host + '/dentists/login', JSON.stringify(payload), { headers, tags: { name: 'LoginDentist' } });
 
   // Check for expected status codes
   check(res, {
@@ -74,7 +74,7 @@ function getNotifications (dentist: User): void {
     Cookies: dentist.cookies
   };
 
-  const res = http.get(host + `/notifications/${dentist.email}`, { headers, tags: { name: 'GetDentistNotifications' } });
+  const res: RefinedResponse<'text'> = http.get(host + `/notifications/${dentist.email}`, { headers, tags: { name: 'GetDentistNotifications' } });
 
   // Check for expected status codes
   check(res, {
