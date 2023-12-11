@@ -161,25 +161,23 @@ const bookAppointment = async (req: Request, res: Response): AsyncResObj => {
   if (!toBook) {
     let subscriptions: PatientSubscription[] = [];
     try {
+      // The current user who unbooked the appointment should not be notified.
       subscriptions = database.prepare(`
-      SELECT patientEmail FROM subscriptions WHERE dentistEmail = ?
-    `).all(email) as PatientSubscription[];
+      SELECT patientEmail FROM subscriptions WHERE dentistEmail = ? AND patientEmail != ?
+    `).all(appointment.dentistId) as PatientSubscription[];
     } catch (err: Error | unknown) {
       return res.status(500).json({ message: 'Internal server error: database error.' });
     }
     try {
       /**
        * Traverse all the subscriptions and publish a notification to each patient.
-       * The notification is not sent to the patient that unbooked the appointment.
        */
       subscriptions.forEach((subscription: PatientSubscription) => {
-        if (subscription.patientEmail !== email) {
-          utils.pubNotification(
-            subscription.patientEmail,
-            utils.newUnbookedAppointmentMsg(email),
-            client as MqttClient
-          );
-        }
+        utils.pubNotification(
+          subscription.patientEmail,
+          utils.newUnbookedAppointmentMsg(email),
+          client as MqttClient
+        );
       });
     } catch (err: Error | unknown) {
       return res.status(503).json((err as Error).message);
