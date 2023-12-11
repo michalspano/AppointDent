@@ -1,7 +1,7 @@
 import { type JSX } from 'solid-js/jsx-runtime'
 import './Navbar.css'
 import logo from '../../assets/logo.png'
-import { For, Show, createEffect, createSignal } from 'solid-js'
+import { For, createEffect, createSignal } from 'solid-js'
 import { patientRoutes } from './routes'
 import location from '../../assets/location.png'
 import { Api } from '../../utils/api'
