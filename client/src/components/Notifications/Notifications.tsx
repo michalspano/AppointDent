@@ -1,7 +1,7 @@
 import { createSignal, onCleanup, type JSX, createEffect } from 'solid-js'
 import NotificationsList from './NotificationList'
-import { type NotificationData } from './types'
 import { Api } from '../../utils/api'
+import { type NotificationData } from '../../utils/types'
 
 export default function Notifications (): JSX.Element {
   const [notifications, setNotifications] = createSignal<NotificationData[]>([])
@@ -22,17 +22,14 @@ export default function Notifications (): JSX.Element {
   // Function to fetch notifications from the server
   const fetchNotifications = async (): Promise<void> => {
     try {
-      // Retrieve user's email
       const userEmail = await getEmail()
-      // Fetch notifications based on the user's email
       const response = await Api.get(`notifications/${userEmail}`, { withCredentials: true })
       const notificationData = response.data
-      console.log(response.data)
 
-      // Update the notifications signal with the fetched data
+      notificationData.sort((a: { timestamp: number }, b: { timestamp: number }) => b.timestamp - a.timestamp)
+
       setNotifications(notificationData)
     } catch (error) {
-      // Handle errors during the notification fetching proces
       console.error('Error fetching or setting notifications:', error)
       throw new Error('Error fetching the notifications')
     }

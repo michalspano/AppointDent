@@ -16,7 +16,7 @@ export default function BookingConfirmationPopup (props: BookingConfirmationProp
         <p>The appointment is scheduled for <strong>{props.date}</strong></p>
         <div class="flex justify-end mt-4">
         <button
-            class="bg-secondary px-4 py-2 rounded"
+            class="bg-secondary text-white px-4 py-2 rounded"
             onClick={props.onCancel}
           >
             Cancel

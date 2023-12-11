@@ -135,7 +135,7 @@ export default function DentistProfile (dentistProp: DentistProfileProps): JSX.E
           })
         }} disabled={false}/>
           {getError() !== null ? <p class="text-error">{(getError() as Error).message}</p> : <></>}
-          <button type="submit" class="log-in-btn h-12 mb-6 bg-secondary rounded-xl text-base" onClick={() => { void patchDentist(dentist) }}>
+          <button type="submit" class="log-in-btn h-12 mb-6 bg-secondary rounded-xl text-base text-white" onClick={() => { void patchDentist(dentist) }}>
              Save changes
           </button>
       </div>

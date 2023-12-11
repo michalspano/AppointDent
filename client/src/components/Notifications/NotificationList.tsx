@@ -1,6 +1,6 @@
 import { For, type JSX } from 'solid-js'
 import Notification from './Notification'
-import { type NotificationData } from './types'
+import { type NotificationData } from '../../utils/types'
 
 // Define the notifications list component
 const NotificationsList = (props: { notifications: NotificationData[] }): JSX.Element => {
