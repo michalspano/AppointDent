@@ -14,3 +14,7 @@ build
 # Ignore all .log files
 *.log
 
+# Remove IDE clutter
+.idea
+.vscode
+

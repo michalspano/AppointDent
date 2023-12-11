@@ -1,46 +1,82 @@
-# AppointDent
+<h1 align="center">AppointDent</h1>
+
+<!-- TODO: Add system's icon/logo -->
+
+**Table of Contents**
+
+- [Introduction](#introduction)
+- [Tech-stack](#tech-stack)
+- [Pre-Requirements](#pre-requirements)
+  - [Installation \& Setup](#installation--setup)
+  - [Usage](#usage)
+  - [API](#api)
+- [System's Overview](#systems-overview)
+  - [Entity Relationship Diagram](#entity-relationship-diagram)
+  - [Component Diagram](#component-diagram)
+  - [Deployment Diagram](#deployment-diagram)
+- [Development team](#development-team)
+
+<!-- table of contents subject to be updated -->
 
 ## Introduction
 
-AppointDent is a service that allows residents of Gothenburg to book dentist appointments. A user can find available times and see the dentist on a map. AppointDent allows users to book times, cancel them as well as get notifications about their bookings. The dentists in our service can see their calendar, add available slots and cancel appointments.
+**AppointDent** is a system that allows residents of **Sweden** to book dentist
+appointments. A user can find available times and see the dentist on an
+integrated map.
 
-The solution is based on a distributed system that combines various architectural styles. 
+AppointDent allows users to book appointments, cancel them, as well as receive
+notifications about their bookings. The dentists in our system make use of a
+calendar to navigate their appointments and manage their availability.
 
-## Entity Relationship Diagram
+The solution is based on a **distributed system** infrastructure that combines
+various architectural styles, namely **microservices**, **publish-subscribe**
+and **client-server**.
 
-![ER Diagram](./docs/diagrams/ERdiagram.png)
+## Tech-stack
 
-## Deployment Diagram
-
-![DeploymentDiagram](./docs/diagrams/DeploymentDiagram.png)
+- TypeScript
+- Express.js
+- Solid.js
+- Sqlite3
+- Tailwind
 
 ## Pre-Requirements
 
 TBD
 
-## Getting started
+### Installation & Setup
 
 TBD
 
-## Technologies used
+### Usage
 
-- TypeScript
-- Express.js
-- Solid.js
-- Postgresql
-- Tailwind
+TBD
+
+### API
+
+TBD
+
+## System's Overview
+
+### Entity Relationship Diagram
+
+![ER Diagram](./docs/diagrams/ERdiagram.png)
+
+### Component Diagram
+
+![Component Diagram](./docs/diagrams/Component-diagram.drawio.png)
+
+### Deployment Diagram
+
+![DeploymentDiagram](./docs/diagrams/DeploymentDiagram.png)
 
 ## Development team
 
-Agrima Singh - @agrima 
-
-Mariia Zabolotnia - @mariiaz
-
-Alexander Säfström - @alesaf
-
-Michal Spano - @spano
-
-Kaisa Arumeel - @arumeel
-
-Omid Khodaparast - @omidk
-
+| Name               | username |
+|--------------------|----------|
+| Agrima Singh       | @agrima  |
+| Mariia Zabolotnia  | @mariiaz |
+| Alexander Säfström | @alesaf  |
+| Michal Spano       | @spano   |
+| Kaisa Arumeel      | @arumeel |
+| Omid Khodaparast   | @omidk   |
