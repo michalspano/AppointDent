@@ -32,6 +32,7 @@ router.get('/dentists/:email', GET.appointmentsByDentistId);
  * is, simply, that when a new appointment is created, there's a direct
  * access to this table without requesting it from another service.
  */
+router.get('/subscribe/:email/:patientEmail', GET.subscription);
 router.post('/subscribe/:email/:patientEmail', subToDentist);
 router.delete('/subscribe/:email/:patientEmail', unsubFromDentist);
 

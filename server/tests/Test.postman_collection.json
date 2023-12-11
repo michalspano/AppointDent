@@ -4517,6 +4517,63 @@
 							"response": []
 						},
 						{
+							"name": "GET subscription",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response code shall be 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response is an array of length 1\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData).to.be.an('array').and.to.have.lengthOf(1);",
+											"});",
+											"",
+											"pm.test(\"Entry from Array has correct structure\", function () {",
+											"    var appointment = pm.response.json()[0];",
+											"    pm.expect(appointment).to.be.an('object').and.to.have.property('dentistEmail').that.is.not.null;",
+											"    pm.expect(appointment).to.have.property('patientEmail').that.is.not.null;",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/v1/appointments/subscribe/:email/:patientEmail",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"appointments",
+										"subscribe",
+										":email",
+										":patientEmail"
+									],
+									"variable": [
+										{
+											"key": "email",
+											"value": "{{dentistEmailSample}}"
+										},
+										{
+											"key": "patientEmail",
+											"value": "{{patientEmailSample}}",
+											"description": "Malformed."
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
 							"name": "SUB (CONFLICT)",
 							"event": [
 								{
@@ -5057,6 +5114,57 @@
 							],
 							"request": {
 								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/v1/appointments/subscribe/:email/:patientEmail",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"appointments",
+										"subscribe",
+										":email",
+										":patientEmail"
+									],
+									"variable": [
+										{
+											"key": "email",
+											"value": "{{dentistEmailSample}}"
+										},
+										{
+											"key": "patientEmail",
+											"value": "{{patientEmailSample}}",
+											"description": "Malformed."
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET subscription",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response code shall be 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response is an array of length 0\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData).to.be.an('array').and.to.have.lengthOf(0);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
 								"header": [],
 								"url": {
 									"raw": "{{host}}/api/v1/appointments/subscribe/:email/:patientEmail",
