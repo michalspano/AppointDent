@@ -7,7 +7,12 @@
 
 import { client } from '../mqtt/mqtt';
 import { randomBytes } from 'crypto';
-import { SessionResponse, type WhoisResponse, type UserType } from '../types/types';
+import {
+  type UserType,
+  SessionResponse,
+  type WhoisResponse,
+  type DentistName
+} from '../types/types';
 import type { MqttClient } from 'mqtt/*';
 
 /**
@@ -28,6 +33,10 @@ export const MQTT_PAIRS: Readonly<Record<string, Record<string, string>>> = Obje
   whois: {
     req: 'WHOIS',
     res: 'WHOISRES'
+  },
+  dname: {
+    req: 'DENNAME',
+    res: 'DENNAMERES'
   }
 });
 
@@ -37,24 +46,23 @@ export const MQTT_PAIRS: Readonly<Record<string, Record<string, string>>> = Obje
  *
  * @see controllers/post.controller.ts
  *
- * @param email an email of a dentist that created an appointment slot.
- * FIXME: this is not a good way to do this. The name should be displayed instead.
+ * @param dName the name of a dentist (first and last name)
  * @returns a formatted string that represents a notification message.
  */
-export const newAppointmentMsg = (email: string): string => {
-  return `Dentist ${email} has created a new appointment slot.`;
+export const newAppointmentMsg = (dName: DentistName): string => {
+  return `Dentist ${dName.firstName} ${dName.lastName} has created a new appointment slot.`;
 };
 
 /**
  * @description a helper function that generates a notification message
  * for a patient when an appointment is unbooked.
  *
- * @param email an email of a dentist that created an appointment slot.
- * FIXME: this is not a good way to do this. The name should be displayed instead.
+ * @param dName the name of a dentist (first and last name)
  * @returns a formatted string that represents a notification message.
  */
-export const newUnbookedAppointmentMsg = (email: string): string => {
-  return `Someone has unbooked an appointment with dentist ${email}, and the slot is now available.`;
+export const newUnbookedAppointmentMsg = (dName: DentistName): string => {
+  return `Someone has unbooked an appointment with dentist ${dName.firstName} ${dName.lastName}.` +
+          ' The slot is now available.';
 };
 
 /**
@@ -113,6 +121,47 @@ export const verifySession = async (reqId: string, RESPONSE_TOPIC: string): Prom
           // Convert to enum type SessionResponse.
           const rawMsg: string = message.toString().split('/')[1];
           resolve(parseInt(rawMsg) as SessionResponse);
+        }
+      }
+    };
+    client?.subscribe(RESPONSE_TOPIC);
+    client?.on('message', eventHandler);
+  });
+};
+
+/**
+ * @description helper function that retrieves the name of a dentist
+ * based on their email.
+ *
+ * @param reqId a randomly computed identifier for the request
+ * @param RESPONSE_TOPIC a response topic to subscribe to
+ * @returns a promise that resolves to the name of a dentist
+ */
+export const dentistNameByEmail = async (reqId: string, RESPONSE_TOPIC: string): Promise<DentistName> => {
+  return await new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      client?.unsubscribe(RESPONSE_TOPIC);
+      reject(new Error('MQTT timeout'));
+    }, TIMEOUT);
+
+    const eventHandler = (topic: string, message: Buffer): void => {
+      console.log(topic, message.toString());
+      if (topic === RESPONSE_TOPIC) {
+        if (message.toString().startsWith(`${reqId}/`)) {
+          clearTimeout(timeout);
+          client?.unsubscribe(topic);
+          client?.removeListener('message', eventHandler);
+
+          const rawMsg: string[] = message.toString().split('/');
+          // Signifies that the dentist was not found.
+          if (rawMsg[1] === '0') reject(new Error('Dentist not found.'));
+
+          const names: string[] = rawMsg[1].split(',');
+          const dName: DentistName = {
+            firstName: names[0],
+            lastName: names[1]
+          };
+          resolve(dName);
         }
       }
     };

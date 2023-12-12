@@ -86,3 +86,12 @@ export type AsyncResObj = Promise<Response<any, Record<string, any>>>;
  * timestamps, therefore type number and NOT Date.
  */
 export interface UnixTimestampRange { from?: number, to?: number };
+
+/**
+ * @description a custom type that denotes the response type
+ * when a dentist is queried by their email.
+ */
+export interface DentistName {
+  firstName: string
+  lastName: string
+}
