@@ -19,11 +19,9 @@ import {
   type AsyncResObj,
   type Appointment,
   type WhoisResponse,
+  type DentistName,
   type PatientSubscription
 } from '../types/types';
-
-const TOPIC: string = utils.MQTT_PAIRS.whois.req;
-const RESPONSE_TOPIC: string = utils.MQTT_PAIRS.whois.res;
 
 /**
  * @description the controller for the PATCH /appointments/:id route. In
@@ -68,13 +66,13 @@ const bookAppointment = async (req: Request, res: Response): AsyncResObj => {
    * with the provided email in the request body. This way, we don't
    * need to call the session service twice. */
   const reqId: string = utils.genReqId();
-  client.publish(TOPIC, `${reqId}/${sessionKey}/*`);
-  client.subscribe(RESPONSE_TOPIC);
+  client.publish(utils.MQTT_PAIRS.whois.req, `${reqId}/${sessionKey}/*`);
+  client.subscribe(utils.MQTT_PAIRS.whois.res);
 
   try {
     const result: WhoisResponse = await utils.whoisByToken(
       reqId.toString(),
-      RESPONSE_TOPIC
+      utils.MQTT_PAIRS.whois.res
     );
     if (result.status !== SessionResponse.Success) {
       return res.status(401).json({ message: 'Unauthorized: invalid session.' });
@@ -154,6 +152,29 @@ const bookAppointment = async (req: Request, res: Response): AsyncResObj => {
   }
 
   /**
+   * We need to get the name of the dentist, we should not be sharing emails, rather
+   * we should be sharing names to patients.
+   */
+  const dReqId: string = utils.genReqId();
+  client.publish(
+    utils.MQTT_PAIRS.dname.req,
+    `${dReqId}/${appointment.dentistId}/*`
+  );
+
+  // Switch the topics
+  client.unsubscribe(utils.MQTT_PAIRS.whois.res);
+  client.subscribe(utils.MQTT_PAIRS.dname.res);
+
+  let dentistName: DentistName;
+  try {
+    dentistName = await utils.dentistNameByEmail(dReqId, utils.MQTT_PAIRS.dname.res);
+  } catch (err: Error | unknown) {
+    return res.status(504).json({
+      message: 'Service timeout: unable to get dentist\'s name.'
+    });
+  }
+
+  /**
    * If a patient has unbooked an appointment, then we need to notify all the
    * patients that are subscribed to the dentist.
    * @see PatientSubscription
@@ -175,7 +196,7 @@ const bookAppointment = async (req: Request, res: Response): AsyncResObj => {
       subscriptions.forEach((subscription: PatientSubscription) => {
         utils.pubNotification(
           subscription.patientEmail,
-          utils.newUnbookedAppointmentMsg(email),
+          utils.newUnbookedAppointmentMsg(dentistName),
           client as MqttClient
         );
       });
@@ -188,6 +209,7 @@ const bookAppointment = async (req: Request, res: Response): AsyncResObj => {
    * As the appointment has been booked or canceled right now, we also want to
    * send a notification to the patient that just booked or canceled it.
    * We also need to let the dentist know that their appointment was booked or canceled.
+   * TODO: add name, not email.
    */
   const patientMessage = toBook
     ? `Your booking on ${utils.formatDateTime(appointment.start_timestamp)} was confirmed.`
