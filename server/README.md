@@ -45,6 +45,10 @@ Runs the linter on the `server` folder.
 
 Runs the linter on the `server` folder and fixes the errors.
 
+### `npm run kill-service:port :<<PORT>>`
+
+Kills the service running at the specified port
+
 ## Deployment
 
 TBD.

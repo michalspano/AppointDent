@@ -21,9 +21,11 @@ interface CorsOptions {
 /**
  * @description array of allowed origins that can access the API
  */
-const allowedOrigins: string[] = [
-  'http://localhost:5173'
-];
+const allowedOrigins: string[] = (process.env.ALLOWED_ORIGINS == null)
+  ? [
+      'http://localhost:5173'
+    ]
+  : process.env.ALLOWED_ORIGINS.split(',');
 
 /**
  * This function has the responsibility of dynamically setting the

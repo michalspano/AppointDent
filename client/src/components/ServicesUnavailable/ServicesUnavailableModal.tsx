@@ -22,7 +22,7 @@ export default function ServicesUnavailableModal (props: ServicesUnavailableModa
         <p>Our team is actively working to fix the problem. Thanks for your patience!</p>
         <div class="flex justify-end mt-4">
         <button
-            class="bg-secondary px-4 py-2 rounded"
+            class="bg-secondary px-4 py-2 rounded text-white"
             onClick={props.onCancel}
           >
             OK
