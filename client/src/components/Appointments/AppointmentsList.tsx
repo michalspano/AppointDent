@@ -9,7 +9,8 @@ import {
   type Appointment,
   type AppointmentResponse,
   type GroupedAppointments,
-  type FilterInterval
+  type FilterInterval,
+  type DentistRegistration
 } from '../../utils/types'
 
 export default function AppointmentsList (): JSX.Element {
