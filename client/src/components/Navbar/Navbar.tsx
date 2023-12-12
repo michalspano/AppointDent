@@ -18,7 +18,13 @@ export default function Navbar (): JSX.Element {
       const response = await Api.get('sessions/whois', { withCredentials: true })
       return response.data
     } catch (error) {
-      throw new Error('Failed to fetch user type')
+      console.error(error)
+      const fallbackValue: WhoisResponse = {
+        status: 0,
+        email: undefined,
+        type: undefined
+      }
+      return fallbackValue
     }
   }
 
@@ -59,6 +65,11 @@ export default function Navbar (): JSX.Element {
   **/
   createEffect(async () => {
     const type = (await user()).type?.toString() as string
+    if (type === undefined) {
+      alert('The system has encountered a problem')
+      window.location.replace('/')
+      return
+    }
     setType(type)
     try {
       switch (type) {
