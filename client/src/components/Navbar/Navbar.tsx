@@ -1,7 +1,7 @@
 import { type JSX } from 'solid-js/jsx-runtime'
 import './Navbar.css'
 import logo from '../../assets/logo.png'
-import { For, createEffect, createSignal } from 'solid-js'
+import { For, createEffect, createSignal, onCleanup } from 'solid-js'
 import { patientRoutes } from './routes'
 import location from '../../assets/location.png'
 import { Api } from '../../utils/api'
@@ -12,9 +12,20 @@ import { type WhoisResponse } from '../../utils/types'
 
 export default function Navbar (): JSX.Element {
   const { notificationCount, showNotificationDot } = useNotification()
+
   const user = async (): Promise<WhoisResponse> => {
-    const response = await Api.get('sessions/whois', { withCredentials: true })
-    return response.data
+    try {
+      const response = await Api.get('sessions/whois', { withCredentials: true })
+      return response.data
+    } catch (error) {
+      console.error(error)
+      const fallbackValue: WhoisResponse = {
+        status: 0,
+        email: undefined,
+        type: undefined
+      }
+      return fallbackValue
+    }
   }
 
   const logout = async (): Promise<void> => {
@@ -48,27 +59,42 @@ export default function Navbar (): JSX.Element {
     })
   }
 
+  /**
+   * setLogoLink is used to define where user will be redirected
+   * upon clicking the app logo in the navbar, route is specific to the user type
+  **/
   createEffect(async () => {
     const type = (await user()).type?.toString() as string
+    if (type === undefined) {
+      alert('The system has encountered a problem')
+      window.location.replace('/')
+      return
+    }
     setType(type)
-    switch (type) {
-      case 'd':
-        setLogoLink('/calendar')
-        break
+    try {
+      switch (type) {
+        case 'd':
+          setLogoLink('/calendar')
+          break
 
-      case 'p':
-        setRoutes(patientRoutes)
-        setLogoLink('/map')
-        break
+        case 'p':
+          setRoutes(patientRoutes) // Navbar for patients should contain multiple links and they are passed as props `patientRoutes`
+          setLogoLink('/map')
+          break
 
-      case 'a':
-        setLogoLink('/notifications') // TODO: replace with admin dashboard when it's added on FE
-        break
+        case 'a':
+          setLogoLink('/admin-page')
+          break
 
-      default:
-        break
+        default:
+          break
+      }
+    } catch (error) {
+      console.error(error)
     }
   })
+
+  onCleanup(() => { })
 
   const [routes, setRoutes] = createSignal<any[]>()
   const [logoLink, setLogoLink] = createSignal<string>('')
