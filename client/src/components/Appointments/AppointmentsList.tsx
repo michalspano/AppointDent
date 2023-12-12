@@ -1,15 +1,16 @@
 import { Api } from '../../utils/api'
-import { isPatient } from '../../utils'
-import { useParams, useNavigate, useSearchParams } from '@solidjs/router'
+import { isPatient, fetchPatientEmail } from '../../utils'
 import default_doctor from '../../assets/default_doctor.jpg'
 import BookingConfirmationPopup from './BookingConfirmation'
+import { useParams, useNavigate, useSearchParams } from '@solidjs/router'
 import { type Signal, createSignal, type JSX, createEffect, onCleanup, Show, onMount } from 'solid-js'
 import {
-  type WhoisResponse,
   type Appointment,
+  type Subscription,
+  SubscriptionStatus,
+  type FilterInterval,
   type AppointmentResponse,
   type GroupedAppointments,
-  type FilterInterval,
   type DentistRegistration
 } from '../../utils/types'
 
@@ -42,25 +43,38 @@ export default function AppointmentsList (): JSX.Element {
     const params: Record<string, string> = useParams<{ email: string }>()
     setDentistEmail(atob(params.email))
 
-    // Fetch resources in a loop
-    void fetchAppointments(); void fetchDentist()
-    setInterval(() => { void fetchAppointments() }, FETCH_INTERVAL)
+    // Fetch the dentist's information
+    void fetchDentist()
+
+    /**
+     * Fetch patient's email address.
+     * Determine if the patient is subscribed to the selected dentist.
+     * This check is carried when the component is mounted. The status
+     * shall and the appointments shall only be fetched if the patient
+     * is fetched successfully.
+     */
+    fetchPatientEmail().then((email: string) => {
+      setPatientEmail(email)
+      void handleSubStatus()
+      void fetchAppointments()
+      setInterval(() => { void fetchAppointments() }, FETCH_INTERVAL)
+    }).catch((error: Error) => {
+      console.error(error.message)
+    })
   })
+
   /**
    * Fetches all available appointments for the dentist. If a valid time range is specified,
    * then only the appointments within the given time range are fetched.
    */
   async function fetchAppointments (): Promise<void> {
     try {
-      const patientResponse: WhoisResponse = (await Api.get('sessions/whois', { withCredentials: true })).data
-      const patientEmail: string = patientResponse.email?.toString() ?? ''
-
       const hasInterval: boolean = (timeRange().start !== '') &&
                                    (timeRange().end !== '')
 
       // Formatted request URL with all *default* parameters
       let requestURL: string = `/appointments/dentists/${dentistEmail()}` +
-                                `?userId=${patientEmail}&onlyAvailable=true`
+                                `?userId=${patientEmail()}&onlyAvailable=true`
 
       // If the time range is given, add the query parameters to the request URL
       // Afterwards, fetch the appointments based on the query parameters
@@ -122,12 +136,8 @@ export default function AppointmentsList (): JSX.Element {
   // TODO: add proper types.
   async function bookAppointment (appointment: Appointment): Promise<void> {
     const appointmentId = appointment.id
-    const patientResponse = await Api.get('sessions/whois', {
-      withCredentials: true
-    })
-    const patientEmail = patientResponse.data.email
     try {
-      const requestURL: string = `/appointments/${appointmentId}?patientId=${patientEmail}&toBook=true`
+      const requestURL: string = `/appointments/${appointmentId}?patientId=${patientEmail()}&toBook=true`
       await Api.patch(requestURL, {}, { withCredentials: true }
       ).then(() => {
         console.log('Appointment booked successfully.')
@@ -137,10 +147,57 @@ export default function AppointmentsList (): JSX.Element {
     }
   }
 
+  /**
+   * @description a function that handles the subscription event. It is triggered when
+   * the button is clicked. It sends a request to the API to subscribe/unsubscribe the
+   * patient to the selected dentist.
+   *
+   * @see SubscriptionStatus
+   */
+  const onClickSubButton = async (event: SubscriptionStatus): Promise<void> => {
+    const requestURL: string = `/appointments/subscribe/${dentistEmail()}/${patientEmail()}`
+
+    // TODO: this can be perhaps extracted to separate functions?
+    if (event === SubscriptionStatus.UNSUBSCRIBED) {
+      await Api.delete(requestURL, { withCredentials: true })
+        .then(() => setIsSubscribed(false))
+        .catch((error: Error) => {
+          console.error('Error unsubscribing to dentist:', error)
+        })
+    } else if (event === SubscriptionStatus.SUBSCRIBED) {
+      await Api.post(requestURL, {}, { withCredentials: true })
+        .then(() => setIsSubscribed(true))
+        .catch((error: Error) => {
+          console.error('Error subscribing to dentist:', error)
+        })
+    }
+  }
+
+  /**
+   * @description a function that checks if the current patient is subscribed to the selected dentist.
+   * In updates the signal isSubscribed accordingly. This check relies on the appointment endpoint, hence
+   * requires a request to the API - for that reason, this endpoint shall be used with caution.
+   *
+   * @see isSubscribed
+   * @see Signal
+   */
+  const handleSubStatus = async (): Promise<void> => {
+    const requestURL: string = `/appointments/subscribe/${dentistEmail()}/${patientEmail()}`
+
+    Api.get(requestURL, { withCredentials: true })
+      .then(response => {
+        const data: Subscription[] = response.data
+        setIsSubscribed(data.length > 0) // if there exists a subscription, then the patient is subscribed
+      })
+      .catch(() => { console.error('Error fetching subscription status') })
+  }
+
   /* Declaration of signals */
   const [timeRange, setTimeRange]: Signal<FilterInterval> = createSignal<FilterInterval>({
     start: '', end: ''
   })
+  const [patientEmail, setPatientEmail]: Signal<string> = createSignal<string>('')
+  const [isSubscribed, setIsSubscribed]: Signal<boolean> = createSignal<boolean>(false)
   const [availableDays, setAvailableDays] = createSignal<GroupedAppointments[]>([])
   const [availableTime, setAvailableTime] = createSignal<Appointment[]>([])
   const [selectedDate, setSelectedDate] = createSignal<string>('')
@@ -207,9 +264,21 @@ export default function AppointmentsList (): JSX.Element {
             <div class='flex-col text-center mt-4 text-lg'>
               <p class='font-semibold text-black'><span class="font-normal">Dentist:</span> {dentistName()}</p>
               <p class='mt-2 text-black'>Location: <strong>{dentistLocation()}</strong></p>
+              <button class='bg-primary rounded-lg text-white shadow-sm p-4 mt-4 px-6 min-w-[30%]'
+                onClick={
+                  () => {
+                    void onClickSubButton(
+                      isSubscribed()
+                        ? SubscriptionStatus.UNSUBSCRIBED
+                        : SubscriptionStatus.SUBSCRIBED)
+                  }
+                }>
+                {isSubscribed()
+                  ? (<span>&#128277; Unsubscribe</span>)
+                  : (<span>&#128276; Subscribe</span>)}
+              </button>
             </div>
           </div>
-
         </div>
         <div>
           <div class="m-6 lg:ml-10 mt-0">
@@ -224,7 +293,6 @@ export default function AppointmentsList (): JSX.Element {
                     </div>
                   ))}
                 </Show>
-
               </div>
             </div>
             {(selectedDate() !== '') && (
@@ -272,7 +340,6 @@ export default function AppointmentsList (): JSX.Element {
           date={`${formatDate(selectedDate())} at ${formatTimeEntry(selectedAppointment())}`}
         />
       )}
-
     </div>
   )
 }

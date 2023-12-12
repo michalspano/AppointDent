@@ -22,6 +22,22 @@ export interface Appointment {
 };
 
 /**
+ * @description a custom type that denotes the relational table
+ * when a subscription is made between a patient and a dentist.
+ */
+export interface Subscription {
+  dentistEmail: string
+  patientEmail: string
+};
+
+/**
+ * @description a custom type that resolves a partial Subscription
+ * type with the patientId property being given.
+ * Set the type of patientId to string.
+ */
+export type PatientSubscription = Partial<Subscription> & { patientEmail: string };
+
+/**
  * @description a custom type that denotes the response type
  * of the session service in terms of the allowed types of users.
  * Similarly as the SessionResponse enum, this type maps the
@@ -70,3 +86,12 @@ export type AsyncResObj = Promise<Response<any, Record<string, any>>>;
  * timestamps, therefore type number and NOT Date.
  */
 export interface UnixTimestampRange { from?: number, to?: number };
+
+/**
+ * @description a custom type that denotes the response type
+ * when a dentist is queried by their email.
+ */
+export interface DentistName {
+  firstName: string
+  lastName: string
+}

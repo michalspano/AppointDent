@@ -63,6 +63,22 @@ export const isPatient = async (): Promise<boolean> => {
 }
 
 /**
+ * A function that fetches the patient's email address.
+ * @returns the patient's email address in a string format.
+ */
+export async function fetchPatientEmail (): Promise<string> {
+  let patientResponse: WhoisResponse
+  try {
+    patientResponse = (
+      await Api.get('sessions/whois', { withCredentials: true })
+    ).data
+  } catch {
+    throw new Error("Couldn't fetch patient's email address.")
+  }
+  return patientResponse.email as string
+}
+
+/**
  * @description a helper function to reset the given cluster group.
  * @param cluster the cluster group that needs to be reset
  */

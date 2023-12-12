@@ -9,7 +9,15 @@ import database from '../db/config';
 import { client } from '../mqtt/mqtt';
 import * as utils from '../utils';
 import type { Request, Response } from 'express';
-import { SessionResponse, type AsyncResObj, UserType, type WhoisResponse, type Appointment, type UnixTimestampRange } from '../types/types';
+import {
+  UserType,
+  SessionResponse,
+  type AsyncResObj,
+  type Appointment,
+  type WhoisResponse,
+  type Subscription,
+  type UnixTimestampRange
+} from '../types/types';
 
 /**
  * @description A controller function to get all unbooked appointments.
@@ -532,6 +540,96 @@ const getAppointmentCount = async (req: Request, res: Response): AsyncResObj => 
 };
 
 /**
+ * @description a controller function that is used to get an array of subscription
+ * that a particular patient has of a particular dentist. This is, in turn, used
+ * to verify if a patient is subscribed to a dentist. This endpoint is protected
+ * by the session service. It can only be accessed when the user has a valid session.
+ * This endpoint is only accessible by patients.
+ *
+ * Note: if required, this endpoint can be opened to dentists as well. As of now,
+ * such a functionality is not required.
+ *
+ * @param req the request object
+ * @param res the response object
+ * @returns Asynchronous response JSON-like object.
+ */
+const getSubscription = async (req: Request, res: Response): AsyncResObj => {
+  if (database === undefined) {
+    return res.status(500).json({
+      message: 'Internal server error: database connection failed.'
+    });
+  }
+
+  if (client === undefined) {
+    return res.status(503).json({
+      message: 'Service unavailable: MQTT connection failed.'
+    });
+  }
+
+  const dentistEmail: string | undefined = req.params.email;
+  const patientEmail: string | undefined = req.params.patientEmail;
+  const sessionKey: string | undefined = req.cookies.sessionKey;
+
+  // Ensure that the required parameters are provided.
+  if (sessionKey === undefined) {
+    return res.status(400).json({ message: 'Bad request: missing session key.' });
+  } else if (utils.isForbiddenId(dentistEmail)) {
+    return res.status(400).json({ message: 'Bad request: invalid dentist email.' });
+  } else if (utils.isForbiddenId(patientEmail)) {
+    return res.status(400).json({ message: 'Bad request: invalid patient email.' });
+  }
+
+  const TOPIC: string = utils.MQTT_PAIRS.whois.req;
+  const RESPONSE_TOPIC: string = utils.MQTT_PAIRS.whois.res;
+
+  const reqId: string = utils.genReqId();
+  client.publish(TOPIC, `${reqId}/${sessionKey}/*`);
+  client.subscribe(RESPONSE_TOPIC);
+
+  try {
+    const result: WhoisResponse = await utils.whoisByToken(
+      reqId.toString(),
+      RESPONSE_TOPIC
+    );
+
+    if (result.status !== SessionResponse.Success) {
+      return res.status(401).json({ message: 'Unauthorized: invalid session.' });
+    }
+
+    // Restrict access to patients only.
+    if (result.type !== UserType.Patient) {
+      return res.status(403).json({
+        message: 'Forbidden: only patients can subscribe to dentists.'
+      });
+    }
+
+    // Check if the emails match (of the patient and the one in the session).
+    // This case also handles when a non-existent email is provided.
+    if (result.email !== patientEmail) {
+      return res.status(403).json({ message: 'Forbidden: invalid email.' });
+    }
+  } catch (err: Error | unknown) {
+    return res.status(504).json({
+      message: 'Service timeout: unable to verify session.'
+    });
+  }
+
+  // Verification step successful, verify the state of the subscription.
+  let subscriptions: Subscription[];
+  try {
+    subscriptions = database.prepare(`
+      SELECT * FROM subscriptions WHERE dentistEmail = ? AND patientEmail = ?
+    `).all(dentistEmail, patientEmail) as Subscription[];
+  } catch (err: Error | unknown) {
+    return res.status(500).json({
+      message: 'Internal server error: fail performing selection.'
+    });
+  }
+
+  return res.status(200).json(subscriptions);
+};
+
+/**
  * @description Wrappers for the controllers.
  *
  * @example
@@ -563,11 +661,16 @@ const appointmentCount = (req: Request, res: Response): void => {
   void getAppointmentCount(req, res);
 };
 
+const subscription = (req: Request, res: Response): void => {
+  void getSubscription(req, res);
+};
+
 // Export the controllers.
 export default {
+  subscription,
   allAppointments,
-  appointmentsByPatientId,
-  appointmentsByDentistId,
   appointment,
-  appointmentCount
+  appointmentCount,
+  appointmentsByPatientId,
+  appointmentsByDentistId
 };

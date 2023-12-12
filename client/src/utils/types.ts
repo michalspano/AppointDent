@@ -132,6 +132,23 @@ export enum SessionResponse {
 }
 
 /**
+ * @description a custom type that denotes the relational table
+ * when a subscription is made between a patient and a dentist.
+ */
+export interface Subscription {
+  dentistEmail: string
+  patientEmail: string
+};
+
+/**
+ * @description the response status of seeing if a patient is subscribed
+ * to a dentist.
+ */
+export enum SubscriptionStatus {
+  SUBSCRIBED, UNSUBSCRIBED
+}
+
+/**
  * Category of the request (patients, dentist etc.)
  * HTTP method
  * And if we should only regard logged in users.
