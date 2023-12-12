@@ -1,12 +1,34 @@
 export interface RegisterRequest {
-  'email': string
-  'firstName': string
-  'lastName': string
-  'clinicCountry': string
-  'clinicCity': string
-  'clinicStreet': string
-  'clinicHouseNumber': number
-  'clinicZipCode': number
-  'picture': string
+  email: string
+  firstName: string
+  lastName: string
+  clinicCountry: string
+  clinicCity: string
+  clinicStreet: string
+  clinicHouseNumber: number
+  clinicZipCode: number
+  picture: string
 }
-export type RegisterRequestKey = keyof RegisterRequest; // Used when iterating through the RegisterRequest
+
+/**
+ * @description iteration through the RegisterRequest keys
+ */
+export type RegisterRequestKey = keyof RegisterRequest;
+
+/**
+ * @description an interface that represents a request over MQTT to
+ * get the name of a dentist from their email.
+ */
+export interface DenNameRequestMQTT {
+  reqId: string
+  email: string
+}
+
+/**
+ * @description an interface type that is yielded by the request.
+ * @see DenNameRequestMQTT
+ */
+export interface DenNameRequest {
+  firstName: string
+  lastName: string
+}
