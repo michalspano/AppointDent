@@ -45,14 +45,6 @@ export const getUser = async (): Promise<WhoisResponse | null> => {
   }
 }
 
-export const formatDate = function (date: Date): string {
-  const parsedDate = date.toLocaleDateString().split('/')
-  const year = parsedDate[2]
-  parsedDate[2] = parsedDate[0]
-  parsedDate[0] = year
-  return parsedDate.toString().replace(/[\s,]/g, '-')
-}
-
 /**
  * @description a helper function to determine if the user is a patient or not.
  * @returns Promise<boolean> - true if the user is a patient, false otherwise.

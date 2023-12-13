@@ -92,8 +92,8 @@ export default function AppointmentsList (): JSX.Element {
         appointments.map((appointment: AppointmentResponse) => ({
           title: '', // can be set to empty because it's not used in the view
           id: appointment.id,
-          start: new Date(appointment.start_timestamp * 1000).toString().split(' ').slice(0, 5).toString().replace(/[\s,]/g, ' '),
-          end: new Date(appointment.end_timestamp * 1000).toString().split(' ').slice(0, 5).toString().replace(/[\s,]/g, ' ')
+          start: new Date(appointment.start_timestamp * 1000).toLocaleString('sv-SE').toString(),
+          end: new Date(appointment.end_timestamp * 1000).toLocaleString('sv-SE').toString()
         }))
 
       // Group appointments by day
@@ -212,11 +212,15 @@ export default function AppointmentsList (): JSX.Element {
 
   // TODO: add proper types to all function below.
   const formatDate = (date: string): string => {
-    return new Date(date).toString().split(' ').slice(0, 5).toString().replace(/[\s,]/g, ' ')
+    const options: Intl.DateTimeFormatOptions = {
+      day: 'numeric', month: 'short', year: 'numeric'
+    }
+    return new Date(date).toLocaleDateString('sv-SE', options)
   }
 
   const formatTime = (date: string): string => {
-    return new Date(date).toString().split(' ').slice(0, 5).toString().replace(/[\s,]/g, ' ')
+    const options: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit' }
+    return new Date(date).toLocaleTimeString('sv-SE', options)
   }
 
   const formatTimeEntry = (appointment: any): string => {

@@ -285,5 +285,5 @@ export const pubNotification = (email: string, message: string, client: MqttClie
  * @returns a formatted string representing the date and time.
  */
 export const formatDateTime = (timestamp: number): string => {
-  return new Date(timestamp).toString().split(' ').slice(0, 5).toString().replace(/[\s,]/g, ' ');
+  return new Date(timestamp * 1000).toLocaleString('sv-SE');
 };

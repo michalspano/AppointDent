@@ -73,7 +73,7 @@ async function parseRawRequest (rawMsg: string): Promise<PatientNameRequestMQTT>
  * REQID: Random unique id that requestor sets to identify an authentication request.
  * Is not stored persistently in a DB. email: The email of a patient
  */
-export async function dentistNameListener (client: mqtt.MqttClient): Promise<void> {
+export async function patientNameListener (client: mqtt.MqttClient): Promise<void> {
   // Set up a listener for MQTT messages
   client?.on('message', (topic: string, message: Buffer) => {
     if (topic === TOPIC) {

@@ -48,8 +48,18 @@ export default function MyBookings (): JSX.Element {
           const dentistInfo = await fetchDentist(appointment.dentistId)
           return {
             // Parse the integer format of a date into human readable date
-            start_timestamp: new Date(appointment.start_timestamp * 1000).toString().split(' ').slice(0, 5).toString().replace(/[\s,]/g, ' '),
-            end_timestamp: new Date(appointment.end_timestamp * 1000).toString().split(' ').slice(0, 5).toString().replace(/[\s,]/g, ' '),
+            start_timestamp: new Date(appointment.start_timestamp * 1000).toLocaleString('sv-SE', {
+              month: 'short',
+              day: 'numeric',
+              hour: 'numeric',
+              minute: 'numeric'
+            }),
+            end_timestamp: new Date(appointment.end_timestamp * 1000).toLocaleString('sv-SE', {
+              month: 'short',
+              day: 'numeric',
+              hour: 'numeric',
+              minute: 'numeric'
+            }),
             dentistId: appointment.dentistId,
             id: appointment.id,
             address: dentistInfo.address,
