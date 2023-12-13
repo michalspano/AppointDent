@@ -84,6 +84,5 @@ export async function fetchPatientEmail (): Promise<string> {
  */
 export function resetCluster (cluster: leaflet.MarkerClusterGroup): void {
   cluster.clearLayers()
-  cluster.clearAllEventListeners()
   cluster.refreshClusters()
 }
