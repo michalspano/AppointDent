@@ -19,7 +19,7 @@ import {
   type AsyncResObj,
   type Appointment,
   type WhoisResponse,
-  type DentistName,
+  type UserName,
   type PatientSubscription
 } from '../types/types';
 
@@ -165,9 +165,26 @@ const bookAppointment = async (req: Request, res: Response): AsyncResObj => {
   client.unsubscribe(utils.MQTT_PAIRS.whois.res);
   client.subscribe(utils.MQTT_PAIRS.dname.res);
 
-  let dentistName: DentistName;
+  let dentistName: UserName;
   try {
-    dentistName = await utils.dentistNameByEmail(dReqId, utils.MQTT_PAIRS.dname.res);
+    dentistName = await utils.userNameByEmail(dReqId, utils.MQTT_PAIRS.dname.res);
+  } catch (err: Error | unknown) {
+    return res.status(504).json({
+      message: 'Service timeout: unable to get dentist\'s name.'
+    });
+  }
+
+  const pReqId: string = utils.genReqId();
+  client.publish(
+    utils.MQTT_PAIRS.pname.req,
+    `${pReqId}/${appointment.patientId}/*`
+  );
+
+  client.unsubscribe(utils.MQTT_PAIRS.dname.res);
+
+  let patientName: UserName;
+  try {
+    patientName = await utils.userNameByEmail(pReqId, utils.MQTT_PAIRS.pname.res);
   } catch (err: Error | unknown) {
     return res.status(504).json({
       message: 'Service timeout: unable to get dentist\'s name.'
@@ -216,8 +233,8 @@ const bookAppointment = async (req: Request, res: Response): AsyncResObj => {
     : `Your booking on ${utils.formatDateTime(appointment.start_timestamp)} was canceled.`;
 
   const dentistMessage = toBook
-    ? `${email} made a booking with you on ${utils.formatDateTime(appointment.start_timestamp)}`
-    : `${email} canceled their booking with you on ${utils.formatDateTime(appointment.start_timestamp)}`;
+    ? `${patientName.firstName} ${patientName.lastName} made a booking with you on ${utils.formatDateTime(appointment.start_timestamp)}`
+    : `${patientName.firstName} ${patientName.lastName} canceled their booking with you on ${utils.formatDateTime(appointment.start_timestamp)}`;
 
   try {
     utils.pubNotification(email, patientMessage, client);

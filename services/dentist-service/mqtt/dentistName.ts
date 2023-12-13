@@ -19,7 +19,7 @@ export async function validateRequestFormat (msgArr: string[], requiredLength: n
     throw Error('Could not find "*" in message! Please double check that you are sending the full data!');
   }
   if (msgArr.length !== requiredLength) {
-    throw Error('Invalid format: REQID/EMAIL/PASSWORD/*');
+    throw Error('Invalid format: REQID/EMAIL/*');
   }
 }
 

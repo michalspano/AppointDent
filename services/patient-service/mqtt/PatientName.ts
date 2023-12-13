@@ -19,12 +19,12 @@ export async function validateRequestFormat (msgArr: string[], requiredLength: n
     throw Error('Could not find "*" in message! Please double check that you are sending the full data!');
   }
   if (msgArr.length !== requiredLength) {
-    throw Error('Invalid format: REQID/EMAIL/PASSWORD/*');
+    throw Error('Invalid format: REQID/EMAIL/*');
   }
 }
 
 /**
- * @description a bufferized query to get the name of a dentist from their email.
+ * @description a bufferized query to get the name of a patient from their email.
  */
 const query = database?.prepare(`
     SELECT firstName,lastName FROM patients WHERE email = ?
@@ -52,7 +52,7 @@ export async function getPaName (request: PatientNameRequestMQTT): Promise<strin
  * Parse a raw MQTT request.
  * @param rawMsg
  * @returns PatientNameRequestMQTT
- * @description Used to parse and validate an a dentist name request over MQTT.
+ * @description Used to parse and validate an a patient name request over MQTT.
  */
 async function parseRawRequest (rawMsg: string): Promise<PatientNameRequestMQTT> {
   const msgArr: string[] = rawMsg.split('/');
@@ -67,11 +67,11 @@ async function parseRawRequest (rawMsg: string): Promise<PatientNameRequestMQTT>
 /**
  * Start PANAME Listener
  * @param client
- * @description Used for checking the name of a dentist from an email
+ * @description Used for checking the name of a patient from an email
  *
  * expected message format: REQID/email/*
  * REQID: Random unique id that requestor sets to identify an authentication request.
- * Is not stored persistently in a DB. email: The email of a dentist
+ * Is not stored persistently in a DB. email: The email of a patient
  */
 export async function dentistNameListener (client: mqtt.MqttClient): Promise<void> {
   // Set up a listener for MQTT messages
