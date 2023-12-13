@@ -3,7 +3,7 @@ import logo from '../../../assets/logo.png'
 import { A } from '@solidjs/router'
 import { createSignal } from 'solid-js'
 import { Api } from '../../../utils/api'
-import type { DentistRegistration, Country } from '../../../utils/types'
+import type { DentistRegistration, Country, Place } from '../../../utils/types'
 import { validateAddress, validateUserInfo } from '../utils'
 import { AxiosError } from 'axios'
 import * as CountryList from 'country-list'
@@ -28,7 +28,7 @@ export default function DentistForm (): JSX.Element {
   }
 
   const signUp = async (): Promise<void> => {
-    const registrationData: DentistRegistration = {
+    let registrationData: DentistRegistration = {
       email: email(),
       password: password(),
       firstName: firstName(),
@@ -38,7 +38,9 @@ export default function DentistForm (): JSX.Element {
       clinicStreet: clinicStreet(),
       clinicHouseNumber: clinicHouseNumber(),
       clinicZipCode: clinicZipCode(),
-      picture: picture()
+      picture: picture(),
+      longitude: undefined,
+      latitude: undefined
     }
     if (Object.values(registrationData).some((field) => field === '')) {
       setError('Please fill in all fields.')
@@ -53,12 +55,52 @@ export default function DentistForm (): JSX.Element {
       setError(addressValidation)
       return
     }
-    Api
-      .post('/dentists/register', registrationData)
+    let useAPI: number = 0
+    /**
+     * Each geocoder has the capacity of at least 1 request per second.
+     * Hence, the delay for cooldown, is calculated as:
+     * 1000 / length of geocoders
+    */
+    const geoCoders: string[] = [
+      'https://us1.locationiq.com/v1/search?key=pk.6e69ae53772e50aa2508ef9f652ee483&format=json&q=**ADDRESS**',
+      'https://geocode.maps.co/search?q=**ADDRESS**',
+      'https://nominatim.openstreetmap.org/search.php?format=jsonv2&q=**ADDRESS**'
+    ]
+    /**
+     * Used to convert addresses into long and lat for the map.
+     * @param address the address that needs to be geocoded
+     * @returns a location in accordance with Geocode API
+    */
+    async function geoCodeAddress (address: string): Promise<Place> {
+      if (address.length === 0) throw Error('Address cannot be empty!')
+      return await new Promise((resolve, reject) => {
+        Api.get(geoCoders[useAPI].replace('**ADDRESS**', address)).then((result) => {
+          const data: Place = result.data[0]
+          resolve(data)
+          if ((useAPI + 1) === geoCoders.length) {
+            useAPI = 0
+          } else {
+            useAPI++
+          }
+        }).catch(async (err) => {
+          reject(new Error('Geocoding system fatal error'))
+          console.error(err)
+        })
+      })
+    }
+    const dentistCombinedAddress: string = clinicStreet() + ' ' + clinicHouseNumber() + ' ' + clinicZipCode() + ' ' + clinicCity()
+    geoCodeAddress(dentistCombinedAddress)
+      .then(async (result: Place) => {
+        console.log(result.lon, result.lat)
+        registrationData = { ...registrationData, longitude: parseFloat(result.lat), latitude: parseFloat(result.lon) }
+        console.log(registrationData)
+        return await Api.post('/dentists/register', registrationData)
+      })
       .then(async () => {
       // enable automatic login when user registers
         await login()
-      }).catch((error: any) => {
+      })
+      .catch((error: any) => {
         const resError: string | AxiosError = error instanceof AxiosError ? error : 'Something went wrong, Please try again.'
         if (resError instanceof AxiosError) {
           if (resError.response !== undefined) {
@@ -68,6 +110,9 @@ export default function DentistForm (): JSX.Element {
           setError(resError)
         }
         console.error('Error during sign up', error)
+      })
+      .catch((err) => {
+        console.error(err)
       })
   }
 

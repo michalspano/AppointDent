@@ -87,6 +87,8 @@ export interface DentistRegistration {
   clinicHouseNumber: string
   clinicZipCode: string
   picture: string
+  longitude: number | undefined
+  latitude: number | undefined
 }
 
 /**
