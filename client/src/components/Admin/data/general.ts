@@ -25,12 +25,10 @@ export async function getChartData (category: string, method: string, loggedInOn
   const labels: string[] = []
   const data: number[] = []
   // At the moment we retrieve only 10 minutes data, later on it can be extended and made customizable
-  const rawData: AnalyticsResponse[] = (await Api.get(`/admins/requests
-    ?timeframe=${timeframe}
-    &method=${method}
-    &search=${category}
-    &loggedInOnly=${loggedInOnly}`,
-  { withCredentials: true })).data
+  const rawData: AnalyticsResponse[] =
+  (await Api.get(
+    `/admins/requests?timeframe=${timeframe}&method=${method}&search=${category}&loggedInOnly=${loggedInOnly}`,
+    { withCredentials: true })).data
 
   for (let i = 0; i < rawData.length; i++) {
     const timeString: string = createTimeString(rawData[i].interval)
