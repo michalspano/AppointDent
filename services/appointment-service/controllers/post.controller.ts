@@ -11,10 +11,16 @@ import * as utils from '../utils';
 import database from '../db/config';
 import { type Statement } from 'better-sqlite3';
 import type { Request, Response } from 'express';
-import { SessionResponse, type AsyncResObj, UserType, type Appointment, type WhoisResponse } from '../types/types';
-
-const TOPIC: string = utils.MQTT_PAIRS.whois.req;
-const RESPONSE_TOPIC: string = utils.MQTT_PAIRS.whois.res;
+import {
+  UserType,
+  SessionResponse,
+  type AsyncResObj,
+  type Appointment,
+  type DentistName,
+  type WhoisResponse,
+  type PatientSubscription
+} from '../types/types';
+import { type MqttClient } from 'mqtt/*';
 
 /**
  * @description the controller that creates an appointment.
@@ -50,13 +56,13 @@ const createAppointment = async (req: Request, res: Response): AsyncResObj => {
   // Use the `WHOIS` topic to determine the role of the user.
   // This, in turn, determines whether the user is allowed to create an appointment.
   const reqId: string = utils.genReqId();
-  client.publish(TOPIC, `${reqId}/${sessionKey}/*`);
-  client.subscribe(RESPONSE_TOPIC);
+  client.publish(utils.MQTT_PAIRS.whois.req, `${reqId}/${sessionKey}/*`);
+  client.subscribe(utils.MQTT_PAIRS.whois.res);
 
   try {
     const result: WhoisResponse = await utils.whoisByToken(
       reqId.toString(),
-      RESPONSE_TOPIC
+      utils.MQTT_PAIRS.whois.res
     );
 
     if (result.status !== SessionResponse.Success) {
@@ -104,6 +110,59 @@ const createAppointment = async (req: Request, res: Response): AsyncResObj => {
     stmt.run(Object.values(appointment));
   } catch (err: Error | unknown) {
     return res.status(400).json({ message: 'Bad request: invalid appointment object.' });
+  }
+
+  /**
+   * We need to get the name of the dentist, we should not be sharing emails, rather
+   * we should be sharing names to patients.
+   */
+  const dReqId: string = utils.genReqId();
+  client.publish(
+    utils.MQTT_PAIRS.dname.req,
+    `${dReqId}/${appointment.dentistId}/*`
+  );
+
+  // Switch the topics
+  client.unsubscribe(utils.MQTT_PAIRS.whois.res);
+  client.subscribe(utils.MQTT_PAIRS.dname.res);
+
+  let dentistName: DentistName;
+  try {
+    dentistName = await utils.dentistNameByEmail(dReqId, utils.MQTT_PAIRS.dname.res);
+  } catch (err: Error | unknown) {
+    return res.status(504).json({
+      message: 'Service timeout: unable to get dentist\'s name.'
+    });
+  }
+
+  /**
+   * Check for all patients that are subscribed to the dentist. If there are any,
+   * publish a notification to them. Herein, we store only the patient's email
+   * in the array, the object with the dentist's email is not needed, we have
+   * the access to it with the `email` variable.
+   *
+   * @see PatientSubscription
+   */
+  let subscriptions: PatientSubscription[] = [];
+  try {
+    subscriptions = database.prepare(`
+      SELECT patientEmail FROM subscriptions WHERE dentistEmail = ?
+    `).all(email) as PatientSubscription[];
+  } catch (err: Error | unknown) {
+    return res.status(500).json({ message: 'Internal server error: database error.' });
+  }
+
+  try {
+    // Traverse all the subscriptions and publish a notification to each patient.
+    subscriptions.forEach((subscription: PatientSubscription) => {
+      utils.pubNotification(
+        subscription.patientEmail,
+        utils.newAppointmentMsg(dentistName),
+        client as MqttClient
+      );
+    });
+  } catch (err: Error | unknown) {
+    return res.status(503).json((err as Error).message);
   }
 
   // Everything went well, return the created object.

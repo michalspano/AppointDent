@@ -7,3 +7,8 @@ CREATE TABLE IF NOT EXISTS appointments (
     dentistId VARCHAR(64) NOT NULL,
     patientId VARCHAR(64) -- can be null: means that the appointment is not booked
 );
+
+CREATE TABLE IF NOT EXISTS subscriptions (
+    dentistEmail VARCHAR(64) NOT NULL,
+    patientEmail VARCHAR(64) NOT NULL
+);

@@ -7,7 +7,15 @@ interface CorsOptions {
   credentials: boolean
 }
 
-const allowedOrigins = ['http://localhost:5173'];
+/**
+ * @description array of allowed origins that can access the API
+ */
+const allowedOrigins: string[] = (process.env.ALLOWED_ORIGINS == null)
+  ? [
+      'http://localhost:5173'
+    ]
+  : process.env.ALLOWED_ORIGINS.split(',');
+
 /**
      * This function has the responsibility of dynamically setitng the
      * Access-Control-Allow-Origin header by checking if the current origin
