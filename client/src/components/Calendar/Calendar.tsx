@@ -36,9 +36,9 @@ export default function DentistCalendar (): JSX.Element {
  */
   function parseDateStringToInteger (dateString: string): number {
     // Parse the date string into a Date object
-    const date = new Date(dateString)
+    const date = new Date(dateString).toString().split(' ').slice(0, 5).toString().replace(/[\s,]/g, ' ')
     // Get the timestamp in milliseconds
-    const timestamp = date.getTime()
+    const timestamp = new Date(date).getTime()
     // Convert the timestamp to seconds (integer)
     const timestampInSeconds = Math.floor(timestamp / 1000)
 
@@ -68,8 +68,8 @@ export default function DentistCalendar (): JSX.Element {
         // Make sure that the patient email is the title. If appointment is unbooked, then there is no title.
         title: appointment.patientId !== null ? appointment.patientId : '',
         // Parse the start and end times from integer to string.
-        start: new Date(appointment.start_timestamp * 1000).toLocaleString('sv-SE'),
-        end: new Date(appointment.end_timestamp * 1000).toLocaleString('sv-SE')
+        start: new Date(appointment.start_timestamp * 1000).toString().split(' ').slice(0, 5).toString().replace(/[\s,]/g, ' '),
+        end: new Date(appointment.end_timestamp * 1000).toString().split(' ').slice(0, 5).toString().replace(/[\s,]/g, ' ')
       }))
 
       setSlots(formattedAppointments)
@@ -139,7 +139,7 @@ export default function DentistCalendar (): JSX.Element {
           return new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(arg.date)
         },
         initialView: 'timeGridWeek',
-        locale: 'sv-SE',
+        locale: navigator.language,
         customButtons: {
           addButton: {
             text: 'Add a slot',
@@ -214,7 +214,7 @@ export default function DentistCalendar (): JSX.Element {
                   setNewAppointment({ ...newAppointment(), start: event.target.value })
                 }}
                 required
-                min={new Date().toISOString().slice(0, 16)}
+                min={new Date().toString().slice(0, 16)}
               />
             </div>
             <div class='flex flex-col'>

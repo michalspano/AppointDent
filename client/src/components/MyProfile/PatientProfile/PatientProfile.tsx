@@ -8,6 +8,7 @@ import { type PatientProfileProps } from '../MyProfileTypes'
 import { isValidName } from '../utils'
 import CustomInput from '../CustomInput'
 import { Api } from '../../../utils/api'
+import { formatDate } from '../../../utils'
 
 export default function PatientProfile (patientProp: PatientProfileProps): JSX.Element {
   const [patient, setPatient] = createStore<Patient>(patientProp.patientProp)
@@ -73,7 +74,7 @@ export default function PatientProfile (patientProp: PatientProfileProps): JSX.E
           </div>
           <label class='text-black'>Date of birth</label>
           <div>
-              <CustomInput class='' max={new Date().toISOString().split('T')[0]} value={patientProp.patientProp.birthDate !== undefined ? new Date(patientProp.patientProp.birthDate).toISOString().split('T')[0] : ''} inputType='date' onChange={(event) => { setPatient('birthDate', Date.parse(new Date(event.target.value).toISOString())) }} disabled={true}/>
+              <CustomInput class='' max={formatDate(new Date())} value={patientProp.patientProp.birthDate !== undefined ? formatDate(new Date(patientProp.patientProp.birthDate)) : ''} inputType='date' onChange={(event) => { setPatient('birthDate', Date.parse(new Date(event.target.value).toString())) }} disabled={true}/>
           </div>
           {getError() !== null ? <p class="text-error">{(getError() as Error).message}</p> : <></>}
           <button type="submit" class="p-4 text-white bg-secondary rounded-xl text-base" onClick={() => { void patchPatient(patient) }}>
