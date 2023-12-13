@@ -21,7 +21,7 @@ export const getDentist = async (req: Request, res: Response): Promise<Response<
 
   let result: unknown[];
   try {
-    result = database.prepare('SELECT email,firstName,lastName,clinicCountry,clinicCity,clinicStreet,clinicHouseNumber,clinicZipCode,picture FROM dentists WHERE email = ?').all(email);
+    result = database.prepare('SELECT email,firstName,lastName,clinicCountry,clinicCity,clinicStreet,clinicHouseNumber,clinicZipCode,picture,longitude,latitude  FROM dentists WHERE email = ?').all(email);
   } catch (err: Error | unknown) {
     console.log(err);
     return res.sendStatus(500);
@@ -45,7 +45,7 @@ export const getAllDentists = async (req: Request, res: Response): Promise<Respo
 
   let result: unknown[];
   try {
-    result = database.prepare('SELECT email,firstName,lastName,clinicCountry,clinicCity,clinicStreet,clinicHouseNumber,clinicZipCode,picture FROM dentists').all();
+    result = database.prepare('SELECT email,firstName,lastName,clinicCountry,clinicCity,clinicStreet,clinicHouseNumber,clinicZipCode,picture,longitude,latitude FROM dentists').all();
   } catch (err: Error | unknown) {
     console.log(err);
     return res.sendStatus(500);
