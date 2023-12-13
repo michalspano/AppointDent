@@ -177,7 +177,7 @@ const bookAppointment = async (req: Request, res: Response): AsyncResObj => {
   const pReqId: string = utils.genReqId();
   client.publish(
     utils.MQTT_PAIRS.pname.req,
-    `${pReqId}/${appointment.patientId}/*`
+    `${pReqId}/${email}/*`
   );
 
   client.unsubscribe(utils.MQTT_PAIRS.dname.res);
@@ -187,7 +187,7 @@ const bookAppointment = async (req: Request, res: Response): AsyncResObj => {
     patientName = await utils.userNameByEmail(pReqId, utils.MQTT_PAIRS.pname.res);
   } catch (err: Error | unknown) {
     return res.status(504).json({
-      message: 'Service timeout: unable to get dentist\'s name.'
+      message: 'Service timeout: unable to get patient\'s name.'
     });
   }
 
