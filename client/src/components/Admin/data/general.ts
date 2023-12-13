@@ -27,7 +27,11 @@ export async function getChartData (category: string, method: string, loggedInOn
   // At the moment we retrieve only 10 minutes data, later on it can be extended and made customizable
   const rawData: AnalyticsResponse[] =
   (await Api.get(
-    `/admins/requests?timeframe=${timeframe}&method=${method}&search=${category}&loggedInOnly=${loggedInOnly}`,
+    '/admins/requests?timeframe=' +
+    timeframe + '&method=' +
+    method + '&search=' +
+    category + '&loggedInOnly=' +
+    loggedInOnly,
     { withCredentials: true })).data
 
   for (let i = 0; i < rawData.length; i++) {
