@@ -8,9 +8,9 @@ export const mqttClient = {
     const broker: string = process.env.BROKER ?? 'mqtt://localhost:1883';
     client = mqtt.connect(broker);
     client.on('connect', () => {
-      if (client != null) { 
+      if (client != null) {
         void patientNameListener(client);
-        void heartbeat(client, serviceName, 1000); 
+        void heartbeat(client, serviceName, 1000);
       }
     });
   }
