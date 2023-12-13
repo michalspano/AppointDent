@@ -66,6 +66,16 @@ export default function DentistForm (): JSX.Element {
       'https://geocode.maps.co/search?q=**ADDRESS**',
       'https://nominatim.openstreetmap.org/search.php?format=jsonv2&q=**ADDRESS**'
     ]
+    const geoCache: Record<string, Place> = {}
+    const API_THROTTLE: number = 1000 / geoCoders.length
+    const lastApiCallTimestamp: number = 0
+
+    // Check if API throttle delay is needed
+    const currentTimestamp = Date.now()
+    const timeSinceLastCall = currentTimestamp - lastApiCallTimestamp
+    if (timeSinceLastCall < API_THROTTLE) {
+      await new Promise((resolve) => setTimeout(resolve, API_THROTTLE - timeSinceLastCall))
+    }
     /**
      * Used to convert addresses into long and lat for the map.
      * @param address the address that needs to be geocoded
@@ -73,10 +83,15 @@ export default function DentistForm (): JSX.Element {
     */
     async function geoCodeAddress (address: string): Promise<Place> {
       if (address.length === 0) throw Error('Address cannot be empty!')
+      console.log(geoCache, address, geoCache[address])
+      if (geoCache[address] !== undefined && geoCache[address] !== null) {
+        return geoCache[address]
+      }
       return await new Promise((resolve, reject) => {
         Api.get(geoCoders[useAPI].replace('**ADDRESS**', address)).then((result) => {
           const data: Place = result.data[0]
           resolve(data)
+          geoCache[address] = data
           if ((useAPI + 1) === geoCoders.length) {
             useAPI = 0
           } else {
@@ -91,9 +106,7 @@ export default function DentistForm (): JSX.Element {
     const dentistCombinedAddress: string = clinicStreet() + ' ' + clinicHouseNumber() + ' ' + clinicZipCode() + ' ' + clinicCity()
     geoCodeAddress(dentistCombinedAddress)
       .then(async (result: Place) => {
-        console.log(result.lon, result.lat)
         registrationData = { ...registrationData, longitude: parseFloat(result.lat), latitude: parseFloat(result.lon) }
-        console.log(registrationData)
         return await Api.post('/dentists/register', registrationData)
       })
       .then(async () => {
