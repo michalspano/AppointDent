@@ -2,7 +2,7 @@ import '../assets/leaflet.css'
 import '../components/Map/map.css'
 import * as leaflet from 'leaflet'
 import { useNavigate } from '@solidjs/router'
-import { createEffect, createSignal } from 'solid-js'
+import { Show, createEffect, createSignal } from 'solid-js'
 import { type JSX, onMount, type Signal } from 'solid-js'
 import { type FilterInterval } from '../utils/types'
 import { addDentistsToCluster } from '../components/Map/dentists'
@@ -10,7 +10,7 @@ import { isPatient, defaultLocation, resetCluster } from '../utils'
 
 export default function Map (): JSX.Element {
   const navigate = useNavigate()
-
+  const [allowFilter, setAllowFilter]: Signal<boolean> = createSignal<boolean>(false)
   const [toShowFilter, setToShowFilter]: Signal<boolean> = createSignal<boolean>(true)
   const [filterInterval, setFilterInterval]: Signal<FilterInterval> = createSignal<FilterInterval>({
     start: '', end: ''
@@ -60,10 +60,17 @@ export default function Map (): JSX.Element {
      * Add all dentists to the map; in the initial call, all dentists are fetched from the database.
      * However, the filter can be applied later to filter the dentists.
      */
-    void addDentistsToCluster(cluster)
+    addDentistsToCluster(cluster).then(() => {
+      setAllowFilter(true)
+    }).catch((err) => {
+      throw new Error(err)
+    })
   })
   return <>
     <div class="z-10 flex flex-col justify-between items-center absolute top-20 right-5 p-4 bg-primary shadow-xl rounded">
+  <Show fallback={
+    <p class="text-white">Loading dentists...</p>
+  } when={allowFilter()}>
       <form
         id='eventForm'
         onReset={() => {
@@ -118,7 +125,10 @@ export default function Map (): JSX.Element {
           </div>
         )}
       </form>
-    </div>
+
+  </Show>
+  </div>
+
     {/* Display the map component */}
     <div id="map" class="z-0" />
   </>
