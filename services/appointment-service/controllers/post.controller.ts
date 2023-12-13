@@ -16,7 +16,7 @@ import {
   SessionResponse,
   type AsyncResObj,
   type Appointment,
-  type DentistName,
+  type UserName,
   type WhoisResponse,
   type PatientSubscription
 } from '../types/types';
@@ -126,9 +126,9 @@ const createAppointment = async (req: Request, res: Response): AsyncResObj => {
   client.unsubscribe(utils.MQTT_PAIRS.whois.res);
   client.subscribe(utils.MQTT_PAIRS.dname.res);
 
-  let dentistName: DentistName;
+  let dentistName: UserName;
   try {
-    dentistName = await utils.dentistNameByEmail(dReqId, utils.MQTT_PAIRS.dname.res);
+    dentistName = await utils.userNameByEmail(dReqId, utils.MQTT_PAIRS.dname.res);
   } catch (err: Error | unknown) {
     return res.status(504).json({
       message: 'Service timeout: unable to get dentist\'s name.'
