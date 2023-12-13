@@ -7,3 +7,4 @@ import database from '../db/config';
 
 console.log(`Dropping the database ${database?.name}...`);
 database?.exec('DROP TABLE IF EXISTS appointments;');
+database?.exec('DROP TABLE IF EXISTS subscriptions;');
