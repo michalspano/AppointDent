@@ -26,7 +26,9 @@ export const register = async (req: Request, res: Response): Promise<Response<an
     clinicStreet: req.body.clinicStreet,
     clinicHouseNumber: req.body.clinicHouseNumber,
     clinicZipCode: req.body.clinicZipCode,
-    picture: req.body.picture
+    picture: req.body.picture,
+    longitude: req.body.longitude,
+    latitude: req.body.latitude
   };
 
   if (req.body.password === undefined) return res.status(400).json({ message: 'Password missing' });
@@ -68,7 +70,7 @@ export const register = async (req: Request, res: Response): Promise<Response<an
     query = database.prepare(`
     INSERT INTO dentists 
     (${fieldsToUpdate.join(', ')})
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
   } catch (err) {
     console.log(err);

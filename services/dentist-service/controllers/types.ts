@@ -8,6 +8,8 @@ export interface RegisterRequest {
   clinicHouseNumber: number
   clinicZipCode: number
   picture: string
+  longitude: number
+  latitude: number
 }
 
 /**
