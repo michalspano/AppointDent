@@ -10,7 +10,7 @@ import { isPatient, defaultLocation, resetCluster } from '../utils'
 
 export default function Map (): JSX.Element {
   const navigate = useNavigate()
-  const [allowFilter, setAllowFilter]: Signal<boolean> = createSignal<boolean>(false)
+  const [allowInteraction, setAllowInteraction]: Signal<boolean> = createSignal<boolean>(false)
   const [toShowFilter, setToShowFilter]: Signal<boolean> = createSignal<boolean>(true)
   const [filterInterval, setFilterInterval]: Signal<FilterInterval> = createSignal<FilterInterval>({
     start: '', end: ''
@@ -61,75 +61,79 @@ export default function Map (): JSX.Element {
      * However, the filter can be applied later to filter the dentists.
      */
     addDentistsToCluster(cluster).then(() => {
-      setAllowFilter(true)
+      setAllowInteraction(true)
     }).catch((err) => {
       throw new Error(err)
     })
   })
   return <>
-    <div class="z-10 flex flex-col justify-between items-center absolute top-20 right-5 p-4 bg-primary shadow-xl rounded">
-  <Show fallback={
-    <p class="text-white">Loading dentists...</p>
-  } when={allowFilter()}>
-      <form
-        id='eventForm'
-        onReset={() => {
-          handleReset().catch(() => {
-            console.error('Error resetting filter.')
-          })
-        }}
-        onSubmit={(event) => {
-          event.preventDefault()
-          handleFilterSubmit().catch(() => {
-            console.error('Error selecting time interval.')
-            void handleReset() // Revert to the default state
-          })
-        }}
-      >
-        <div
-          class='cursor-pointer text-white'
-          // The 'X' is displayed at the top right corner of the filter form
-          classList={{ 'absolute top-0 right-0 m-2 ': toShowFilter() }}
-          onClick={() => setToShowFilter(!toShowFilter())}
-        >
-          {toShowFilter() ? 'X' : 'Filter'}
+    <div class="max-h-screen">
+      <Show when={!allowInteraction()}>
+        <div class="loader flex justify-center items-center absolute z-20 bg-primary opacity-75">
         </div>
-        {toShowFilter() && (
-          // Grouped in a div to enable conditional rendering of the whole region
-          // TODO: add validation for the maximum date not to exhaust the server
-          <div>
-            <div class='flex flex-col'>
-              <label class='text-white'>Start:</label>
-              <input
-                required
-                type='datetime-local'
-                value={filterInterval().start}
-                min={0} /* we don't know ahead how old appointments can be, hence only positive integers */
-                onChange={(event) => setFilterInterval({ ...filterInterval(), start: event.target.value })}
-              />
-            </div>
-            <div class='flex flex-col'>
-              <label class='text-white'>End:</label>
-              <input
-                required
-                type='datetime-local'
-                value={filterInterval().end}
-                min={filterInterval().start}
-                onChange={(event) => setFilterInterval({ ...filterInterval(), end: event.target.value })}
-              />
-            </div>
-            <div class="inline-flex w-full mt-4">
-              <button class='w-1/2 bg-secondary rounded text-white p-2' type='submit'>Apply</button>
-              <button class='w-1/2 ml-2 bg-grey rounded text-transparent-black p-2' type='reset'>Reset</button>
-            </div>
+        <p class="loader flex justify-center items-center absolute z-20 bg-primary opacity-75 text-xl text-white font-bold">Loading map...</p>
+      </Show>
+      <div class="z-10 flex flex-col justify-between items-center absolute top-20 right-5 p-4 bg-primary shadow-xl rounded">
+
+        <form
+          id='eventForm'
+          onReset={() => {
+            handleReset().catch(() => {
+              console.error('Error resetting filter.')
+            })
+          }}
+          onSubmit={(event) => {
+            event.preventDefault()
+            handleFilterSubmit().catch(() => {
+              console.error('Error selecting time interval.')
+              void handleReset() // Revert to the default state
+            })
+          }}
+        >
+          <div
+            class='cursor-pointer text-white'
+            // The 'X' is displayed at the top right corner of the filter form
+            classList={{ 'absolute top-0 right-0 m-2 ': toShowFilter() }}
+            onClick={() => setToShowFilter(!toShowFilter())}
+          >
+            {toShowFilter() ? 'X' : 'Filter'}
           </div>
-        )}
-      </form>
+          {toShowFilter() && (
+            // Grouped in a div to enable conditional rendering of the whole region
+            // TODO: add validation for the maximum date not to exhaust the server
+            <div>
+              <div class='flex flex-col'>
+                <label class='text-white'>Start:</label>
+                <input
+                  required
+                  type='datetime-local'
+                  value={filterInterval().start}
+                  min={0} /* we don't know ahead how old appointments can be, hence only positive integers */
+                  onChange={(event) => setFilterInterval({ ...filterInterval(), start: event.target.value })}
+                />
+              </div>
+              <div class='flex flex-col'>
+                <label class='text-white'>End:</label>
+                <input
+                  required
+                  type='datetime-local'
+                  value={filterInterval().end}
+                  min={filterInterval().start}
+                  onChange={(event) => setFilterInterval({ ...filterInterval(), end: event.target.value })}
+                />
+              </div>
+              <div class="inline-flex w-full mt-4">
+                <button class='w-1/2 bg-secondary rounded text-white p-2' type='submit'>Apply</button>
+                <button class='w-1/2 ml-2 bg-grey rounded text-transparent-black p-2' type='reset'>Reset</button>
+              </div>
+            </div>
+          )}
+        </form>
+      </div>
+      {/* Display the map component */}
+      <div id="map" class="z-0" />
 
-  </Show>
-  </div>
+    </div>
 
-    {/* Display the map component */}
-    <div id="map" class="z-0" />
   </>
 }
