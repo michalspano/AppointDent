@@ -1,12 +1,12 @@
 import database from '../db/config';
 import type * as mqtt from 'mqtt';
 import {
-  type DenNameRequestMQTT,
-  type DenNameRequest
-} from '../controllers/types';
+  type PatientNameRequestMQTT,
+  type PatientNameRequest
+} from '../utils/types';
 
-const TOPIC: string = 'DENNAME';
-const RESPONSE_TOPIC: string = 'DENNAMERES';
+const TOPIC: string = 'PANAME';
+const RESPONSE_TOPIC: string = 'PANAMERES';
 
 /**
  * Validate the format of an MQTT request array.
@@ -24,10 +24,10 @@ export async function validateRequestFormat (msgArr: string[], requiredLength: n
 }
 
 /**
- * @description a bufferized query to get the name of a dentist from their email.
+ * @description a bufferized query to get the name of a patient from their email.
  */
 const query = database?.prepare(`
-    SELECT firstName,lastName FROM dentists WHERE email = ?
+    SELECT firstName,lastName FROM patients WHERE email = ?
 `);
 
 /**
@@ -35,11 +35,11 @@ const query = database?.prepare(`
  * @param request the request object that stores the email.
  * @returns Success state of the operation.
  */
-export async function dentistName (request: DenNameRequestMQTT): Promise<string> {
+export async function getPaName (request: PatientNameRequestMQTT): Promise<string> {
   return await new Promise<string>((resolve, reject) => {
-    let result: DenNameRequest;
+    let result: PatientNameRequest;
     try {
-      result = query?.get(request.email) as DenNameRequest;
+      result = query?.get(request.email) as PatientNameRequest;
     } catch (err: Error | unknown) {
       reject(new Error('One or more queries resulted in zero output.')); return;
     }
@@ -51,13 +51,13 @@ export async function dentistName (request: DenNameRequestMQTT): Promise<string>
 /**
  * Parse a raw MQTT request.
  * @param rawMsg
- * @returns DenNameRequestMQTT
- * @description Used to parse and validate an a dentist name request over MQTT.
+ * @returns PatientNameRequestMQTT
+ * @description Used to parse and validate an a patient name request over MQTT.
  */
-async function parseRawRequest (rawMsg: string): Promise<DenNameRequestMQTT> {
+async function parseRawRequest (rawMsg: string): Promise<PatientNameRequestMQTT> {
   const msgArr: string[] = rawMsg.split('/');
   await validateRequestFormat(msgArr, 3);
-  const request: DenNameRequestMQTT = {
+  const request: PatientNameRequestMQTT = {
     reqId: msgArr[0],
     email: msgArr[1]
   };
@@ -65,21 +65,21 @@ async function parseRawRequest (rawMsg: string): Promise<DenNameRequestMQTT> {
 }
 
 /**
- * Start dentistName Listener
+ * Start PANAME Listener
  * @param client
- * @description Used for checking the name of a dentist from an email
+ * @description Used for checking the name of a patient from an email
  *
  * expected message format: REQID/email/*
  * REQID: Random unique id that requestor sets to identify an authentication request.
- * Is not stored persistently in a DB. email: The email of a dentist
+ * Is not stored persistently in a DB. email: The email of a patient
  */
-export async function dentistNameListener (client: mqtt.MqttClient): Promise<void> {
+export async function patientNameListener (client: mqtt.MqttClient): Promise<void> {
   // Set up a listener for MQTT messages
   client?.on('message', (topic: string, message: Buffer) => {
     if (topic === TOPIC) {
       // Parse the raw request, insert the user, and publish the response
-      parseRawRequest(message.toString()).then((result: DenNameRequestMQTT) => {
-        dentistName(result).then((stringResult: string) => {
+      parseRawRequest(message.toString()).then((result: PatientNameRequestMQTT) => {
+        getPaName(result).then((stringResult: string) => {
           client.publish(RESPONSE_TOPIC, `${result.reqId}/${stringResult}/*`);
         }).catch((err) => {
           client.publish(RESPONSE_TOPIC, `${result.reqId}/0/*`);
@@ -92,5 +92,5 @@ export async function dentistNameListener (client: mqtt.MqttClient): Promise<voi
   });
   // Subscribe the client to the topic
   client.subscribe(TOPIC);
-  console.log('DENNAME Listener Started');
+  console.log('PANAME Listener Started');
 }

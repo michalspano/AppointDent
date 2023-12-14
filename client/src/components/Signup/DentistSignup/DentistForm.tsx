@@ -14,7 +14,7 @@ export default function DentistForm (): JSX.Element {
   const [firstName, setFirstName] = createSignal('')
   const [lastName, setLastName] = createSignal('')
   const [clinicCity, setClinicCity] = createSignal('')
-  const [clinicCountry, setClinicCountry] = createSignal('')
+  const [clinicCountry, setClinicCountry] = createSignal('SE')
   const [clinicStreet, setClinicStreet] = createSignal('')
   const [clinicHouseNumber, setClinicHouseNumber] = createSignal('')
   const [clinicZipCode, setClinicZipcode] = createSignal('')
@@ -158,7 +158,7 @@ export default function DentistForm (): JSX.Element {
               class="input h-12 w-full px-3 py-2 mb-3  mr-2  border rounded-xl"
               onChange={(event) => setClinicCountry(event.target.value)}
             >
-              <option value="none" selected disabled hidden>Select your Country</option>
+              <option value="SE" selected disabled hidden>Sweden</option>
               {
               allCountries.map((country) => (
                 <option value={country.code}>{country.name}</option>
