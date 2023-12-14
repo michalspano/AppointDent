@@ -1,7 +1,8 @@
-import type { Request, Response } from 'express';
 import database from '../db/config';
+import QUERY from '../utils/query';
 import { client } from '../mqtt/mqtt';
 import { getServiceResponse } from './helper';
+import type { Request, Response } from 'express';
 import { type RegisterRequestKey, type RegisterRequest } from './types';
 
 const TOPIC = 'INSERTUSER';
@@ -54,27 +55,12 @@ export const register = async (req: Request, res: Response): Promise<Response<an
   }
 
   const fieldsToUpdate: string[] = [];
-  const values: any[] = [];
+  const values: (string | number)[] = [];
 
   // Build the SET clause dynamically based on the provided fields in updatedInfo
   for (const [key, value] of Object.entries(request)) {
     fieldsToUpdate.push(`${key}`);
     values.push(value);
-  }
-
-  /**
-   * Build sql query dynamically and catch the potential error of having a missed field.
-   */
-  let query;
-  try {
-    query = database.prepare(`
-    INSERT INTO dentists 
-    (${fieldsToUpdate.join(', ')})
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `);
-  } catch (err) {
-    console.log(err);
-    return res.status(400).json({ message: 'Invalid input' });
   }
 
   /**
@@ -95,7 +81,13 @@ export const register = async (req: Request, res: Response): Promise<Response<an
   /**
    * Execute SQL query on db.
    */
-  query.run(...values);
+  try {
+    QUERY.INSERT_DENTIST.run(...values);
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Internal server error, ensure that all fields are valid'
+    });
+  }
 
   return res.sendStatus(201);
 };
@@ -107,14 +99,7 @@ export const register = async (req: Request, res: Response): Promise<Response<an
  */
 
 function checkEmailRegistered (email: string): boolean {
-  // Check if the email is already registered
-  const checkEmailQuery = database?.prepare(`
-      SELECT COUNT(*) as count
-      FROM dentists
-      WHERE email = ?
-    `);
-  const emailCheckResult = checkEmailQuery?.get(email) as { count: number };
-
+  const emailCheckResult = QUERY.DENTIST_COUNT.get(email) as { count: number };
   return emailCheckResult !== null && emailCheckResult.count > 0;
 }
 /**
