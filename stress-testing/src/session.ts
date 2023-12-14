@@ -24,7 +24,9 @@ function registerDentist (): User {
     clinicHouseNumber: '1',
     clinicZipCode: '12345',
     picture: 'base64encodedimage',
-    password: 'Password123!'
+    password: 'Password123!',
+    longitude: 57.706178,
+    latitude: 11.969585
   };
 
   const headers = {
