@@ -1,13 +1,17 @@
-import { createSignal, onCleanup, type JSX, createEffect } from 'solid-js'
+import { createSignal, onCleanup, type JSX, onMount } from 'solid-js'
 import NotificationsList from './NotificationList'
 import { Api } from '../../utils/api'
 import { type NotificationData } from '../../utils/types'
 
 export default function Notifications (): JSX.Element {
   const [notifications, setNotifications] = createSignal<NotificationData[]>([])
+  const FETCH_INTERVAL: number = 5000
 
-  createEffect(async () => {
-    await fetchNotifications()
+  onMount(() => {
+    void fetchNotifications()
+    setInterval(() => {
+      void fetchNotifications()
+    }, FETCH_INTERVAL)
   })
 
   /**
