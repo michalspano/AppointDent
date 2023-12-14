@@ -4,7 +4,7 @@ import { A } from '@solidjs/router'
 import { createSignal } from 'solid-js'
 import { Api } from '../../../utils/api'
 import type { DentistRegistration, Country, Place } from '../../../utils/types'
-import { validateAddress, validateUserInfo } from '../utils'
+import { geoCodeAddress, validateAddress, validateUserInfo } from '../utils'
 import { AxiosError } from 'axios'
 import * as CountryList from 'country-list'
 
@@ -54,54 +54,6 @@ export default function DentistForm (): JSX.Element {
     if (addressValidation !== null) {
       setError(addressValidation)
       return
-    }
-    let useAPI: number = 0
-    /**
-     * Each geocoder has the capacity of at least 1 request per second.
-     * Hence, the delay for cooldown, is calculated as:
-     * 1000 / length of geocoders
-    */
-    const geoCoders: string[] = [
-      'https://us1.locationiq.com/v1/search?key=pk.6e69ae53772e50aa2508ef9f652ee483&format=json&q=**ADDRESS**',
-      'https://geocode.maps.co/search?q=**ADDRESS**',
-      'https://nominatim.openstreetmap.org/search.php?format=jsonv2&q=**ADDRESS**'
-    ]
-    const geoCache: Record<string, Place> = {}
-    const API_THROTTLE: number = 1000 / geoCoders.length
-    const lastApiCallTimestamp: number = 0
-
-    // Check if API throttle delay is needed
-    const currentTimestamp = Date.now()
-    const timeSinceLastCall = currentTimestamp - lastApiCallTimestamp
-    if (timeSinceLastCall < API_THROTTLE) {
-      await new Promise((resolve) => setTimeout(resolve, API_THROTTLE - timeSinceLastCall))
-    }
-    /**
-     * Used to convert addresses into long and lat for the map.
-     * @param address the address that needs to be geocoded
-     * @returns a location in accordance with Geocode API
-    */
-    async function geoCodeAddress (address: string): Promise<Place> {
-      if (address.length === 0) throw Error('Address cannot be empty!')
-      console.log(geoCache, address, geoCache[address])
-      if (geoCache[address] !== undefined && geoCache[address] !== null) {
-        return geoCache[address]
-      }
-      return await new Promise((resolve, reject) => {
-        Api.get(geoCoders[useAPI].replace('**ADDRESS**', address)).then((result) => {
-          const data: Place = result.data[0]
-          resolve(data)
-          geoCache[address] = data
-          if ((useAPI + 1) === geoCoders.length) {
-            useAPI = 0
-          } else {
-            useAPI++
-          }
-        }).catch(async (err) => {
-          reject(new Error('Geocoding system fatal error'))
-          console.error(err)
-        })
-      })
     }
     const dentistCombinedAddress: string = clinicStreet() + ' ' + clinicHouseNumber() + ' ' + clinicZipCode() + ' ' + clinicCity()
     geoCodeAddress(dentistCombinedAddress)
