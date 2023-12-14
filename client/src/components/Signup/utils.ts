@@ -1,5 +1,6 @@
 import axios from 'axios'
 import type { Place, DentistRegistration, PatientRegistration } from '../../utils/types'
+import { Api } from '../../utils/api'
 
 // Validity check for users before performing sign up
 
@@ -59,4 +60,31 @@ export async function validateAddress (dentist: DentistRegistration): Promise<nu
     return 'Please provide a valid address.'
   }
   return null
+}
+
+const geoCoder: string = 'https://geocode.maps.co/search?q=**ADDRESS**'
+const API_THROTTLE: number = 1000
+const lastApiCallTimestamp: number = 0
+/**
+     * Used to convert addresses into long and lat for the map.
+     * @param address the address that needs to be geocoded
+     * @returns a location in accordance with Geocode API
+    */
+export async function geoCodeAddress (address: string): Promise<Place> {
+  // Check if API throttle delay is needed
+  const currentTimestamp = Date.now()
+  const timeSinceLastCall = currentTimestamp - lastApiCallTimestamp
+  if (timeSinceLastCall < API_THROTTLE) {
+    await new Promise((resolve) => setTimeout(resolve, API_THROTTLE - timeSinceLastCall))
+  }
+  if (address.length === 0) throw Error('Address cannot be empty!')
+  return await new Promise((resolve, reject) => {
+    Api.get(geoCoder.replace('**ADDRESS**', address)).then((result) => {
+      const data: Place = result.data[0]
+      resolve(data)
+    }).catch(async (err) => {
+      reject(new Error('Geocoding system error'))
+      console.error(err)
+    })
+  })
 }

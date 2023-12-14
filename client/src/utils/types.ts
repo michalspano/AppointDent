@@ -33,7 +33,8 @@ export interface Dentist {
   clinicHouseNumber: number
   clinicZipCode: number
   picture: string
-  combinedAddress: string
+  longitude: number
+  latitude: number
 }
 
 /**
@@ -88,6 +89,8 @@ export interface DentistRegistration {
   clinicHouseNumber: string
   clinicZipCode: string
   picture: string
+  longitude: number | undefined
+  latitude: number | undefined
 }
 
 /**

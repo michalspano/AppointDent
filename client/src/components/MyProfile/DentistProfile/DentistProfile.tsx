@@ -1,6 +1,6 @@
 // import { type JSX } from 'solid-js/jsx-runtime'
 import logo from '../../../assets/logo.png'
-import { type Dentist, type Country } from '../../../utils/types'
+import type { Dentist, Country, Place } from '../../../utils/types'
 import { createStore } from 'solid-js/store'
 import { createEffect, createSignal, type JSX } from 'solid-js'
 import { type AxiosResponse } from 'axios'
@@ -9,6 +9,7 @@ import { isValidName, validateAddress } from '../utils'
 import CustomInput from '../CustomInput'
 import { Api } from '../../../utils/api'
 import * as CountryList from 'country-list'
+import { geoCodeAddress } from '../../Signup/utils'
 
 export default function DentistProfile (dentistProp: DentistProfileProps): JSX.Element {
   const allCountriesNames = CountryList.getNameList()
@@ -65,8 +66,14 @@ export default function DentistProfile (dentistProp: DentistProfileProps): JSX.E
       setTimeout(() => setError(null), 3000)
       return
     }
-    const url = `/dentists/${dentistProp.dentistProp.email}`
-    await Api.patch<Dentist, AxiosResponse<Dentist>, Dentist>(url, patchedDentist, { withCredentials: true })
+    // calculate longitude and latitude for the new address
+    const dentistCombinedAddress: string = patchedDentist.clinicStreet + ' ' + patchedDentist.clinicHouseNumber + ' ' + patchedDentist.clinicZipCode + ' ' + patchedDentist.clinicCity
+    geoCodeAddress(dentistCombinedAddress)
+      .then(async (result: Place) => {
+        patchedDentist = { ...patchedDentist, longitude: parseFloat(result.lat), latitude: parseFloat(result.lon) }
+        const url = `/dentists/${dentistProp.dentistProp.email}`
+        return await Api.patch<Dentist, AxiosResponse<Dentist>, Dentist>(url, patchedDentist, { withCredentials: true })
+      })
       .then(result => {
         const user = result.data
         if (user !== undefined) {

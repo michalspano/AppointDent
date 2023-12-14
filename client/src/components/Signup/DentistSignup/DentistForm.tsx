@@ -3,8 +3,8 @@ import logo from '../../../assets/logo.png'
 import { A } from '@solidjs/router'
 import { createSignal } from 'solid-js'
 import { Api } from '../../../utils/api'
-import type { DentistRegistration, Country } from '../../../utils/types'
-import { validateAddress, validateUserInfo } from '../utils'
+import type { DentistRegistration, Country, Place } from '../../../utils/types'
+import { geoCodeAddress, validateAddress, validateUserInfo } from '../utils'
 import { AxiosError } from 'axios'
 import * as CountryList from 'country-list'
 
@@ -28,7 +28,7 @@ export default function DentistForm (): JSX.Element {
   }
 
   const signUp = async (): Promise<void> => {
-    const registrationData: DentistRegistration = {
+    let registrationData: DentistRegistration = {
       email: email(),
       password: password(),
       firstName: firstName(),
@@ -38,7 +38,9 @@ export default function DentistForm (): JSX.Element {
       clinicStreet: clinicStreet(),
       clinicHouseNumber: clinicHouseNumber(),
       clinicZipCode: clinicZipCode(),
-      picture: picture()
+      picture: picture(),
+      longitude: undefined,
+      latitude: undefined
     }
     if (Object.values(registrationData).some((field) => field === '')) {
       setError('Please fill in all fields.')
@@ -53,12 +55,17 @@ export default function DentistForm (): JSX.Element {
       setError(addressValidation)
       return
     }
-    Api
-      .post('/dentists/register', registrationData)
+    const dentistCombinedAddress: string = clinicStreet() + ' ' + clinicHouseNumber() + ' ' + clinicZipCode() + ' ' + clinicCity()
+    geoCodeAddress(dentistCombinedAddress)
+      .then(async (result: Place) => {
+        registrationData = { ...registrationData, longitude: parseFloat(result.lat), latitude: parseFloat(result.lon) }
+        return await Api.post('/dentists/register', registrationData)
+      })
       .then(async () => {
       // enable automatic login when user registers
         await login()
-      }).catch((error: any) => {
+      })
+      .catch((error: any) => {
         const resError: string | AxiosError = error instanceof AxiosError ? error : 'Something went wrong, Please try again.'
         if (resError instanceof AxiosError) {
           if (resError.response !== undefined) {
@@ -68,6 +75,9 @@ export default function DentistForm (): JSX.Element {
           setError(resError)
         }
         console.error('Error during sign up', error)
+      })
+      .catch((err) => {
+        console.error(err)
       })
   }
 

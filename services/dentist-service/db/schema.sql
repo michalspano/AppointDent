@@ -9,5 +9,7 @@ CREATE TABLE IF NOT EXISTS dentists (
     clinicStreet VARCHAR NOT NULL,
     clinicHouseNumber INT NOT NULL,
     clinicZipCode INT NOT NULL,
-    picture VARCHAR NOT NULL -- a base64 encoded image (taken as a string)
+    picture VARCHAR NOT NULL, -- a base64 encoded image (taken as a string)
+    longitude FLOAT NOT NULL,
+    latitude FLOAT NOT NULL
 );
