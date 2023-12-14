@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "b8bc451c-e07c-4064-930e-c0dc24645ef5",
+		"_postman_id": "fb15e7c9-a65f-459d-ba76-492968f52ef2",
 		"name": "DBPopulation",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "28264405"
+		"_exporter_id": "28868794"
 	},
 	"item": [
 		{
@@ -181,7 +181,11 @@
 							"}",
 							"",
 							"let dentistEmail = \"dentist\" + (dentCount + 1) + \"@example.com\";",
+							"let dentFName = \"fName\" + (dentCount + 1);",
+							"let dentLName = \"lName\" + (dentCount + 1);",
 							"pm.collectionVariables.set(\"dentEmail\", dentistEmail);",
+							"pm.collectionVariables.set(\"dentFName\", dentFName);",
+							"pm.collectionVariables.set(\"dentLName\", dentLName);",
 							""
 						],
 						"type": "text/javascript"
@@ -199,7 +203,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"email\": \"{{dentEmail}}\",\n  \"password\": \"secretpassword\",\n  \"firstName\": \"{{$randomFirstName}}\",\n  \"lastName\": \"{{$randomLastName}}\",\n  \"clinicCountry\": \"SE\",\n  \"clinicCity\": \"Göteborg\",\n  \"clinicStreet\": \"{{street}}\",\n  \"clinicHouseNumber\": {{houseNumber}},\n  \"clinicZipCode\": {{zip}},\n  \"picture\": \"{{$randomImageDataUri}}\",\n  \"longitude\":\"{{longitude}}\",\n  \"latitude\":\"{{latitude}}\"\n}"
+					"raw": "{\n  \"email\": \"{{dentEmail}}\",\n  \"password\": \"secretpassword\",\n  \"firstName\": \"{{dentFName}}\",\n  \"lastName\": \"{{dentLName}}\",\n  \"clinicCountry\": \"SE\",\n  \"clinicCity\": \"Göteborg\",\n  \"clinicStreet\": \"{{street}}\",\n  \"clinicHouseNumber\": {{houseNumber}},\n  \"clinicZipCode\": {{zip}},\n  \"picture\": \"{{$randomImageDataUri}}\",\n  \"longitude\":\"{{longitude}}\",\n  \"latitude\":\"{{latitude}}\"\n}"
 				},
 				"url": {
 					"raw": "{{host}}/api/v1/dentists/register",
@@ -450,6 +454,24 @@
 			"key": "patientBDate",
 			"value": "",
 			"type": "string"
+		},
+		{
+			"key": "dentFName",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "dentLName",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "latitude",
+			"value": ""
+		},
+		{
+			"key": "longitude",
+			"value": ""
 		}
 	]
 }
