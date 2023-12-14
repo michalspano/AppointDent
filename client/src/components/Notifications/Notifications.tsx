@@ -10,6 +10,10 @@ export default function Notifications (): JSX.Element {
     await fetchNotifications()
   })
 
+  setInterval(async () => {
+    await fetchNotifications()
+  }, 5000)
+
   /**
    * Get the current logged in user's email.
    * @returns Current user email (string)
