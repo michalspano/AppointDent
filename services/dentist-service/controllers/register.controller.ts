@@ -55,7 +55,7 @@ export const register = async (req: Request, res: Response): Promise<Response<an
   }
 
   const fieldsToUpdate: string[] = [];
-  const values: (string | number)[] = [];
+  const values: Array<string | number> = [];
 
   // Build the SET clause dynamically based on the provided fields in updatedInfo
   for (const [key, value] of Object.entries(request)) {
