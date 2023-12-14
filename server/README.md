@@ -49,6 +49,19 @@ Runs the linter on the `server` folder and fixes the errors.
 
 Kills the service running at the specified port
 
+### `npm run populate-db`
+
+Populates the database with 20 different patients and dentists. 
+
+**Login details**
+- dentist1@example.com --> dentist20@example.com
+- patient1@example.com --> patient20@example.com
+
+**Password**
+- secretpassword
+
+**Requires the broker, server and services to be running**
+
 ## Deployment
 
 TBD.
