@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import database from '../db/config';
 import { client } from '../mqtt/mqtt';
 import { getServiceResponse } from './helper';
-import { type RegisterRequest } from './types';
+import { type Dentist } from './types';
 
 const TOPIC = 'AUTHREQ';
 const RESPONSE_TOPIC = 'AUTHRES';
@@ -19,7 +19,7 @@ export const updateDentist = async (req: Request, res: Response): Promise<Respon
   const { email } = req.params;
 
   const { sessionKey } = req.cookies; // Get the session key from the cookies.
-  const updatedInfo = req.body as Partial<RegisterRequest>;
+  const updatedInfo = req.body as Partial<Dentist>;
   if (database === undefined) {
     return res.status(500).send('Database undefined');
   }

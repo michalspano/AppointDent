@@ -3,7 +3,7 @@ import QUERY from '../utils/query';
 import { client } from '../mqtt/mqtt';
 import { getServiceResponse } from './helper';
 import type { Request, Response } from 'express';
-import { type RegisterRequestKey, type RegisterRequest } from './types';
+import { type DentistField, type Dentist } from './types';
 
 const TOPIC = 'INSERTUSER';
 const RESPONSE_TOPIC = 'INSERTUSERRES';
@@ -18,7 +18,7 @@ export const register = async (req: Request, res: Response): Promise<Response<an
   /**
    * Assume the request is complete
    */
-  const request: RegisterRequest = {
+  const request: Dentist = {
     email: req.body.email,
     firstName: req.body.firstName,
     lastName: req.body.lastName,
@@ -37,7 +37,7 @@ export const register = async (req: Request, res: Response): Promise<Response<an
   /**
    * Check if any fields are missing
    */
-  for (const key of Object.keys(request) as RegisterRequestKey[]) {
+  for (const key of Object.keys(request) as DentistField[]) {
     if (request[key] === undefined || request[key] === null) {
       return res.status(400).json({ message: 'Invalid input' });
     }
