@@ -55,10 +55,10 @@ export default function DentistForm (): JSX.Element {
       setError(addressValidation)
       return
     }
-    const dentistCombinedAddress: string = clinicStreet() + ' ' + clinicHouseNumber() + ' ' + clinicZipCode() + ' ' + clinicCity()
+    const dentistCombinedAddress: string = clinicStreet() + ' ' + clinicHouseNumber() + ' ' + clinicZipCode() + ' ' + clinicCity() + ' ' + clinicCountry()
     geoCodeAddress(dentistCombinedAddress)
       .then(async (result: Place) => {
-        registrationData = { ...registrationData, longitude: parseFloat(result.lat), latitude: parseFloat(result.lon) }
+        registrationData = { ...registrationData, longitude: parseFloat(result.lon), latitude: parseFloat(result.lat) }
         return await Api.post('/dentists/register', registrationData)
       })
       .then(async () => {
