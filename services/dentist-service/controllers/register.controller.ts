@@ -3,7 +3,7 @@ import QUERY from '../utils/query';
 import { client } from '../mqtt/mqtt';
 import { getServiceResponse } from './helper';
 import type { Request, Response } from 'express';
-import { type DentistField, type Dentist } from './types';
+import { type DentistField, type Dentist } from '../utils/types';
 
 const TOPIC = 'INSERTUSER';
 const RESPONSE_TOPIC = 'INSERTUSERRES';

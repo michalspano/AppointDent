@@ -1,6 +1,6 @@
 import QUERY from '../utils/query';
 import database from '../db/config';
-import type { LoginRequest } from './types';
+import type { LoginRequest } from '../utils/types';
 import { client } from '../mqtt/mqtt';
 import { getServiceResponse } from './helper';
 import type { Request, Response } from 'express';
