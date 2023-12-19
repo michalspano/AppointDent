@@ -11,7 +11,7 @@ import {
   type UserType,
   SessionResponse,
   type WhoisResponse,
-  type DentistName
+  type UserName
 } from '../types/types';
 import type { MqttClient } from 'mqtt/*';
 
@@ -37,6 +37,10 @@ export const MQTT_PAIRS: Readonly<Record<string, Record<string, string>>> = Obje
   dname: {
     req: 'DENNAME',
     res: 'DENNAMERES'
+  },
+  pname: {
+    req: 'PANAME',
+    res: 'PANAMERES'
   }
 });
 
@@ -49,7 +53,7 @@ export const MQTT_PAIRS: Readonly<Record<string, Record<string, string>>> = Obje
  * @param dName the name of a dentist (first and last name)
  * @returns a formatted string that represents a notification message.
  */
-export const newAppointmentMsg = (dName: DentistName): string => {
+export const newAppointmentMsg = (dName: UserName): string => {
   return `Dentist ${dName.firstName} ${dName.lastName} has created a new appointment slot.`;
 };
 
@@ -60,7 +64,7 @@ export const newAppointmentMsg = (dName: DentistName): string => {
  * @param dName the name of a dentist (first and last name)
  * @returns a formatted string that represents a notification message.
  */
-export const newUnbookedAppointmentMsg = (dName: DentistName): string => {
+export const newUnbookedAppointmentMsg = (dName: UserName): string => {
   return `Someone has unbooked an appointment with dentist ${dName.firstName} ${dName.lastName}.` +
           ' The slot is now available.';
 };
@@ -130,14 +134,14 @@ export const verifySession = async (reqId: string, RESPONSE_TOPIC: string): Prom
 };
 
 /**
- * @description helper function that retrieves the name of a dentist
+ * @description helper function that retrieves the name of a dentist/patient
  * based on their email.
  *
  * @param reqId a randomly computed identifier for the request
  * @param RESPONSE_TOPIC a response topic to subscribe to
- * @returns a promise that resolves to the name of a dentist
+ * @returns a promise that resolves to the name of a dentist/patient
  */
-export const dentistNameByEmail = async (reqId: string, RESPONSE_TOPIC: string): Promise<DentistName> => {
+export const userNameByEmail = async (reqId: string, RESPONSE_TOPIC: string): Promise<UserName> => {
   return await new Promise((resolve, reject) => {
     const timeout = setTimeout(() => {
       client?.unsubscribe(RESPONSE_TOPIC);
@@ -157,7 +161,7 @@ export const dentistNameByEmail = async (reqId: string, RESPONSE_TOPIC: string):
           if (rawMsg[1] === '0') reject(new Error('Dentist not found.'));
 
           const names: string[] = rawMsg[1].split(',');
-          const dName: DentistName = {
+          const dName: UserName = {
             firstName: names[0],
             lastName: names[1]
           };
@@ -281,13 +285,5 @@ export const pubNotification = (email: string, message: string, client: MqttClie
  * @returns a formatted string representing the date and time.
  */
 export const formatDateTime = (timestamp: number): string => {
-  const options: Intl.DateTimeFormatOptions = {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  };
-  return new Date(timestamp * 1000).toLocaleDateString('sv-SE', options).slice(0, 16);
+  return new Date(timestamp * 1000).toLocaleString('sv-SE');
 };

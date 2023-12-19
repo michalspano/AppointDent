@@ -46,7 +46,7 @@ export async function validateAddress (dentist: DentistRegistration): Promise<nu
   if (Number(dentist.clinicHouseNumber) <= 0) {
     return 'House number must be greater than zero.'
   }
-  const dentistCombinedAddress: string = dentist.clinicHouseNumber + ' ' + dentist.clinicStreet + ' ' + dentist.clinicZipCode + ' ' + dentist.clinicCity
+  const dentistCombinedAddress: string = dentist.clinicStreet + ' ' + dentist.clinicHouseNumber + ' ' + dentist.clinicZipCode + ' ' + dentist.clinicCity + ' ' + dentist.clinicCountry
   let result
   try {
     result = await axios.get(`https://geocode.maps.co/search?q=${dentistCombinedAddress}`)

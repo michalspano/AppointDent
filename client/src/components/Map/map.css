@@ -16,12 +16,13 @@
     color:white;
 }
 
-#map{
+#map,.loader{
     height: 100vh;
     width: 100%;
 }
+
 .marker-cluster{
-    background-color: #12878D;
+    background-color: rgba(18,135,141,0.9);
     color:white;
     font-weight: 600;
     font-size: 1rem;

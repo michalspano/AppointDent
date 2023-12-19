@@ -14,7 +14,7 @@ export default function DentistForm (): JSX.Element {
   const [firstName, setFirstName] = createSignal('')
   const [lastName, setLastName] = createSignal('')
   const [clinicCity, setClinicCity] = createSignal('')
-  const [clinicCountry, setClinicCountry] = createSignal('')
+  const [clinicCountry, setClinicCountry] = createSignal('SE')
   const [clinicStreet, setClinicStreet] = createSignal('')
   const [clinicHouseNumber, setClinicHouseNumber] = createSignal('')
   const [clinicZipCode, setClinicZipcode] = createSignal('')
@@ -55,10 +55,10 @@ export default function DentistForm (): JSX.Element {
       setError(addressValidation)
       return
     }
-    const dentistCombinedAddress: string = clinicStreet() + ' ' + clinicHouseNumber() + ' ' + clinicZipCode() + ' ' + clinicCity()
+    const dentistCombinedAddress: string = clinicStreet() + ' ' + clinicHouseNumber() + ' ' + clinicZipCode() + ' ' + clinicCity() + ' ' + clinicCountry()
     geoCodeAddress(dentistCombinedAddress)
       .then(async (result: Place) => {
-        registrationData = { ...registrationData, longitude: parseFloat(result.lat), latitude: parseFloat(result.lon) }
+        registrationData = { ...registrationData, longitude: parseFloat(result.lon), latitude: parseFloat(result.lat) }
         return await Api.post('/dentists/register', registrationData)
       })
       .then(async () => {
@@ -158,7 +158,7 @@ export default function DentistForm (): JSX.Element {
               class="input h-12 w-full px-3 py-2 mb-3  mr-2  border rounded-xl"
               onChange={(event) => setClinicCountry(event.target.value)}
             >
-              <option value="none" selected disabled hidden>Select your Country</option>
+              <option value="SE" selected disabled hidden>Sweden</option>
               {
               allCountries.map((country) => (
                 <option value={country.code}>{country.name}</option>

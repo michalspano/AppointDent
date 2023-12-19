@@ -91,7 +91,7 @@ export interface UnixTimestampRange { from?: number, to?: number };
  * @description a custom type that denotes the response type
  * when a dentist is queried by their email.
  */
-export interface DentistName {
+export interface UserName {
   firstName: string
   lastName: string
 }
