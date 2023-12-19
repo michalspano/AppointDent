@@ -1,7 +1,10 @@
-import type { Request, Response } from 'express';
+import QUERY from '../utils/query';
 import database from '../db/config';
 import { client } from '../mqtt/mqtt';
 import { getServiceResponse } from './helper';
+import type { Patient } from '../utils/types';
+import type { Request, Response } from 'express';
+
 const TOPIC = 'INSERTUSER';
 const RESPONSE_TOPIC = 'INSERTUSERRES';
 
@@ -12,6 +15,7 @@ const RESPONSE_TOPIC = 'INSERTUSERRES';
  * @returns request object
  */
 export const registerController = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
+  // TODO: extract this to a function
   if (req.body.email === undefined) return res.sendStatus(400);
   if (req.body.password === undefined) return res.sendStatus(400);
   if (req.body.birthDate === undefined) return res.sendStatus(400);
@@ -19,39 +23,28 @@ export const registerController = async (req: Request, res: Response): Promise<R
   if (req.body.firstName === undefined) return res.sendStatus(400);
 
   const {
-    email,
-    password,
-    birthDate,
-    lastName,
-    firstName
-  } = req.body;
-  // To verify if required dependencies are defined
-  if (database === undefined) {
-    return res.sendStatus(500);
-  }
-  if (client === undefined) {
-    return res.sendStatus(500);
-  }
+    email, birthDate, lastName, firstName
+  } = req.body as Patient;
+  const password: string = req.body.password;
 
-  // To check if the email is already registered
+  if (database === undefined || client === undefined) return res.sendStatus(500);
+
   if (checkEmailRegistered(email)) {
-    return res.status(409).json('Email is already registered.');
+    return res.status(409).json({
+      message: 'Email is already registered.'
+    });
   }
 
-  let query;
+  // Attempt to insert the patient into the database.
   try {
-  // To insert user into the database
-    query = database.prepare(`
-    INSERT INTO patients 
-    (email, birthDate, lastName, firstName) 
-    VALUES (?, ?, ?, ?)
-  `);
-  } catch (err) {
-    console.log(err);
-    return res.sendStatus(400);
+    QUERY.INSERT_PATIENT.run(email, birthDate, lastName, firstName);
+  } catch (error) {
+    return res.sendStatus(500);
   }
 
-  // To generate a random reqId
+  /**
+   * Insertion successful, now publish to MQTT.
+   */
   const reqId = Math.floor(Math.random() * 1000);
 
   // To publish registration information to MQTT topic
@@ -60,31 +53,28 @@ export const registerController = async (req: Request, res: Response): Promise<R
 
   try {
     // To wait for MQTT response
+    // TODO: add types.
     const mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
     // To handle unsuccessful authorization
     if (mqttResult === '0') {
-      return res.status(401).json('Email is already registered');
+      return res.status(401).json({
+        message: 'Email is already registered'
+      });
     }
   } catch (error) {
     console.error('Error in registerController:', error);
     return res.sendStatus(500);
   }
-  query.run(email, birthDate, lastName, firstName);
 
   return res.sendStatus(201);
 };
 
 // To check if the email is already registered
 function checkEmailRegistered (email: string): boolean {
-  const checkEmailQuery = database?.prepare(`
-    SELECT COUNT(*) as count
-    FROM patients
-    WHERE email = ?
-  `);
-  const emailCheckResult = checkEmailQuery?.get(email) as { count: number };
-
+  const emailCheckResult = QUERY.PATIENT_COUNT.get(email) as { count: number };
   return emailCheckResult !== null && emailCheckResult.count > 0;
 };
+
 /**
  * Wraps the promise returning function to conform to ts constraints
  * @param req request
