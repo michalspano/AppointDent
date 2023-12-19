@@ -3,7 +3,7 @@ import type * as mqtt from 'mqtt';
 import {
   type DenNameRequestMQTT,
   type DenNameRequest
-} from '../controllers/types';
+} from '../utils/types';
 
 const TOPIC: string = 'DENNAME';
 const RESPONSE_TOPIC: string = 'DENNAMERES';
