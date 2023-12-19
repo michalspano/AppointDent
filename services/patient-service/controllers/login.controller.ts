@@ -36,16 +36,14 @@ export const loginController = async (req: Request, res: Response): Promise<Resp
   client.publish(TOPIC, `${reqId}/${email}/${password}/*`);
 
   try {
-    const mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
-    if (mqttResult === '0') return res.sendStatus(401);
-
-    // TODO: revisit this logic
-    if (mqttResult !== undefined && mqttResult.length === 1 && mqttResult === '0') {
-      return res.sendStatus(400);
-    } else {
-      res.cookie('sessionKey', mqttResult, { httpOnly: true });
-      return res.sendStatus(200);
+    const mqttResult: string | undefined = await getServiceResponse(
+      reqId.toString(), RESPONSE_TOPIC
+    );
+    if (mqttResult === undefined || mqttResult === '0') {
+      return res.sendStatus(401);
     }
+    res.cookie('sessionKey', mqttResult, { httpOnly: true });
+    return res.sendStatus(200);
   } catch (error) {
     return res.sendStatus(500);
   } finally {

@@ -8,7 +8,7 @@ const TIMEOUT = 120000;
  * @param isLoginFlow used to
  * @returns The result if the user is authenticated or not
  */
-export async function getServiceResponse (reqId: string, RESPONSE_TOPIC: string): Promise<string> {
+export async function getServiceResponse (reqId: string, RESPONSE_TOPIC: string): Promise<string | undefined> {
   return await new Promise((resolve, reject) => {
     const timeout = setTimeout(() => {
       client?.unsubscribe(RESPONSE_TOPIC);
@@ -17,10 +17,10 @@ export async function getServiceResponse (reqId: string, RESPONSE_TOPIC: string)
     const eventHandler = (topic: string, message: Buffer): void => {
       if (topic === RESPONSE_TOPIC) {
         if (message.toString().startsWith(`${reqId}/`)) {
-          resolve(message.toString().split('/')[1]);
           clearTimeout(timeout);
           client?.unsubscribe(topic);
           client?.removeListener('message', eventHandler);
+          resolve(message.toString().split('/')[1]);
         }
       }
     };

@@ -38,23 +38,19 @@ export const login = async (req: Request, res: Response): Promise<Response<any, 
   const reqId = Math.floor(Math.random() * 1000);
   client.subscribe(RESPONSE_TOPIC); // Subscribe first to ensure we dont miss anything
   client.publish(TOPIC, `${reqId}/${request.email}/${request.password}/*`);
-  // TODO: add types.
-  let mqttResult;
+
+  let mqttResult: string | undefined;
   try {
     mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
-    if (mqttResult === '0') {
+    if (mqttResult === undefined || mqttResult === '0') {
       return res.status(401).json({ message: 'Unable to authorize' });
     }
   } catch (error) {
     return res.status(504).json({ message: 'Service Timeout' });
   }
-  // TODO: revisit this logic
-  if (mqttResult !== undefined && mqttResult.length === 1 && mqttResult === '0') { // REQID/0/* (fail)
-    return res.status(401).json({ message: 'Email or password is incorrect' });
-  } else { // REQID/SESSIONKEY/* (success)
-    res.cookie('sessionKey', mqttResult, { httpOnly: true });
-    return res.sendStatus(200);
-  }
+
+  res.cookie('sessionKey', mqttResult, { httpOnly: true });
+  return res.sendStatus(200);
 };
 
 /**
