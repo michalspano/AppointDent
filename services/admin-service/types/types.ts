@@ -13,7 +13,6 @@ export interface AnalyticsData {
   timestamp: number
   method: string
   path: string
-  agent: string
   clientHash: string
   [key: string]: string | number | undefined
 }

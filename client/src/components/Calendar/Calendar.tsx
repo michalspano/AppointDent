@@ -20,7 +20,8 @@ export default function DentistCalendar (): JSX.Element {
     start: '',
     end: ''
   })
-
+  // Used to prevent overlaying requests to BE
+  let blocked: boolean = false
   async function handleFormSubmit (): Promise<void> {
     try {
       await addAppointment(newAppointment())
@@ -73,7 +74,9 @@ export default function DentistCalendar (): JSX.Element {
       }))
 
       setSlots(formattedAppointments)
+      blocked = false
     } catch (error) {
+      blocked = false
       throw new Error('Error fetching appointments')
     }
   }
@@ -178,6 +181,8 @@ export default function DentistCalendar (): JSX.Element {
 
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       setInterval(async () => {
+        if (blocked) return
+        blocked = true
         await fetchAppointments()
         const events = [...slots()]
         calendar.setOption('events', events)

@@ -6,19 +6,24 @@ export function Graph (props: ChartType): JSX.Element {
   let chartInstance: Chart
   let chartRef: HTMLCanvasElement
   let chartData: ChartData
-
+  // Used to prevent overlaying requests to BE
+  let blocked: boolean = false
   /**
    * Used to automatically fetch chart data from analytics endpoint
    */
   const autoFetch = setInterval(() => {
+    if (blocked) return
+    blocked = true
     getChartData(props.category, props.method, props.loggedInOnly).then((result: ChartData) => {
       chartData = result
       chartInstance.data.datasets = [{ label: '', data: chartData.data, borderWidth: 1 }]
       chartInstance.data.labels = chartData.labels
       chartInstance.update()
+      blocked = false
     }).catch((err) => {
       console.error(err)
       console.error('Chart data fetching failed!')
+      blocked = false
     })
   }, 2000)
   onCleanup(() => {

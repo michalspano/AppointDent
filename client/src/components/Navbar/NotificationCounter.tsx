@@ -8,12 +8,14 @@ export const useNotification = (): {
 } => {
   const [notificationCount, setNotificationCount] = createSignal(0)
   const [showNotificationDot, setShowNotificationDot] = createSignal(false)
-
+  // Used to prevent overlaying requests to BE
+  let blocked: boolean = false
   /**
    * Used to retrieve the number of notifications in the system
    */
   const fetchNotificationCount = async (): Promise<void> => {
     try {
+      blocked = true
       const whoIs: WhoisResponse = (await Api.get('sessions/whois', { withCredentials: true })).data
       const userEmail: string | undefined = whoIs.email
 
@@ -34,6 +36,7 @@ export const useNotification = (): {
       setNotificationCount(unreadNotifications)
       // We only want to show the number of notifications if its > 0
       setShowNotificationDot(unreadNotifications > 0)
+      blocked = false
     } catch (error) {
       console.error('Error fetching notification count:', error)
     }
@@ -44,6 +47,7 @@ export const useNotification = (): {
    */
   void fetchNotificationCount()
   const notificationFetcher = setInterval(() => {
+    if (blocked) return
     void fetchNotificationCount()
   }, 1000)
   onCleanup(() => {
