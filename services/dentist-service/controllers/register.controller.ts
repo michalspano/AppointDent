@@ -64,6 +64,17 @@ export const register = async (req: Request, res: Response): Promise<Response<an
   }
 
   /**
+   * Execute SQL query on db.
+   */
+  try {
+    QUERY.INSERT_DENTIST.run(...values);
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Internal server error, ensure that all fields are valid'
+    });
+  }
+
+  /**
    * If everything worked we should now be able to tell the session service to reqgister a new user.
    */
   const reqId = Math.floor(Math.random() * 1000); // Generates a random integer between 0 and 999
@@ -76,17 +87,6 @@ export const register = async (req: Request, res: Response): Promise<Response<an
     }
   } catch (error) {
     return res.status(504).json({ message: 'Service Timeout' });
-  }
-
-  /**
-   * Execute SQL query on db.
-   */
-  try {
-    QUERY.INSERT_DENTIST.run(...values);
-  } catch (error) {
-    return res.status(500).json({
-      message: 'Internal server error, ensure that all fields are valid'
-    });
   }
 
   return res.sendStatus(201);

@@ -48,6 +48,7 @@ export const login = async (req: Request, res: Response): Promise<Response<any, 
   } catch (error) {
     return res.status(504).json({ message: 'Service Timeout' });
   }
+  // TODO: revisit this logic
   if (mqttResult !== undefined && mqttResult.length === 1 && mqttResult === '0') { // REQID/0/* (fail)
     return res.status(401).json({ message: 'Email or password is incorrect' });
   } else { // REQID/SESSIONKEY/* (success)
