@@ -9,6 +9,5 @@ CREATE TABLE IF NOT EXISTS requests (
     timestamp INT NOT NULL,
     method VARCHAR(255) NOT NULL,
     path VARCHAR(255) NOT NULL,
-    agent VARCHAR(255) NOT NULL,
     clientHash VARCHAR(64) NOT NULL
 );

@@ -6,10 +6,13 @@ import { type NotificationData } from '../../utils/types'
 export default function Notifications (): JSX.Element {
   const [notifications, setNotifications] = createSignal<NotificationData[]>([])
   const FETCH_INTERVAL: number = 5000
-
+  // Used to prevent overlaying requests to BE
+  let blocked: boolean = false
   onMount(() => {
     void fetchNotifications()
     setInterval(() => {
+      if (blocked) return
+      blocked = true
       void fetchNotifications()
     }, FETCH_INTERVAL)
   })
@@ -33,7 +36,9 @@ export default function Notifications (): JSX.Element {
       notificationData.sort((a: { timestamp: number }, b: { timestamp: number }) => b.timestamp - a.timestamp)
 
       setNotifications(notificationData)
+      blocked = false
     } catch (error) {
+      blocked = false
       console.error('Error fetching or setting notifications:', error)
       throw new Error('Error fetching the notifications')
     }
