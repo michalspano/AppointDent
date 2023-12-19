@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import database from '../db/config';
 import { client } from '../mqtt/mqtt';
 import { getServiceResponse } from './helper';
-import { type Dentist } from './types';
+import { type Dentist } from '../utils/types';
 
 const TOPIC = 'AUTHREQ';
 const RESPONSE_TOPIC = 'AUTHRES';
