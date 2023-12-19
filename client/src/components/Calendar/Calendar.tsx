@@ -20,6 +20,7 @@ export default function DentistCalendar (): JSX.Element {
     start: '',
     end: ''
   })
+  const [maxEnd, setMaxEnd] = createSignal<string>('')
 
   async function handleFormSubmit (): Promise<void> {
     try {
@@ -211,6 +212,9 @@ export default function DentistCalendar (): JSX.Element {
                 placeholder=''
                 value={newAppointment().start}
                 onChange={(event) => {
+                  const start: string = event.target.value
+                  const maxEndValue: string = start.slice(0, 10) + 'T23:59'
+                  setMaxEnd(maxEndValue)
                   setNewAppointment({ ...newAppointment(), start: event.target.value })
                 }}
                 required
@@ -227,6 +231,7 @@ export default function DentistCalendar (): JSX.Element {
                 }}
                 required
                 min={newAppointment().start}
+                max={maxEnd()}
               />
             </div>
             <div class='flex flex-row mt-3'>
