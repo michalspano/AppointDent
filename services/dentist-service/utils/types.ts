@@ -24,11 +24,6 @@ export interface LoginRequest {
 }
 
 /**
- * @description iteration through the RegisterRequest keys
- */
-export type DentistField = keyof Dentist;
-
-/**
  * @description an interface that represents a request over MQTT to
  * get the name of a dentist from their email.
  */

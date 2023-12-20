@@ -1,9 +1,9 @@
-import database from '../db/config';
 import QUERY from '../utils/query';
+import database from '../db/config';
 import { client } from '../mqtt/mqtt';
-import { getServiceResponse } from './helper';
+import { type Dentist } from '../utils/types';
 import type { Request, Response } from 'express';
-import { type DentistField, type Dentist } from '../utils/types';
+import { getServiceResponse, isValidDentist } from './helper';
 
 const TOPIC = 'INSERTUSER';
 const RESPONSE_TOPIC = 'INSERTUSERRES';
@@ -16,7 +16,7 @@ const RESPONSE_TOPIC = 'INSERTUSERRES';
  */
 export const register = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
   /**
-   * Assume the request is complete
+   * Populate a new Dentist instance with the request body.
    */
   const request: Dentist = {
     email: req.body.email,
@@ -34,48 +34,19 @@ export const register = async (req: Request, res: Response): Promise<Response<an
 
   if (req.body.password === undefined) return res.status(400).json({ message: 'Password missing' });
 
-  /**
-   * Check if any fields are missing
-   */
-  for (const key of Object.keys(request) as DentistField[]) {
-    if (request[key] === undefined || request[key] === null) {
-      return res.status(400).json({ message: 'Invalid input' });
-    }
-  }
-
+  // Perform the necessary checks before continuing.
   if (database === undefined) {
     return res.status(500).json({ message: 'Database undefined' });
-  }
-  if (client === undefined) {
+  } else if (client === undefined) {
     return res.status(503).json({ message: 'MQTT connection failed' });
-  }
-  // Check if the email is already registered
-  if (checkEmailRegistered(request.email)) {
+  } else if (checkEmailRegistered(request.email)) {
     return res.status(409).json('Email is already registered');
-  }
-
-  const fieldsToUpdate: string[] = [];
-  const values: Array<string | number> = [];
-
-  // Build the SET clause dynamically based on the provided fields in updatedInfo
-  for (const [key, value] of Object.entries(request)) {
-    fieldsToUpdate.push(`${key}`);
-    values.push(value);
+  } else if (!isValidDentist(request)) {
+    return res.status(400).json({ message: 'Invalid dentist' });
   }
 
   /**
-   * Execute SQL query on db.
-   */
-  try {
-    QUERY.INSERT_DENTIST.run(...values);
-  } catch (error) {
-    return res.status(500).json({
-      message: 'Internal server error, ensure that all fields are valid'
-    });
-  }
-
-  /**
-   * If everything worked we should now be able to tell the session service to reqgister a new user.
+   * If everything worked we should now be able to tell the session service to register a new user.
    */
   const reqId = Math.floor(Math.random() * 1000); // Generates a random integer between 0 and 999
   client.subscribe(RESPONSE_TOPIC);
@@ -87,6 +58,18 @@ export const register = async (req: Request, res: Response): Promise<Response<an
     }
   } catch (error) {
     return res.status(504).json({ message: 'Service Timeout' });
+  }
+
+  /**
+   * Execute SQL query on db. The fields are already validated, so only an error
+   * with the IO (database) can occur (this is a 500 error).
+   */
+  try {
+    QUERY.INSERT_DENTIST.run(...Object.values(request));
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Internal server error: query failed.'
+    });
   }
 
   return res.sendStatus(201);
