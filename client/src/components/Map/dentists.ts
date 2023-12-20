@@ -116,20 +116,19 @@ export async function addDentistsToCluster (cluster: leaflet.MarkerClusterGroup,
     return
   }
 
-  // Retain dentists that have an appointment in within the specified
-  // time range.
-  const addedDentists: string[] = [] // This array prevent duplicate additions
-  for (let i = 0; i < appointments.length; i++) {
-    const dentist = dentists.find((dentist: Dentist) =>
-      dentist.email === appointments[i].dentistId
-    ) as Dentist
-    // If dentist already added, skip iteration
-    if (addedDentists.includes(dentist.email)) continue
+  /**
+   * Retain dentists that have at least one appointment within
+   * the time range.
+   */
+  for (let i = 0; i < dentists.length; i++) {
+    const appointment: AppointmentResponse | undefined = appointments.find((appointment: AppointmentResponse) =>
+      appointment.dentistId === dentists[i].email
+    )
+    if (appointment === undefined) continue
     void connectToCluster(
-      dentist,
+      dentists[i],
       cluster,
       timeRange
     )
-    addedDentists.push(dentist.email)
   }
 }
