@@ -26,9 +26,7 @@ export const loginController = async (req: Request, res: Response): Promise<Resp
     const result = QUERY.VERIFY_PATIENT.get(req.body.email) as string | undefined;
     if (result === undefined) return res.sendStatus(404);
   } catch (err) {
-    return res.status(500).json({
-      message: 'Internal server error: failed performing selection.'
-    });
+    return res.status(500).json('Internal server error: failed performing selection.');
   }
 
   const reqId = Math.floor(Math.random() * 1000);

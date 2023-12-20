@@ -30,9 +30,7 @@ export const registerController = async (req: Request, res: Response): Promise<R
   if (database === undefined || client === undefined) return res.sendStatus(500);
 
   if (checkEmailRegistered(email)) {
-    return res.status(409).json({
-      message: 'Email is already registered.'
-    });
+    return res.status(409).json('Email is already registered.');
   }
 
   // Attempt to insert the patient into the database.
@@ -57,9 +55,7 @@ export const registerController = async (req: Request, res: Response): Promise<R
     const mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
     // To handle unsuccessful authorization
     if (mqttResult === '0') {
-      return res.status(401).json({
-        message: 'Email is already registered'
-      });
+      return res.status(401).json('Email is already registered');
     }
   } catch (error) {
     console.error('Error in registerController:', error);
