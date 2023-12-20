@@ -13,7 +13,6 @@ async function addAnalyticsData (req: Request, res: Response): Promise<Response<
     timestamp: Math.round(Date.now() / 1000),
     method: req.body?.method,
     path: req.body?.path,
-    agent: req.body?.agent,
     clientHash: req.body?.clientHash
   };
 
@@ -23,8 +22,8 @@ async function addAnalyticsData (req: Request, res: Response): Promise<Response<
 
   const stmt: Statement = database.prepare(`
     INSERT INTO requests
-    (id, timestamp, method, path, agent, clientHash)
-    VALUES (?, ?, ?, ?, ?, ?)
+    (id, timestamp, method, path, clientHash)
+    VALUES (?, ?, ?, ?, ?)
   `);
   /* A query can fail because of a bad request (e.g. invalid object),
    * or that something is wrong with the database (an internal server error).

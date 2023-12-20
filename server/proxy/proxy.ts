@@ -8,7 +8,6 @@ type ProxyTargets = Record<string, string>;
 interface AnalyticsData {
   method: string
   path: string
-  agent: string
   clientHash: string
   [key: string]: string | number | undefined
 
@@ -47,23 +46,35 @@ function constructProxies (targets: ProxyTargets): ProxyMap {
   return newProxies;
 }
 
+async function forwardAnalyticsRequest (url: string, method: string, clientHash: string): Promise<void> {
+  console.log(url);
+  const analyticsEntry: AnalyticsData = {
+    method,
+    path: url,
+    clientHash
+  };
+  void axios.post(DATA_COLLECTOR_API + '/requests', analyticsEntry);
+}
+
 export function routeProxy (req: Request, res: Response, next: NextFunction): void {
-  const pathParts = req.url.split('/'); // Use req.url to include query string if necessary.
+  const url = req.originalUrl;
+  const method = req.method;
   const clientCookie = req.cookies.sessionKey;
   let clientHash: string = '';
-  if (clientCookie !== undefined) {
-    clientHash = crypto.createHash('sha256').update(clientCookie).digest('hex');
-  }
-  if (!req.url.includes('admins')) {
-    const analyticsEntry: AnalyticsData = {
-      method: req.method,
-      path: req.url,
-      agent: req.get('User-Agent') as string,
-      clientHash
-    };
-    void axios.post(DATA_COLLECTOR_API + '/requests', analyticsEntry);
+  if (!req.originalUrl.includes('admins')) {
+    if (clientCookie !== undefined) {
+      crypto.pbkdf2(clientCookie, 'salt', 10, 64, 'sha256', (err, derivedKey) => {
+        if (err != null) { throw new Error(err.message); }
+        clientHash = derivedKey.toString('hex');
+        void forwardAnalyticsRequest(url, method, clientHash);
+      });
+    } else {
+      void forwardAnalyticsRequest(url, method, clientHash);
+    }
   }
 
+  const pathParts = req.url.split('/'); // Use req.url to include query string if necessary.
+  console.log(pathParts);
   const service = pathParts[1];
   const target: httpProxy | undefined = proxies[service];
 

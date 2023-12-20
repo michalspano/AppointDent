@@ -18,6 +18,26 @@ function bypassQueue (req: Request, res: Response, next: NextFunction): void {
   queue(req, res, next);
 }
 app.use(bypassQueue);
+
+/**
+ * This middleware has the responsibility of ensuring that dropped connections
+ * are destroyed from the queue to prevent them from taking up space. When
+ * many thousands of requests accumulate this becomes a problem because they
+ * can hang in the system. So if a request is dropped we drop the entire request.
+ */
+app.use((req, res, next) => {
+  // Initiate event listener for closing event
+  req.socket.on('close', () => {
+    if (req.socket.destroyed) { // If the underlying socket is destroyed
+      if (!res.headersSent) { // We double check that the request has not been dropped
+        res.end(); // Drop the request.
+      }
+    }
+  });
+  // After initialising the event listener we move on to the next middleware.
+  next();
+});
+
 app.use(morgan('dev')); // Add morgan HTTP request logger.
 
 interface CorsOptions {

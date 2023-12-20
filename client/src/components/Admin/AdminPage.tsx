@@ -24,6 +24,8 @@ export default function Admin (): JSX.Element {
     </button>
     )
   }
+  // Used to prevent overlaying requests to BE
+  let blocked: boolean = false
 
   // State to track the active tab
   const [activeTab, setActiveTab] = createSignal('appointments')
@@ -47,11 +49,15 @@ export default function Admin (): JSX.Element {
 
   // Keep track on the number of available appointments
   const autoFetchAppointments = setInterval(() => {
+    if (blocked) return
+    blocked = true
     getAvailableAppointments().then((result: number) => {
       setAvailableAppointments(result)
+      blocked = false
     }).catch((err) => {
       console.error(err)
       setAvailableAppointments(0)
+      blocked = false
     })
   }, 5000)
 
@@ -72,7 +78,7 @@ export default function Admin (): JSX.Element {
         <Show when={activeTab() === 'general'}>
           <div class="sm:w-full md:w-3/6 p-3">
             <p class="font-bold">System requests</p>
-            <Graph category={'/'} method={''} loggedInOnly={true} />
+            <Graph category={'/'} method={''} loggedInOnly={false} />
           </div>
         </Show>
 
@@ -94,7 +100,7 @@ export default function Admin (): JSX.Element {
           </div>
           <div class="sm:w-full md:w-3/6 p-3">
             <p class="font-bold">Dentist login requests</p>
-            <Graph category={'/dentist/login'} method={'POST'} loggedInOnly={false} />
+            <Graph category={'/dentists/login'} method={'POST'} loggedInOnly={false} />
           </div>
         </Show>
 

@@ -1,13 +1,15 @@
 import { type JSX } from 'solid-js/jsx-runtime'
 import './ServicesUnavailable.css'
-import { createEffect, createSignal } from 'solid-js'
+import { createSignal, onCleanup } from 'solid-js'
 import ServicesUnavailableModal from './ServicesUnavailableModal'
 import { Api } from '../../utils/api'
-
+// Used to prevent overlaying requests to BE
+let blocked: boolean = false
 const servicesErr = async (): Promise<void> => {
   const response = await Api.get('/heartbeat', { withCredentials: true })
   const killedServices = getKilledServicesNames(response.data.data)
   setErrServices(killedServices)
+  blocked = false
 }
 
 function getKilledServicesNames (statusObject: object): string[] {
@@ -16,13 +18,17 @@ function getKilledServicesNames (statusObject: object): string[] {
     .map(([serviceName]) => serviceName)
 }
 
-createEffect(() => {
-  setInterval(() => {
-    servicesErr()
-      .catch((error) => {
-        console.error(error)
-      })
-  }, 5000)
+const heartbeatWatcher = setInterval(() => {
+  if (blocked) return
+  blocked = true
+  servicesErr()
+    .catch((error) => {
+      console.error(error)
+    })
+}, 5000)
+
+onCleanup(() => {
+  clearInterval(heartbeatWatcher)
 })
 
 const [errServices, setErrServices] = createSignal<string[]>([])
