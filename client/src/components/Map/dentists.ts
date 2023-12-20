@@ -118,13 +118,17 @@ export async function addDentistsToCluster (cluster: leaflet.MarkerClusterGroup,
 
   // Retain dentists that have an appointment in within the specified
   // time range.
+  const addedDentists: string[] = []
   for (let i = 0; i < appointments.length; i++) {
+    const dentist = dentists.find((dentist: Dentist) =>
+      dentist.email === appointments[i].dentistId
+    ) as Dentist
+    if (addedDentists.includes(dentist.email)) continue
     void connectToCluster(
-      dentists.find((dentist: Dentist) =>
-        dentist.email === appointments[i].dentistId
-      ) as Dentist,
+      dentist,
       cluster,
       timeRange
     )
+    addedDentists.push(dentist.email)
   }
 }
