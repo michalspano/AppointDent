@@ -1,4 +1,14 @@
 /**
+ * @description An interface to represent a Patient.
+ */
+export interface Patient {
+  email: string
+  birthDate: string
+  lastName: string
+  firstName: string
+}
+
+/**
 * @description an interface that represents a request over MQTT to
 * get the name of a patient from their email.
 */

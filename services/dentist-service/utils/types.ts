@@ -1,4 +1,7 @@
-export interface RegisterRequest {
+/**
+ * @description an interface that represents a dentist.
+ */
+export interface Dentist {
   email: string
   firstName: string
   lastName: string
@@ -13,9 +16,12 @@ export interface RegisterRequest {
 }
 
 /**
- * @description iteration through the RegisterRequest keys
+ * @description an interface that represents a login request.
  */
-export type RegisterRequestKey = keyof RegisterRequest;
+export interface LoginRequest {
+  email: string
+  password: string
+}
 
 /**
  * @description an interface that represents a request over MQTT to

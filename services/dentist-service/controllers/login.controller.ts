@@ -1,15 +1,13 @@
-import type { Request, Response } from 'express';
+import QUERY from '../utils/query';
 import database from '../db/config';
+import type { LoginRequest } from '../utils/types';
 import { client } from '../mqtt/mqtt';
 import { getServiceResponse } from './helper';
+import type { Request, Response } from 'express';
 
 const TOPIC = 'CREATESESSION';
 const RESPONSE_TOPIC = 'SESSION';
 
-interface LoginRequest {
-  email: string
-  password: string
-}
 /**
  * Used to login a dentist into the system.
  * @param req request
@@ -28,11 +26,9 @@ export const login = async (req: Request, res: Response): Promise<Response<any, 
   if (request.password === undefined) return res.sendStatus(400);
 
   try {
-    const result = database.prepare('SELECT email FROM dentists WHERE email = ?').get(req.body.email);
-
-    if (result === undefined) {
-      return res.sendStatus(404);
-    }
+    // The email either exists or it doesn't.
+    const result = QUERY.VERIFY_DENTIST.get(req.body.email) as string | undefined;
+    if (result === undefined) return res.sendStatus(404);
   } catch (err) {
     return res.status(500).json({
       message: 'Internal server error: failed performing selection.'
@@ -42,21 +38,19 @@ export const login = async (req: Request, res: Response): Promise<Response<any, 
   const reqId = Math.floor(Math.random() * 1000);
   client.subscribe(RESPONSE_TOPIC); // Subscribe first to ensure we dont miss anything
   client.publish(TOPIC, `${reqId}/${request.email}/${request.password}/*`);
-  let mqttResult;
+
+  let mqttResult: string | undefined;
   try {
     mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
-    if (mqttResult === '0') {
+    if (mqttResult === undefined || mqttResult === '0') {
       return res.status(401).json({ message: 'Unable to authorize' });
     }
   } catch (error) {
     return res.status(504).json({ message: 'Service Timeout' });
   }
-  if (mqttResult !== undefined && mqttResult.length === 1 && mqttResult === '0') { // REQID/0/* (fail)
-    return res.status(401).json({ message: 'Email or password is incorrect' });
-  } else { // REQID/SESSIONKEY/* (success)
-    res.cookie('sessionKey', mqttResult, { httpOnly: true });
-    return res.sendStatus(200);
-  }
+
+  res.cookie('sessionKey', mqttResult, { httpOnly: true });
+  return res.sendStatus(200);
 };
 
 /**

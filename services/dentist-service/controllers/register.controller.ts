@@ -1,8 +1,9 @@
-import type { Request, Response } from 'express';
+import QUERY from '../utils/query';
 import database from '../db/config';
 import { client } from '../mqtt/mqtt';
-import { getServiceResponse } from './helper';
-import { type RegisterRequestKey, type RegisterRequest } from './types';
+import { type Dentist } from '../utils/types';
+import type { Request, Response } from 'express';
+import { getServiceResponse, isValidDentist } from './helper';
 
 const TOPIC = 'INSERTUSER';
 const RESPONSE_TOPIC = 'INSERTUSERRES';
@@ -15,9 +16,9 @@ const RESPONSE_TOPIC = 'INSERTUSERRES';
  */
 export const register = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
   /**
-   * Assume the request is complete
+   * Populate a new Dentist instance with the request body.
    */
-  const request: RegisterRequest = {
+  const request: Dentist = {
     email: req.body.email,
     firstName: req.body.firstName,
     lastName: req.body.lastName,
@@ -33,52 +34,19 @@ export const register = async (req: Request, res: Response): Promise<Response<an
 
   if (req.body.password === undefined) return res.status(400).json({ message: 'Password missing' });
 
-  /**
-   * Check if any fields are missing
-   */
-  for (const key of Object.keys(request) as RegisterRequestKey[]) {
-    if (request[key] === undefined || request[key] === null) {
-      return res.status(400).json({ message: 'Invalid input' });
-    }
-  }
-
+  // Perform the necessary checks before continuing.
   if (database === undefined) {
     return res.status(500).json({ message: 'Database undefined' });
-  }
-  if (client === undefined) {
+  } else if (client === undefined) {
     return res.status(503).json({ message: 'MQTT connection failed' });
-  }
-  // Check if the email is already registered
-  if (checkEmailRegistered(request.email)) {
+  } else if (checkEmailRegistered(request.email)) {
     return res.status(409).json('Email is already registered');
-  }
-
-  const fieldsToUpdate: string[] = [];
-  const values: any[] = [];
-
-  // Build the SET clause dynamically based on the provided fields in updatedInfo
-  for (const [key, value] of Object.entries(request)) {
-    fieldsToUpdate.push(`${key}`);
-    values.push(value);
+  } else if (!isValidDentist(request)) {
+    return res.status(400).json({ message: 'Invalid dentist' });
   }
 
   /**
-   * Build sql query dynamically and catch the potential error of having a missed field.
-   */
-  let query;
-  try {
-    query = database.prepare(`
-    INSERT INTO dentists 
-    (${fieldsToUpdate.join(', ')})
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `);
-  } catch (err) {
-    console.log(err);
-    return res.status(400).json({ message: 'Invalid input' });
-  }
-
-  /**
-   * If everything worked we should now be able to tell the session service to reqgister a new user.
+   * If everything worked we should now be able to tell the session service to register a new user.
    */
   const reqId = Math.floor(Math.random() * 1000); // Generates a random integer between 0 and 999
   client.subscribe(RESPONSE_TOPIC);
@@ -93,9 +61,16 @@ export const register = async (req: Request, res: Response): Promise<Response<an
   }
 
   /**
-   * Execute SQL query on db.
+   * Execute SQL query on db. The fields are already validated, so only an error
+   * with the IO (database) can occur (this is a 500 error).
    */
-  query.run(...values);
+  try {
+    QUERY.INSERT_DENTIST.run(...Object.values(request));
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Internal server error: query failed.'
+    });
+  }
 
   return res.sendStatus(201);
 };
@@ -107,14 +82,7 @@ export const register = async (req: Request, res: Response): Promise<Response<an
  */
 
 function checkEmailRegistered (email: string): boolean {
-  // Check if the email is already registered
-  const checkEmailQuery = database?.prepare(`
-      SELECT COUNT(*) as count
-      FROM dentists
-      WHERE email = ?
-    `);
-  const emailCheckResult = checkEmailQuery?.get(email) as { count: number };
-
+  const emailCheckResult = QUERY.DENTIST_COUNT.get(email) as { count: number };
   return emailCheckResult !== null && emailCheckResult.count > 0;
 }
 /**
