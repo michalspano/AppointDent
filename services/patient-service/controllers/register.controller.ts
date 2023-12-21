@@ -33,16 +33,11 @@ export const registerController = async (req: Request, res: Response): Promise<R
     return res.status(409).json('Email is already registered.');
   }
 
-  // Attempt to insert the patient into the database.
-  try {
-    QUERY.INSERT_PATIENT.run(email, birthDate, lastName, firstName);
-  } catch (error) {
-    return res.sendStatus(500);
-  }
+  // TODO: ensure that the request is of the desired structure.
+  // This way, we can continue to proceed to deliver it via MQTT
+  // and insert it into the database.
 
-  /**
-   * Insertion successful, now publish to MQTT.
-   */
+  // Publish via MQTT to the session-service
   const reqId = Math.floor(Math.random() * 1000);
 
   // To publish registration information to MQTT topic
@@ -59,6 +54,15 @@ export const registerController = async (req: Request, res: Response): Promise<R
     }
   } catch (error) {
     console.error('Error in registerController:', error);
+    return res.sendStatus(500);
+  }
+
+  /**
+   * Session-service handled the insertion to the sessions, now insert to the patients table.
+   */
+  try {
+    QUERY.INSERT_PATIENT.run(email, birthDate, lastName, firstName);
+  } catch (error) {
     return res.sendStatus(500);
   }
 
