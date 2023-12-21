@@ -1,9 +1,9 @@
 import QUERY from '../utils/query';
 import database from '../db/config';
 import { client } from '../mqtt/mqtt';
-import { getServiceResponse } from './helper';
 import type { Patient } from '../utils/types';
 import type { Request, Response } from 'express';
+import { getServiceResponse, isValidPatient } from './helper';
 
 const TOPIC = 'INSERTUSER';
 const RESPONSE_TOPIC = 'INSERTUSERRES';
@@ -15,38 +15,40 @@ const RESPONSE_TOPIC = 'INSERTUSERRES';
  * @returns request object
  */
 export const registerController = async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
-  // TODO: extract this to a function
-  if (req.body.email === undefined) return res.sendStatus(400);
-  if (req.body.password === undefined) return res.sendStatus(400);
-  if (req.body.birthDate === undefined) return res.sendStatus(400);
-  if (req.body.lastName === undefined) return res.sendStatus(400);
-  if (req.body.firstName === undefined) return res.sendStatus(400);
-
-  const {
-    email, birthDate, lastName, firstName
-  } = req.body as Patient;
-  const password: string = req.body.password;
-
-  if (database === undefined || client === undefined) return res.sendStatus(500);
-
-  if (checkEmailRegistered(email)) {
-    return res.status(409).json('Email is already registered.');
+  if (database === undefined || client === undefined) {
+    return res.sendStatus(500);
+  } else if (req.body.password === undefined) {
+    return res.sendStatus(400);
   }
 
-  // TODO: ensure that the request is of the desired structure.
-  // This way, we can continue to proceed to deliver it via MQTT
-  // and insert it into the database.
+  // Extract the necessary information from the request body
+  const request: Patient = {
+    email: req.body.email,
+    birthDate: req.body.birthDate,
+    lastName: req.body.lastName,
+    firstName: req.body.firstName
+  };
+
+  const password: string = req.body.password;
+
+  /** Enforce the uniqueness constraint of the email and
+   * ensure that the patient entry has followed the desired format.
+   * Otherwise, return the appropriate status code. */
+  if (checkEmailRegistered(request.email)) {
+    return res.status(409).json('Email is already registered.');
+  } else if (!isValidPatient(request)) {
+    return res.status(400).json({ message: 'Invalid patient' });
+  }
 
   // Publish via MQTT to the session-service
   const reqId = Math.floor(Math.random() * 1000);
 
   // To publish registration information to MQTT topic
   client.subscribe(RESPONSE_TOPIC);
-  client.publish(TOPIC, `${reqId}/${email}/${password}/p/*`); // p for patient type
+  client.publish(TOPIC, `${reqId}/${request.email}/${password}/p/*`); // p for patient type
 
   try {
-    // To wait for MQTT response
-    // TODO: add types.
+    // To wait for MQTT response; TODO: add types.
     const mqttResult = await getServiceResponse(reqId.toString(), RESPONSE_TOPIC);
     // To handle unsuccessful authorization
     if (mqttResult === '0') {
@@ -59,9 +61,10 @@ export const registerController = async (req: Request, res: Response): Promise<R
 
   /**
    * Session-service handled the insertion to the sessions, now insert to the patients table.
+   * The patient entry has been validated, so, herein, the fail can only be an internal server error.
    */
   try {
-    QUERY.INSERT_PATIENT.run(email, birthDate, lastName, firstName);
+    QUERY.INSERT_PATIENT.run(...Object.values(request));
   } catch (error) {
     return res.sendStatus(500);
   }

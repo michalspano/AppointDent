@@ -27,3 +27,27 @@ export async function getServiceResponse (reqId: string, RESPONSE_TOPIC: string)
     client?.on('message', eventHandler);
   });
 }
+
+/**
+ * @description number of key-value pairs that a patient has.
+ * This can be checked dynamically, but this is more efficient,
+ * because it is rarely changed.
+ */
+const NUM_OF_FIELDS: Readonly<number> = 4;
+
+/**
+ * @description a helper function that dynamically checks if a given patient is
+ * constructed correctly. A patient has only string-based values.
+ *
+ * @param patient the current values for a potential patient (can be incomplete,
+ * incorrect).
+ * @returns a boolean flag
+ */
+export const isValidPatient = (patient: Record<string, any>): boolean => {
+  if (NUM_OF_FIELDS !== Object.keys(patient).length) return false;
+
+  // Predicate to dynamically check if the type of a given value is a string
+  const isTypeString = (value: any): boolean => typeof value === 'string';
+
+  return Object.values(patient).every(isTypeString);
+};
