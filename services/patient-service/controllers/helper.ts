@@ -29,6 +29,11 @@ export async function getServiceResponse (reqId: string, RESPONSE_TOPIC: string)
 }
 
 /**
+ * @description an array of keys that are of type number.
+ */
+const NUMBER_KEYS: readonly string[] = ['birthDate'];
+
+/**
  * @description number of key-value pairs that a patient has.
  * This can be checked dynamically, but this is more efficient,
  * because it is rarely changed.
@@ -46,8 +51,15 @@ const NUM_OF_FIELDS: Readonly<number> = 4;
 export const isValidPatient = (patient: Record<string, any>): boolean => {
   if (NUM_OF_FIELDS !== Object.keys(patient).length) return false;
 
-  // Predicate to dynamically check if the type of a given value is a string
-  const isTypeString = (value: any): boolean => typeof value === 'string';
+  // Predicate to check if the type of a given key is valid.
+  const isValidType = (key: string, value: any): boolean => {
+    if (NUMBER_KEYS.includes(key)) return typeof value === 'number';
+    return typeof value === 'string';
+  };
 
-  return Object.values(patient).every(isTypeString);
+  // Predicate to check if the patient is valid.
+  const isValid: boolean = Object.entries(patient)
+    .every(([key, value]) => isValidType(key, value));
+
+  return isValid;
 };
