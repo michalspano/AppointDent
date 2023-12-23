@@ -31,7 +31,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"dentist@example.com\",\n  \"password\": \"secretpassword\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"clinicCountry\": \"Country\",\n  \"clinicCity\": \"City\",\n  \"clinicStreet\": \"Street\",\n  \"clinicHouseNumber\": 123,\n  \"clinicZipCode\": 12345,\n  \"picture\": \"base64encodedimage\",\n  \"longitude\": 57.706178,\n  \"latitude\": 11.969585\n}",
+							"raw": "{\n  \"email\": \"dentist@example.com\",\n  \"password\": \"secretpassword\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"clinicCountry\": \"Country\",\n  \"clinicCity\": \"City\",\n  \"clinicStreet\": \"Street\",\n  \"clinicHouseNumber\": \"123\",\n  \"clinicZipCode\": \"12345\",\n  \"picture\": \"base64encodedimage\",\n  \"longitude\": 57.706178,\n  \"latitude\": 11.969585\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -113,7 +113,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"dentist@example.com\", // this email was already registered\n  \"password\": \"secretpassword\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"clinicCountry\": \"Country\",\n  \"clinicCity\": \"City\",\n  \"clinicStreet\": \"Street\",\n  \"clinicHouseNumber\": 123,\n  \"clinicZipCode\": 12345,\n  \"picture\": \"base64encodedimage\",\n  \"longitude\": 57.706178,\n  \"latitude\": 11.969585\n}",
+							"raw": "{\n  \"email\": \"dentist@example.com\", // this email was already registered\n  \"password\": \"secretpassword\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"clinicCountry\": \"Country\",\n  \"clinicCity\": \"City\",\n  \"clinicStreet\": \"Street\",\n  \"clinicHouseNumber\": \"123\",\n  \"clinicZipCode\": \"12345\",\n  \"picture\": \"base64encodedimage\",\n  \"longitude\": 57.706178,\n  \"latitude\": 11.969585\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -626,7 +626,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"dentist@example.com\",\n  \"password\": \"secretpassword\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"clinicCountry\": \"Country\",\n  \"clinicCity\": \"City\",\n  \"clinicStreet\": \"Street\",\n  \"clinicHouseNumber\": 123,\n  \"clinicZipCode\": 12345,\n  \"picture\": \"base64encodedimage\",\n  \"longitude\": 57.706178,\n  \"latitude\": 11.969585\n}",
+							"raw": "{\n  \"email\": \"dentist@example.com\",\n  \"password\": \"secretpassword\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"clinicCountry\": \"Country\",\n  \"clinicCity\": \"City\",\n  \"clinicStreet\": \"Street\",\n  \"clinicHouseNumber\": \"123\",\n  \"clinicZipCode\": \"12345\",\n  \"picture\": \"base64encodedimage\",\n  \"longitude\": 57.706178,\n  \"latitude\": 11.969585\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -767,7 +767,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"email\": \"{{dentistEmailSample}}\",\n  \"password\": \"pass123pass456\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"clinicCountry\": \"Country\",\n  \"clinicCity\": \"City\",\n  \"clinicStreet\": \"Sesame Street\",\n  \"clinicHouseNumber\": 11,\n  \"clinicZipCode\": 197312,\n  \"picture\": \"base64encodedimage\",\n  \"longitude\": 57.706178,\n  \"latitude\": 11.969585\n}",
+									"raw": "{\n  \"email\": \"{{dentistEmailSample}}\",\n  \"password\": \"pass123pass456\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"clinicCountry\": \"Country\",\n  \"clinicCity\": \"City\",\n  \"clinicStreet\": \"Sesame Street\",\n  \"clinicHouseNumber\": \"11\",\n  \"clinicZipCode\": \"197312\",\n  \"picture\": \"base64encodedimage\",\n  \"longitude\": 57.706178,\n  \"latitude\": 11.969585\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -809,7 +809,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"email\": \"{{dentistEmailSample2}}\",\n  \"password\": \"pass123pass456\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"clinicCountry\": \"Country\",\n  \"clinicCity\": \"City\",\n  \"clinicStreet\": \"Street\",\n  \"clinicHouseNumber\": 12,\n  \"clinicZipCode\": 197312,\n  \"picture\": \"base64encodedimage\",\n  \"longitude\": 57.706178,\n  \"latitude\": 11.969585\n}",
+									"raw": "{\n  \"email\": \"{{dentistEmailSample2}}\",\n  \"password\": \"pass123pass456\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"clinicCountry\": \"Country\",\n  \"clinicCity\": \"City\",\n  \"clinicStreet\": \"Street\",\n  \"clinicHouseNumber\": \"12\",\n  \"clinicZipCode\": \"197312\",\n  \"picture\": \"base64encodedimage\",\n  \"longitude\": 57.706178,\n  \"latitude\": 11.969585\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -7609,7 +7609,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"email\": \"dentist1@example.com\",\n  \"password\": \"secretpassword\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"clinicCountry\": \"Country\",\n  \"clinicCity\": \"City\",\n  \"clinicStreet\": \"Street\",\n  \"clinicHouseNumber\": 123,\n  \"clinicZipCode\": 12345,\n  \"picture\": \"base64encodedimage\",\n  \"longitude\": 57.706178,\n  \"latitude\": 11.969585\n}",
+									"raw": "{\n  \"email\": \"dentist1@example.com\",\n  \"password\": \"secretpassword\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"clinicCountry\": \"Country\",\n  \"clinicCity\": \"City\",\n  \"clinicStreet\": \"Street\",\n  \"clinicHouseNumber\": \"123\",\n  \"clinicZipCode\": \"12345\",\n  \"picture\": \"base64encodedimage\",\n  \"longitude\": 57.706178,\n  \"latitude\": 11.969585\n}",
 									"options": {
 										"raw": {
 											"language": "json"
