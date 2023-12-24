@@ -1,6 +1,6 @@
 <h2 align="center">AppointDent</h2>
 
-<img src="docs/imgs/logo.png" align="left" alt="AppointDent Logo" width="256"/>
+<img src="docs/imgs/logo.png" align="left" alt="AppointDent Logo" width="200"/>
 
 &#129463;&#129701; `AppointDent` is a **full-stack web application** that allows residents of Sweden
 manage their dentist appointments, as well as a tool for dentists to organize
