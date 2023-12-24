@@ -48,7 +48,7 @@ export async function validateAddress (dentist: DentistRegistration): Promise<nu
   return null
 }
 
-const geoCoder: string = 'https://nominatim.openstreetmap.org/search?q=**ADDRESS**'
+const geoCoder: string = 'https://nominatim.openstreetmap.org/search?format=jsonv2&q=**ADDRESS**'
 const API_THROTTLE: number = 1000
 const lastApiCallTimestamp: number = 0
 /**
