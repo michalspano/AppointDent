@@ -39,7 +39,7 @@ export function validateUserInfo (user: PatientRegistration | DentistRegistratio
 }
 
 export async function validateAddress (dentist: DentistRegistration): Promise<null | string> {
-  if (!isValidZip(dentist.clinicZipCode)) {
+  if (!isValidZip(dentist.clinicZipCode.toString())) {
     return 'Zip must be five digits and be greater than zero.'
   }
   if (Number(dentist.clinicHouseNumber) <= 0) {

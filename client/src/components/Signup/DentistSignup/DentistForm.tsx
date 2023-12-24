@@ -16,8 +16,8 @@ export default function DentistForm (): JSX.Element {
   const [clinicCity, setClinicCity] = createSignal('')
   const [clinicCountry, setClinicCountry] = createSignal('SE')
   const [clinicStreet, setClinicStreet] = createSignal('')
-  const [clinicHouseNumber, setClinicHouseNumber] = createSignal('')
-  const [clinicZipCode, setClinicZipcode] = createSignal('')
+  const [clinicHouseNumber, setClinicHouseNumber] = createSignal(0)
+  const [clinicZipCode, setClinicZipcode] = createSignal(0)
   const [picture, setPicture] = createSignal('')
   const [error, setError] = createSignal<string | null>(null)
   const [awaitingResponse, setAwaitingResponse] = createSignal(false)
@@ -64,6 +64,7 @@ export default function DentistForm (): JSX.Element {
     geoCodeAddress(dentistCombinedAddress)
       .then(async (result: Place) => {
         registrationData = { ...registrationData, longitude: parseFloat(result.lon), latitude: parseFloat(result.lat) }
+        console.log(registrationData)
         return await Api.post('/dentists/register', registrationData)
       })
       .then(async () => {
@@ -193,13 +194,13 @@ export default function DentistForm (): JSX.Element {
             class="input h-12 w-full px-3 py-2 mb-3  mr-2  border rounded-xl"
             type="text"
             placeholder="House number"
-            onChange={(event) => setClinicHouseNumber(event.target.value)}
+            onChange={(event) => setClinicHouseNumber(parseInt(event.target.value))}
           />
           <input
             class="input h-12 w-full px-3 py-2 mb-3  border rounded-xl"
             type="text"
             placeholder="Zipcode"
-            onChange={(event) => setClinicZipcode(event.target.value)}
+            onChange={(event) => setClinicZipcode(parseInt(event.target.value))}
           />
         </div>
         <label class="text-black block pl-2 text-xs font-extralight pb-1">
@@ -210,9 +211,10 @@ export default function DentistForm (): JSX.Element {
           type="file"
           accept=".jpeg, .jpg, .png"
           placeholder="Upload a profile image"
-          // eslint-disable-next-line @typescript-eslint/no-misused-promises
-          onChange={async () => {
-            setPicture(await handleUpload())
+          onChange={() => {
+            handleUpload().then((result: any) => {
+              setPicture(result)
+            }).catch(err => { console.error(err) })
           }}
         />
 

@@ -33,6 +33,8 @@ export async function getServiceResponse (reqId: string, RESPONSE_TOPIC: string)
  * @description an array of keys that are of type number.
  */
 const NUMBER_KEYS: readonly string[] = [
+  'clinicHouseNumber',
+  'clinicZipCode',
   'longitude',
   'latitude'
 ];
