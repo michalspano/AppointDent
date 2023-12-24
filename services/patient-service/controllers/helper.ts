@@ -29,18 +29,16 @@ export async function getServiceResponse (reqId: string, RESPONSE_TOPIC: string)
 }
 
 /**
+ * @description an array of keys that are of type number.
+ */
+const NUMBER_KEYS: readonly string[] = ['birthDate'];
+
+/**
  * @description number of key-value pairs that a patient has.
  * This can be checked dynamically, but this is more efficient,
  * because it is rarely changed.
  */
 const NUM_OF_FIELDS: Readonly<number> = 4;
-
-/**
- * @description an array of keys that are of type number.
- */
-const NUMBER_KEYS: readonly string[] = [
-  'birthDate'
-];
 
 /**
  * @description a helper function that dynamically checks if a given patient is
@@ -61,8 +59,9 @@ export const isValidPatient = (patient: Record<string, any>): boolean => {
     return typeof value === 'string';
   };
 
-  // Predicate to check if the dentist is valid.
+  // Predicate to check if the patient is valid.
   const isValid: boolean = Object.entries(patient)
     .every(([key, value]) => isValidType(key, value));
+
   return isValid;
 };
