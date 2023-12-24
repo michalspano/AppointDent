@@ -1,6 +1,10 @@
-<h1 align="center">AppointDent</h1>
+<h2 align="center">AppointDent</h2>
 
-<!-- TODO: Add system's icon/logo -->
+<img src="docs/imgs/logo.png" align="left" alt="AppointDent Logo" width="256"/>
+
+&#129463;&#129701; `AppointDent` is a **full-stack web application** that allows residents of Sweden
+manage their dentist appointments, as well as a tool for dentists to organize
+their work. 
 
 **Table of Contents**
 
@@ -72,11 +76,13 @@ TBD
 
 ## Development team
 
-| Name               | username |
-|--------------------|----------|
-| Agrima Singh       | @agrima  |
-| Mariia Zabolotnia  | @mariiaz |
-| Alexander Säfström | @alesaf  |
-| Michal Spano       | @spano   |
-| Kaisa Arumeel      | @arumeel |
-| Omid Khodaparast   | @omidk   |
+The project has been developed over the course of 10 weeks by the following:
+
+| Name               | username (Chalmers GitLab) |
+|--------------------|----------------------------|
+| Agrima Singh       | @agrima                    |
+| Mariia Zabolotnia  | @mariiaz                   |
+| Alexander Säfström | @alesaf                    |
+| Michal Spano       | @spano                     |
+| Kaisa Arumeel      | @arumeel                   |
+| Omid Khodaparast   | @omidk                     |
