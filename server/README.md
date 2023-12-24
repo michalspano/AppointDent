@@ -54,13 +54,13 @@ Kills the service running at the specified port
 Populates the database with 20 different patients and dentists. 
 
 **Login details**
-- dentist1@example.com --> dentist20@example.com
-- patient1@example.com --> patient20@example.com
+- dentist1@example.com $\to$ dentist20@example.com
+- patient1@example.com $\to$ patient20@example.com
 
 **Password**
-- secretpassword
+- `secretpassword`
 
-**Requires the broker, server and services to be running**
+*Note:* **requires the broker, server and services to be running**.
 
 ## Deployment
 
