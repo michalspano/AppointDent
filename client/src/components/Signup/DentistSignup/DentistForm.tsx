@@ -60,7 +60,7 @@ export default function DentistForm (): JSX.Element {
       setError(addressValidation)
       return
     }
-    const dentistCombinedAddress: string = clinicStreet() + ' ' + clinicHouseNumber() + ' ' + clinicZipCode() + ' ' + clinicCity() + ' ' + clinicCountry()
+    const dentistCombinedAddress: string = clinicStreet() + ', ' + clinicHouseNumber() + ', ' + clinicZipCode() + ', ' + clinicCity() + ', ' + clinicCountry()
     geoCodeAddress(dentistCombinedAddress)
       .then(async (result: Place) => {
         registrationData = { ...registrationData, longitude: parseFloat(result.lon), latitude: parseFloat(result.lat) }
@@ -70,8 +70,8 @@ export default function DentistForm (): JSX.Element {
         // enable automatic login when user registers
         await login()
       })
-      .catch((error: any) => {
-        const resError: string | AxiosError = error instanceof AxiosError ? error : 'Something went wrong, Please try again.'
+      .catch((error: Error) => {
+        const resError: string | AxiosError = error instanceof AxiosError ? error : error.message
         if (resError instanceof AxiosError) {
           if (resError.response !== undefined) {
             setAwaitingResponse(false)
