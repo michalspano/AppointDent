@@ -49,7 +49,9 @@ const NUM_OF_FIELDS: Readonly<number> = 4;
  * @returns a boolean flag
  */
 export const isValidPatient = (patient: Record<string, any>): boolean => {
-  if (NUM_OF_FIELDS !== Object.keys(patient).length) return false;
+  if (NUM_OF_FIELDS !== Object.keys(patient).length) {
+    return false;
+  }
 
   // Predicate to check if the type of a given key is valid.
   const isValidType = (key: string, value: any): boolean => {
