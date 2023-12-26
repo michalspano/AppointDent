@@ -5,6 +5,7 @@
  * @version     :: 1.0
  */
 
+import QUERY from '../utils/query';
 import database from '../db/config';
 import { client } from '../mqtt/mqtt';
 import * as utils from '../utils';
@@ -18,6 +19,8 @@ import {
   type Subscription,
   type UnixTimestampRange
 } from '../types/types';
+
+const { GET } = QUERY;
 
 /**
  * @description A controller function to get all unbooked appointments.
@@ -116,17 +119,12 @@ const getAllAppointments = async (req: Request, res: Response): AsyncResObj => {
   // Session has been validated, proceed with the request.
   let result: Appointment[];
   try {
-    const rawQuery: string = `
-      SELECT * FROM appointments WHERE patientId IS NULL
-      ${hasRange ? ' AND start_timestamp >= ? AND end_timestamp <= ?' : ''}
-    `;
-
     // In case the range is provided, then the query must be prepared with the range.
     // Type `any` is used because the array does not mutate.
     const options: Array<number | undefined> = !hasRange
       ? []
       : [interval.from, interval.to];
-    result = database.prepare(rawQuery).all(options) as Appointment[];
+    result = GET.UNASSIGNED_APPOINTMENTS(hasRange).all(...options) as Appointment[];
   } catch (err: Error | unknown) {
     return res.status(500).json({
       message: 'Internal server error: fail performing selection.'
@@ -207,9 +205,8 @@ const getAppointmentsByPatientId = async (req: Request, res: Response): AsyncRes
   // Verification successful, proceed with the request.
   let result: Appointment[];
   try {
-    result = database.prepare(`
-      SELECT * FROM appointments WHERE patientId = ?
-    `).all(email) as Appointment[];
+    result = GET.APPOINTMENTS_BY_PATIENT
+      .all(email) as Appointment[];
   } catch (err: Error | unknown) {
     return res.status(500).json({
       message: 'Internal server error: fail performing selection.'
@@ -353,21 +350,17 @@ const getAppointmentsByDentistId = async (req: Request, res: Response): AsyncRes
      * The query is different based on the following:
      * (i) whether to filter booked appointments or not,
      * (ii) whether to filter by a date range or not.
+     *
      * These two flags can be combined and both have default values
      * (i.e., can be omitted).
+     * In case the range is provided, then the query must be prepared with the range.
      */
-    const rawQuery: string = `
-      SELECT * FROM appointments WHERE dentistId = ?
-      ${getOnlyAvailable ? ' AND patientId IS NULL' : ''}
-      ${hasRange ? ' AND start_timestamp >= ? AND end_timestamp <= ?' : ''}
-    `;
-
-    // In case the range is provided, then the query must be prepared with the range.
-    // Type `any` is used because the array does not mutate.
-    const options: any[] = !hasRange
+    const options: [string, number?, number?] = !hasRange
       ? [dentistId]
       : [dentistId, interval.from, interval.to];
-    result = database.prepare(rawQuery).all(options) as Appointment[];
+    result = GET.APPOINTMENTS_BY_DENTIST(
+      getOnlyAvailable, hasRange
+    ).all(...options) as Appointment[];
   } catch (err: Error | unknown) {
     return res.status(500).json({
       message: 'Internal server error: fail performing selection.'
@@ -440,9 +433,7 @@ const getAppointment = async (req: Request, res: Response): AsyncResObj => {
   const id: string = req.params.id;
   let appointment: unknown;
   try {
-    appointment = database
-      .prepare('SELECT * FROM appointments WHERE id = ?')
-      .get(id);
+    appointment = GET.APPOINTMENT_BY_ID.get(id);
   } catch (err: Error | unknown) {
     return res.status(500).json({
       message: 'Internal server error: query failed.'
@@ -525,11 +516,9 @@ const getAppointmentCount = async (req: Request, res: Response): AsyncResObj => 
   // Verification successful, proceed with the request.
   let count: number;
   try {
-    const rawCount: Record<string, number> = database.prepare(`
-      SELECT COUNT(*) FROM appointments
-      ${getOnlyAvailable ? 'WHERE patientId IS NULL' : ''}
-    `).get() as Record<string, number>;
-    count = Object.values(rawCount)[0]; // extract the first value (the count)
+    const rawResult = GET.COUNT_APPOINTMENTS(getOnlyAvailable)
+      .get() as { count: number };
+    count = rawResult.count;
   } catch (err: Error | unknown) {
     return res.status(500).json({
       message: 'Internal server error: fail performing selection.'
@@ -617,9 +606,7 @@ const getSubscription = async (req: Request, res: Response): AsyncResObj => {
   // Verification step successful, verify the state of the subscription.
   let subscriptions: Subscription[];
   try {
-    subscriptions = database.prepare(`
-      SELECT * FROM subscriptions WHERE dentistEmail = ? AND patientEmail = ?
-    `).all(dentistEmail, patientEmail) as Subscription[];
+    subscriptions = GET.SUBSCRIPTION.all(dentistEmail, patientEmail) as Subscription[];
   } catch (err: Error | unknown) {
     return res.status(500).json({
       message: 'Internal server error: fail performing selection.'
