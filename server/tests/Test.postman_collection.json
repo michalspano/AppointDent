@@ -1,9 +1,10 @@
 {
 	"info": {
-		"_postman_id": "bfccffe3-8ea6-4786-af1d-ea35a9bbf28f",
-		"name": "Test-24dec",
+		"_postman_id": "658dee91-781a-47bb-8766-538e5575e503",
+		"name": "Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "28264405"
+		"_exporter_id": "31133349",
+		"_collection_link": "https://appointdent.postman.co/workspace/AppointDent~3d7b8d88-ecc1-4d83-a513-eb9122453c58/collection/31133267-658dee91-781a-47bb-8766-538e5575e503?action=share&source=collection_link&creator=31133349"
 	},
 	"item": [
 		{
@@ -112,7 +113,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"dentist@example.com\", // this email was already registered\n  \"password\": \"secretpassword\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"clinicCountry\": \"Country\",\n  \"clinicCity\": \"City\",\n  \"clinicStreet\": \"Street\",\n  \"clinicHouseNumber\": \"123\",\n  \"clinicZipCode\": \"12345\",\n  \"picture\": \"base64encodedimage\",\n  \"longitude\": 57.706178,\n  \"latitude\": 11.969585\n}",
+							"raw": "{\n  \"email\": \"dentist@example.com\", // this email was already registered\n  \"password\": \"secretpassword\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"clinicCountry\": \"Country\",\n  \"clinicCity\": \"City\",\n  \"clinicStreet\": \"Street\",\n  \"clinicHouseNumber\": 123,\n  \"clinicZipCode\": 12345,\n  \"picture\": \"base64encodedimage\",\n  \"longitude\": 57.706178,\n  \"latitude\": 11.969585\n}",
 							"options": {
 								"raw": {
 									"language": "json"
