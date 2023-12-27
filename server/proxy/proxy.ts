@@ -73,7 +73,7 @@ export function routeProxy (req: Request, res: Response, next: NextFunction): vo
   let clientHash: string = '';
   if (!req.originalUrl.includes('admins')) {
     if (clientCookie !== undefined) {
-      crypto.pbkdf2(clientCookie, 'salt', 10, 64, 'sha256', (err, derivedKey) => {
+      crypto.pbkdf2(clientCookie, 'salt', 10, 32, 'sha256', (err, derivedKey) => {
         if (err != null) { throw new Error(err.message); }
         clientHash = derivedKey.toString('hex');
         void forwardAnalyticsRequest(url, method, clientHash);
