@@ -12,8 +12,6 @@ void mqttClient.setup(SERVICES_PATH);
 
 config();
 
-// app.use('/', patientRoute);
-
 app.use(cookieParser());
 app.use('/', patientRoute);
 
@@ -22,8 +20,5 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.listen(port, () => {
-  console.log('AppointDent - Patients Service');
-  console.log(`Server is running at http://localhost:${port}`);
-  console.log(`Using database: ${database?.name}`);
-  console.log(`Database connection: ${((database?.open) ?? false) ? 'OK' : 'ERROR'}`);
+  console.log(((database?.open) ?? false) ? 'OK' : 'ERROR');
 });
