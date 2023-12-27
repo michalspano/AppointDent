@@ -18,7 +18,8 @@ export default function AppointmentsList (): JSX.Element {
   const navigate = useNavigate()
   const FETCH_INTERVAL: Readonly<number> = 5000
   const [queryParams] = useSearchParams()
-
+  // Used to prevent overlaying requests to BE
+  let blocked: boolean = false
   /**
    * Continuous monitor for the user's authentication status.
    */
@@ -57,7 +58,11 @@ export default function AppointmentsList (): JSX.Element {
       setPatientEmail(email)
       void handleSubStatus()
       void fetchAppointments()
-      setInterval(() => { void fetchAppointments() }, FETCH_INTERVAL)
+      setInterval(() => {
+        if (blocked) return
+        blocked = true
+        void fetchAppointments()
+      }, FETCH_INTERVAL)
     }).catch((error: Error) => {
       console.error(error.message)
     })
@@ -114,7 +119,9 @@ export default function AppointmentsList (): JSX.Element {
       // Sort the grouped appointments by day
       groupedAppointmentsArray.sort((a, b) => (a.day > b.day ? 1 : -1))
       setAvailableDays(groupedAppointmentsArray)
+      blocked = false
     } catch (error) {
+      blocked = false
       throw new Error('Error fetching appointments')
     }
   }

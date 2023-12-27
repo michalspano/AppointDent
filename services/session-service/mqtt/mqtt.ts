@@ -13,7 +13,7 @@ export const mqttClient = {
     const broker: string = process.env.BROKER ?? 'mqtt://localhost:1883';
     client = mqtt.connect(broker);
     // Listening for the "connect" event
-    client.on('connect', () => {
+    client.once('connect', () => {
       if (client != null) {
         void listenForAuthorise(client);
         void listenForInsertion(client);
@@ -22,8 +22,8 @@ export const mqttClient = {
         void listenForSessionCreation(client);
         // Send heartbeat with interval of 1 second
         void heartbeat(client, serviceName, 1000);
+        client.setMaxListeners(5000);
       }
     });
-    client.setMaxListeners(5000);
   }
 };

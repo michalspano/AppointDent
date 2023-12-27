@@ -7,10 +7,11 @@ export const mqttClient = {
   setup: async (serviceName: string): Promise<void> => {
     const broker: string = process.env.BROKER ?? 'mqtt://localhost:1883';
     client = mqtt.connect(broker);
-    client.on('connect', () => {
+    client.once('connect', () => {
       if (client != null) {
         void heartbeat(client, serviceName, 1000);
         void listenForAppointments(client);
+        client.setMaxListeners(5000);
       }
     });
   }

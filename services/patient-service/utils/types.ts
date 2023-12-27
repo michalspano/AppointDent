@@ -3,7 +3,7 @@
  */
 export interface Patient {
   email: string
-  birthDate: string
+  birthDate: number
   lastName: string
   firstName: string
 }

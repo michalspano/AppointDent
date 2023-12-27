@@ -1,7 +1,7 @@
 import { type JSX } from 'solid-js/jsx-runtime'
 import logo from '../../../assets/logo.png'
 import { A } from '@solidjs/router'
-import { createSignal } from 'solid-js'
+import { Show, createSignal } from 'solid-js'
 import { Api } from '../../../utils/api'
 import { validateUserInfo } from '../utils'
 import { AxiosError } from 'axios'
@@ -19,8 +19,10 @@ export default function PatientForm (): JSX.Element {
   const [firstName, setFirstName] = createSignal('')
   const [lastName, setLastName] = createSignal('')
   const [error, setError] = createSignal<string | null>(null)
+  const [awaitingResponse, setAwaitingResponse] = createSignal(false)
 
   const signup = async (): Promise<void> => {
+    setAwaitingResponse(true)
     const requiredFields: PatientRegistration = {
       email: email(),
       password: password(),
@@ -31,11 +33,13 @@ export default function PatientForm (): JSX.Element {
 
     if (Object.values(requiredFields).some((field) => field === '')) {
       setError('Please fill in all fields.')
+      setAwaitingResponse(false)
       return
     }
 
     if (validateUserInfo(requiredFields) !== null) {
       setError(validateUserInfo(requiredFields) as string)
+      setAwaitingResponse(false)
       return
     }
 
@@ -48,9 +52,11 @@ export default function PatientForm (): JSX.Element {
         if (resError instanceof AxiosError) {
           if (resError.response !== undefined) {
             setError(resError.response.data as string)
+            setAwaitingResponse(false)
           }
         } else {
           setError(resError)
+          setAwaitingResponse(false)
         }
         console.error('Error during sign up', error)
       })
@@ -60,24 +66,25 @@ export default function PatientForm (): JSX.Element {
     try {
       await Api.post('/patients/login', { email: email(), password: password() }, { withCredentials: true })
         .then(() => {
-        // navigate to logged in view
+          // navigate to logged in view
           window.location.replace('/map')
         })
     } catch (error) {
+      setAwaitingResponse(false)
       setError('Something went wrong, try again.')
       console.error('Error during login:', error)
     }
   }
 
   return <>
-  <div class="h-full w-full bg-white flex flex-col items-center justify-center">
-  <div class="lg:w-3/4  w-5/6 flex flex-col text-black rounded-sm bg-gradient-to-b from-neutral ... lg:px-10 px-5 py-3 text-sm font-medium">
-            <div class="flex items-center justify-center">
-                <img class="w-40 " src={logo} alt="AppointDent" />
-            </div>
-            <h1 class="mb-2 mt-4 text-lg">Create a patient account</h1>
-            <p class="mb-6 font-extralight">Welcome to AppointDent! Sign up as a patient. </p>
-          <input
+    <div class="h-full w-full bg-white flex flex-col items-center justify-center">
+      <div class="lg:w-3/4  w-5/6 flex flex-col text-black rounded-sm bg-gradient-to-b from-neutral ... lg:px-10 px-5 py-3 text-sm font-medium">
+        <div class="flex items-center justify-center">
+          <img class="w-40 " src={logo} alt="AppointDent" />
+        </div>
+        <h1 class="mb-2 mt-4 text-lg">Create a patient account</h1>
+        <p class="mb-6 font-extralight">Welcome to AppointDent! Sign up as a patient. </p>
+        <input
           class="input h-12 px-3 py-2 mb-3 border rounded-xl"
           type="text"
           placeholder="Email"
@@ -89,43 +96,49 @@ export default function PatientForm (): JSX.Element {
           placeholder="Password"
           onChange={(event) => setPassword(event.target.value)}
         />
-          <div class="flex flex-row">
-            <input
-              class="input h-12 w-full px-3 py-2 mb-3 md:mb-0 mr-2 border rounded-xl"
-              type="text"
-              placeholder="First name"
-              onChange={(event) => setFirstName(event.target.value)}
-            />
-            <input
-              class="input h-12 w-full px-3 py-2 mb-3 border rounded-xl"
-              type="text"
-              placeholder="Last name"
-              onChange={(event) => setLastName(event.target.value)}
-            />
-          </div>
+        <div class="flex flex-row">
           <input
-              class="input h-12 w-full px-3 py-2 mb-6 border rounded-xl"
-              type="date"
-              max={yesterday}
-              placeholder="Date of birth"
-              onChange={(event) => setDateOfBirth(event.target.value)}
-            />
+            class="input h-12 w-full px-3 py-2 mb-3 md:mb-0 mr-2 border rounded-xl"
+            type="text"
+            placeholder="First name"
+            onChange={(event) => setFirstName(event.target.value)}
+          />
+          <input
+            class="input h-12 w-full px-3 py-2 mb-3 border rounded-xl"
+            type="text"
+            placeholder="Last name"
+            onChange={(event) => setLastName(event.target.value)}
+          />
+        </div>
+        <input
+          class="input h-12 w-full px-3 py-2 mb-6 border rounded-xl"
+          type="date"
+          max={yesterday}
+          placeholder="Date of birth"
+          onChange={(event) => setDateOfBirth(event.target.value)}
+        />
         {error() !== null && <p class="text-error">{error()}</p>}
         <button type="submit" class="log-in-btn h-12 mb-6 bg-secondary rounded-xl text-base"
-        onclick={() => {
-          signup()
-            .catch((error) => {
-              console.error('Error creating account:', error)
-            })
-        }}>
-            Create account
-            </button>
+          onclick={() => {
+            signup()
+              .catch((error) => {
+                setAwaitingResponse(false)
+                console.error('Error creating account:', error)
+              })
+          }}>
+          <Show when={awaitingResponse()} fallback={'Create account'}>
+            <div class="flex gap-2 justify-center items-center ">
+              <div class="border-2 border-t-primary border-b-white border-l-white border-r-white rounded-lg w-4 h-4 animate-spin"></div>
+              <span>Loading</span>
+            </div>
+          </Show>
+        </button>
         <p class="font-extralight">Already have an account?
-        <span class="font-medium">
-        <A class='text-black' href="/"> Log in.</A>
-            </span>
-          </p>
-        </div>
+          <span class="font-medium">
+            <A class='text-black' href="/"> Log in.</A>
+          </span>
+        </p>
       </div>
-    </>
+    </div>
+  </>
 }

@@ -1,10 +1,9 @@
 {
 	"info": {
-		"_postman_id": "658dee91-781a-47bb-8766-538e5575e503",
+		"_postman_id": "42b518f8-dd5e-433f-9626-32cc89bc26a2",
 		"name": "Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "31133267",
-		"_collection_link": "https://appointdent.postman.co/workspace/AppointDent~3d7b8d88-ecc1-4d83-a513-eb9122453c58/collection/31133267-658dee91-781a-47bb-8766-538e5575e503?action=share&source=collection_link&creator=31133267"
+		"_exporter_id": "31133349"
 	},
 	"item": [
 		{
@@ -1555,7 +1554,7 @@
 												],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"email\": \"{{patientEmailSample}}\",\n    \"password\": \"complicatedpassword\",\n    \"birthDate\": \"2003\",\n    \"lastName\": \"Sample\",\n    \"firstName\": \"Patient\"\n}",
+													"raw": "{\n    \"email\": \"{{patientEmailSample}}\",\n    \"password\": \"complicatedpassword\",\n    \"birthDate\": 2003,\n    \"lastName\": \"Sample\",\n    \"firstName\": \"Patient\"\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -7047,7 +7046,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"sophia2043.appleseed@email.com\",\n    \"password\": \"complicatedpassword\",\n    \"birthDate\": \"2023\",\n    \"lastName\": \"Appleseeed\",\n    \"firstName\": \"Sophia\"\n}",
+							"raw": "{\n    \"email\": \"sophia2043.appleseed@email.com\",\n    \"password\": \"complicatedpassword\",\n    \"birthDate\": 2023,\n    \"lastName\": \"Appleseeed\",\n    \"firstName\": \"Sophia\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -7389,7 +7388,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"sophia2043.appleseed@email.com\",\n    \"password\": \"complicatedpassword\",\n    \"birthDate\": \"2023\",\n    \"lastName\": \"Appleseeed\",\n    \"firstName\": \"Sophia\"\n}",
+							"raw": "{\n    \"email\": \"sophia2043.appleseed@email.com\",\n    \"password\": \"complicatedpassword\",\n    \"birthDate\": 2023,\n    \"lastName\": \"Appleseeed\",\n    \"firstName\": \"Sophia\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -7897,7 +7896,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"email\": \"patient1@example.com\",\n    \"password\": \"complicatedpassword\",\n    \"birthDate\": \"2003\",\n    \"lastName\": \"Sample\",\n    \"firstName\": \"Patient\"\n}",
+									"raw": "{\n    \"email\": \"patient1@example.com\",\n    \"password\": \"complicatedpassword\",\n    \"birthDate\": 2003,\n    \"lastName\": \"Sample\",\n    \"firstName\": \"Patient\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
