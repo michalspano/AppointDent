@@ -22,7 +22,7 @@ async function spawnService (serviceName: string, servicesPath: string, retryOnB
         cwd: servicePath
       });
 
-    buildProcess.on('close', (code: number | null) => {
+    buildProcess.once('close', (code: number | null) => {
       if (code === 0) {
         // Remove PORT from the child process environment
         const childEnv: NodeJS.ProcessEnv = process.env;
@@ -34,20 +34,29 @@ async function spawnService (serviceName: string, servicesPath: string, retryOnB
             env: childEnv
           });
 
-        child.stdout?.on('data', (data) => {
-          console.log(`${serviceName}: ${data}`);
-          resolve(child);
-        });
+        const okListener = (data: Buffer): void => {
+          if (data.toString().includes('OK')) {
+            child.stdout?.removeListener('data', okListener); // Correctly remove the listener
+            resolve(child);
+            return;
+          }
+          console.info(data.toString());
+        };
 
-        child.stderr?.on('data', (data) => {
+        child.stdout?.on('data', okListener);
+
+        child.stderr?.once('data', (data) => {
           console.error(`${serviceName}: ${data}`);
         });
+
         // Comment during implementation of #91.
-        // child.on('close', (code: number | null) => {
-        //   if (code !== 0) {
-        //     throw new Error(`${serviceName}: Exited with non-zero code`);
-        //   }
-        // });
+        /*
+        child.on('close', (code: number | null) => {
+           if (code !== 0) {
+             throw new Error(`${serviceName}: Exited with non-zero code`);
+           }
+         });
+         */
       } else if (retryOnBuildFault) {
         /**
          * In the event of an initial fault, we attempt to recover the system using a fault recovery
@@ -63,7 +72,7 @@ async function spawnService (serviceName: string, servicesPath: string, retryOnB
           `${PLATFORM === 'win32' ? 'npm.cmd' : 'npm'}`, ['ci'], {
             cwd: servicePath
           });
-        purgeChild.on('close', (code: number | null) => {
+        purgeChild.once('close', (code: number | null) => {
           if (code === 0) {
             resolve(spawnService(serviceName, servicesPath, false));
           } else {
@@ -96,21 +105,20 @@ async function spawnServices (servicesPath: string, services: string[]): Promise
           process: result.value
         });
       });
-
-      // Comment during implementation of #91.
-      // When a child process fails, this method kills the server;
-      // however, in #91, the system should be able to notify the client if a service is unavailable without crashing the system.
-
-      // ['SIGINT', 'SIGTERM', 'SIGQUIT', 'exit'].forEach((event: string) => {
-      //   process.on(event, () => {
-      //     while (children.length > 0) {
-      //       const child = children.pop();
-      //       child?.process.kill();
-      //       console.log('Killed ' + child?.name + ' with code SIGTERM');
-      //     }
-      //     process.exit(0);
-      //   });
-      // });
+      /*
+       Comment during implementation of #91.
+       When a child process fails, this method kills the server;
+       however, in #91, the system should be able to notify the client if a service is unavailable without crashing the system.
+      ['SIGINT', 'SIGTERM', 'SIGQUIT', 'exit'].forEach((event: string) => {
+        process.on(event, () => {
+          while (children.length > 0) {
+            const child = children.pop();
+            child?.process.kill();
+            console.log('Killed ' + child?.name + ' with code SIGTERM');
+          }
+          process.exit(0);
+        });
+      }); */
       resolve();
     }).catch((err) => {
       reject(Error(`Fatal error occurred while spawning services: ${err}`));

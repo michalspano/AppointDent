@@ -9,3 +9,8 @@ export interface Notification {
   message: string
   email: string
 }
+export interface InsertedNotification {
+  timestamp: number
+  message: string
+  email: string
+}

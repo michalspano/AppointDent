@@ -1,8 +1,6 @@
 import { validateRequestFormat } from '../helper/validator';
 import type { QueryResult, Notification } from '../types/types';
-import * as crypto from 'crypto';
 import database from '../db/config';
-import { type Statement } from 'better-sqlite3';
 import { type MqttClient } from 'mqtt/*';
 
 // 'not' in variable names is short term for 'notification'
@@ -43,38 +41,17 @@ async function parseRawRequest (rawMsg: string): Promise<Notification | Error> {
  * if any error in the execution of the method happens.
  */
 async function postNot (rawMsg: string): Promise<Notification | Error> {
-  let id: string;
-  let notification: Notification;
-  let uniqueId: boolean = false;
-  let idQueryRes: unknown;
-
   return await new Promise((resolve, reject) => {
     parseRawRequest(rawMsg).then(result => {
-      id = crypto.randomUUID();
-
-      while (!uniqueId) {
-        const idQuery: Statement<any> | Statement<[any]> | undefined = database?.prepare('SELECT * FROM notifications WHERE id = ?');
-        if (idQuery === undefined) {
-          reject(new Error('Selection query not found.'));
-        } else {
-          idQueryRes = idQuery.get(id);
-        }
-        if (idQueryRes === undefined) {
-          uniqueId = true;
-        } else {
-          id = crypto.randomUUID();
-        }
-      }
-
-      notification = result as Notification;
-      notification.id = id;
+      const notification: Notification = result as Notification;
+      notification.id = '';
       notification.timestamp = Math.floor(Date.now() / 1000);
-      const notInsertion = database?.prepare('INSERT INTO notifications (id, timestamp, message, email) VALUES (?, ?, ?, ?)');
+      const notInsertion = database?.prepare('INSERT INTO notifications (timestamp, message, email) VALUES ( ?, ?, ?)');
       if (notInsertion === undefined) {
         reject(new Error('Insertion query not found.'));
       }
-      const insertionRes: QueryResult = notInsertion?.run(notification.id,
-        notification.timestamp, notification.message, notification.email) as QueryResult;
+      const insertionRes: QueryResult = notInsertion?.run(notification.timestamp,
+        notification.message, notification.email) as QueryResult;
       if (insertionRes.changes === 0) {
         reject(new Error('No changes made.'));
       }

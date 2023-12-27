@@ -20,8 +20,8 @@ function registerDentist (): User {
     clinicCountry: 'Sweden',
     clinicCity: 'Göteborg',
     clinicStreet: 'Street',
-    clinicHouseNumber: '1',
-    clinicZipCode: '12345',
+    clinicHouseNumber: 1,
+    clinicZipCode: 12345,
     picture: 'base64encodedimage',
     password: 'Password123!',
     longitude: 57.706178,
@@ -109,7 +109,7 @@ function registerPatient (): User {
     firstName: 'Patient',
     lastName: 'Doe',
     password: 'Password123!',
-    birthDate: '2000'
+    birthDate: 2000
 
   };
 
