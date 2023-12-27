@@ -117,7 +117,7 @@ const getAllAppointments = async (req: Request, res: Response): AsyncResObj => {
   let result: Appointment[];
   try {
     const rawQuery: string = `
-      SELECT * FROM appointments WHERE patientId IS NULL
+      SELECT ROWID as id,* FROM appointments WHERE patientId IS NULL
       ${hasRange ? ' AND start_timestamp >= ? AND end_timestamp <= ?' : ''}
     `;
 
@@ -208,7 +208,7 @@ const getAppointmentsByPatientId = async (req: Request, res: Response): AsyncRes
   let result: Appointment[];
   try {
     result = database.prepare(`
-      SELECT * FROM appointments WHERE patientId = ?
+      SELECT ROWID as id,* FROM appointments WHERE patientId = ?
     `).all(email) as Appointment[];
   } catch (err: Error | unknown) {
     return res.status(500).json({
@@ -357,7 +357,7 @@ const getAppointmentsByDentistId = async (req: Request, res: Response): AsyncRes
      * (i.e., can be omitted).
      */
     const rawQuery: string = `
-      SELECT * FROM appointments WHERE dentistId = ?
+      SELECT ROWID as id,* FROM appointments WHERE dentistId = ?
       ${getOnlyAvailable ? ' AND patientId IS NULL' : ''}
       ${hasRange ? ' AND start_timestamp >= ? AND end_timestamp <= ?' : ''}
     `;
@@ -441,7 +441,7 @@ const getAppointment = async (req: Request, res: Response): AsyncResObj => {
   let appointment: unknown;
   try {
     appointment = database
-      .prepare('SELECT * FROM appointments WHERE id = ?')
+      .prepare('SELECT ROWID as id,* FROM appointments WHERE ROWID = ?')
       .get(id);
   } catch (err: Error | unknown) {
     return res.status(500).json({
@@ -454,7 +454,7 @@ const getAppointment = async (req: Request, res: Response): AsyncResObj => {
     return res.status(404).json({ message: 'Not found.' });
   }
 
-  return res.status(200).json(appointment);
+  return res.status(200).json({ id: (appointment as Appointment).id.toString(), ...appointment });
 };
 
 /**

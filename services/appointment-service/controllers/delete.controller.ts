@@ -79,7 +79,7 @@ export const deleteAppointment = async (req: Request, res: Response): AsyncResOb
   let objToDelete: Appointment | undefined;
   try {
     objToDelete = database
-      .prepare('SELECT * FROM appointments WHERE id = ?')
+      .prepare('SELECT ROWID as id,* FROM appointments WHERE ROWID = ?')
       .get(id) as Appointment;
   } catch (err: Error | unknown) {
     return res.status(500).json({
@@ -99,7 +99,7 @@ export const deleteAppointment = async (req: Request, res: Response): AsyncResOb
   }
 
   // All steps have been completed, proceed with deleting the appointment...
-  const stmt: Statement = database.prepare('DELETE FROM appointments WHERE id = ?');
+  const stmt: Statement = database.prepare('DELETE FROM appointments WHERE ROWID = ?');
   try {
     stmt.run(id);
   } catch (err: Error | unknown) {
