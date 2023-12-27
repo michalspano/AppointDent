@@ -1,10 +1,9 @@
 {
 	"info": {
-		"_postman_id": "1b332611-feb5-4995-be55-f22dbfc003a0",
+		"_postman_id": "57e086a8-4747-468f-bfbc-f04a3e6f3bdc",
 		"name": "DBPopulation",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "31133349",
-		"_collection_link": "https://appointdent.postman.co/workspace/AppointDent~3d7b8d88-ecc1-4d83-a513-eb9122453c58/collection/31133267-1b332611-feb5-4995-be55-f22dbfc003a0?action=share&source=collection_link&creator=31133349"
+		"_exporter_id": "31133349"
 	},
 	"item": [
 		{
@@ -182,7 +181,11 @@
 							"}",
 							"",
 							"let dentistEmail = \"dentist\" + (dentCount + 1) + \"@example.com\";",
+							"let dentFName = \"fName\" + (dentCount + 1);",
+							"let dentLName = \"lName\" + (dentCount + 1);",
 							"pm.collectionVariables.set(\"dentEmail\", dentistEmail);",
+							"pm.collectionVariables.set(\"dentFName\", dentFName);",
+							"pm.collectionVariables.set(\"dentLName\", dentLName);",
 							""
 						],
 						"type": "text/javascript"
@@ -200,7 +203,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"email\": \"{{dentEmail}}\",\n  \"password\": \"secretpassword\",\n  \"firstName\": \"{{$randomFirstName}}\",\n  \"lastName\": \"{{$randomLastName}}\",\n  \"clinicCountry\": \"SE\",\n  \"clinicCity\": \"Göteborg\",\n  \"clinicStreet\": \"{{street}}\",\n  \"clinicHouseNumber\": {{houseNumber}},\n  \"clinicZipCode\": {{zip}},\n  \"picture\": \"{{$randomImageDataUri}}\",\n  \"longitude\":{{longitude}},\n  \"latitude\":{{latitude}}\n}"
+					"raw": "{\n  \"email\": \"{{dentEmail}}\",\n  \"password\": \"secretpassword\",\n  \"firstName\": \"{{dentFName}}\",\n  \"lastName\": \"{{dentLName}}\",\n  \"clinicCountry\": \"SE\",\n  \"clinicCity\": \"Göteborg\",\n  \"clinicStreet\": \"{{street}}\",\n  \"clinicHouseNumber\": {{houseNumber}},\n  \"clinicZipCode\": {{zip}},\n  \"picture\": \"{{$randomImageDataUri}}\",\n  \"longitude\":{{longitude}},\n  \"latitude\":{{latitude}}\n}"
 				},
 				"url": {
 					"raw": "{{host}}/api/v1/dentists/register",
@@ -449,6 +452,16 @@
 		},
 		{
 			"key": "patientBDate",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "dentFName",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "dentLName",
 			"value": "",
 			"type": "string"
 		},
