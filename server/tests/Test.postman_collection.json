@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "bfccffe3-8ea6-4786-af1d-ea35a9bbf28f",
-		"name": "Test-24dec",
+		"_postman_id": "42b518f8-dd5e-433f-9626-32cc89bc26a2",
+		"name": "Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "28264405"
+		"_exporter_id": "31133349"
 	},
 	"item": [
 		{
@@ -112,7 +112,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"dentist@example.com\", // this email was already registered\n  \"password\": \"secretpassword\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"clinicCountry\": \"Country\",\n  \"clinicCity\": \"City\",\n  \"clinicStreet\": \"Street\",\n  \"clinicHouseNumber\": \"123\",\n  \"clinicZipCode\": \"12345\",\n  \"picture\": \"base64encodedimage\",\n  \"longitude\": 57.706178,\n  \"latitude\": 11.969585\n}",
+							"raw": "{\n  \"email\": \"dentist@example.com\", // this email was already registered\n  \"password\": \"secretpassword\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"clinicCountry\": \"Country\",\n  \"clinicCity\": \"City\",\n  \"clinicStreet\": \"Street\",\n  \"clinicHouseNumber\": 123,\n  \"clinicZipCode\": 12345,\n  \"picture\": \"base64encodedimage\",\n  \"longitude\": 57.706178,\n  \"latitude\": 11.969585\n}",
 							"options": {
 								"raw": {
 									"language": "json"

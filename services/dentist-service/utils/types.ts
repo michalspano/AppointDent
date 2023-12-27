@@ -8,8 +8,8 @@ export interface Dentist {
   clinicCountry: string
   clinicCity: string
   clinicStreet: string
-  clinicHouseNumber: string
-  clinicZipCode: string
+  clinicHouseNumber: number
+  clinicZipCode: number
   picture: string
   longitude: number
   latitude: number
