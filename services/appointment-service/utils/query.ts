@@ -71,19 +71,94 @@ const COUNT_APPOINTMENTS = (onlyAvailable: boolean): Readonly<Statement<[]>> =>
 /**
  * @description select all subscriptions for a given patient of a particular dentist.
  */
-const SUBSCRIPTION: Readonly<Statement<[string, string]>> = database?.prepare(`
+const SUBSCRIPTIONS: Readonly<Statement<[string, string]>> = database?.prepare(`
   SELECT *
   FROM subscriptions
   WHERE dentistEmail = ? AND patientEmail = ?
 `) as Statement;
 
+/**
+ * @description insert a new subscription into the database.
+ */
+const SUBSCRIPTION: Readonly<Statement<[string, string]>> = database?.prepare(`
+  INSERT INTO subscriptions
+  VALUES (?, ?)
+`) as Statement;
+
+/**
+ * @description select all patients that are subscribed to a particular dentist.
+ */
+const SUBSCRIPTIONS_BY_DENTIST: Readonly<Statement<[string]>> = database?.prepare(`
+  SELECT patientEmail
+  FROM subscriptions
+  WHERE dentistEmail = ?
+`) as Statement;
+
+/**
+ * @see SUBSCRIPTIONS_BY_DENTIST
+ * Only the patient itself is not selected.
+ */
+const _SUBSCRIPTIONS_BY_DENTIST: Readonly<Statement<[string, string]>> = database?.prepare(`
+  SELECT patientEmail
+  FROM subscriptions
+  WHERE dentistEmail = ? AND patientEmail != ?
+`) as Statement;
+
+/**
+ * @description insert a new appointment into the database.
+ */
+const APPOINTMENT: Readonly<Statement<[string, number, number, string, (string | null)]>> = database?.prepare(`
+  INSERT INTO appointments
+  (id, start_timestamp, end_timestamp, dentistId, patientId)
+  VALUES (?, ?, ?, ?, ?)
+`) as Statement;
+
+/**
+ * @description remove a particular subscription from the database, based on the
+ * dentist and patient emails.
+ */
+const SUBSCRIPTION_BY_IDS: Readonly<Statement<[string, string]>> = database?.prepare(`
+  DELETE FROM subscriptions
+  WHERE dentistEmail = ? AND patientEmail = ?
+`) as Statement;
+
+/**
+ * @description remove a particular appointment from the database, based on its ID.
+ */
+const _APPOINTMENT_BY_ID: Readonly<Statement<[string]>> = database?.prepare(`
+  DELETE FROM appointments
+  WHERE id = ?
+`) as Statement;
+
+/**
+ * @description update the booking status of a particular appointment.
+ */
+const BOOK_STATUS: Readonly<Statement<[string | null, string]>> = database?.prepare(`
+  UPDATE appointments
+  SET patientId = ?
+  WHERE id = ?
+`) as Statement;
+
 export default {
   GET: {
     COUNT_APPOINTMENTS,
-    SUBSCRIPTION,
+    SUBSCRIPTIONS,
     APPOINTMENT_BY_ID,
     APPOINTMENTS_BY_PATIENT,
     APPOINTMENTS_BY_DENTIST,
-    UNASSIGNED_APPOINTMENTS
+    UNASSIGNED_APPOINTMENTS,
+    SUBSCRIPTIONS_BY_DENTIST,
+    _SUBSCRIPTIONS_BY_DENTIST
+  },
+  POST: {
+    APPOINTMENT,
+    SUBSCRIPTION
+  },
+  DELETE: {
+    SUBSCRIPTION_BY_IDS,
+    _APPOINTMENT_BY_ID
+  },
+  PATCH: {
+    BOOK_STATUS
   }
 };

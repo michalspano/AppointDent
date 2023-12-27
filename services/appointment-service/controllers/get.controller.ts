@@ -606,7 +606,7 @@ const getSubscription = async (req: Request, res: Response): AsyncResObj => {
   // Verification step successful, verify the state of the subscription.
   let subscriptions: Subscription[];
   try {
-    subscriptions = GET.SUBSCRIPTION.all(dentistEmail, patientEmail) as Subscription[];
+    subscriptions = GET.SUBSCRIPTIONS.all(dentistEmail, patientEmail) as Subscription[];
   } catch (err: Error | unknown) {
     return res.status(500).json({
       message: 'Internal server error: fail performing selection.'

@@ -8,8 +8,8 @@
 import { randomUUID } from 'crypto';
 import { client } from '../mqtt/mqtt';
 import * as utils from '../utils';
+import QUERY from '../utils/query';
 import database from '../db/config';
-import { type Statement } from 'better-sqlite3';
 import type { Request, Response } from 'express';
 import {
   UserType,
@@ -21,6 +21,8 @@ import {
   type PatientSubscription
 } from '../types/types';
 import { type MqttClient } from 'mqtt/*';
+
+const { GET, POST } = QUERY;
 
 /**
  * @description the controller that creates an appointment.
@@ -96,18 +98,18 @@ const createAppointment = async (req: Request, res: Response): AsyncResObj => {
     patientId: null // Initially, the appointment is not booked (hence NULL).
   };
 
-  const stmt: Statement = database.prepare(`
-    INSERT INTO appointments
-    (id, start_timestamp, end_timestamp, dentistId, patientId)
-    VALUES (?, ?, ?, ?, ?)
-  `);
-
   /* A query can fail because of a bad request (e.g. invalid object),
    * or that something is wrong with the database (an internal server error).
    * TODO: add proper error handling, so that the latter case is appropriately
    * handled with a 500 status code. */
   try {
-    stmt.run(Object.values(appointment));
+    POST.APPOINTMENT.run(
+      appointment.id,
+      appointment.start_timestamp,
+      appointment.end_timestamp,
+      appointment.dentistId,
+      appointment.patientId
+    );
   } catch (err: Error | unknown) {
     return res.status(400).json({ message: 'Bad request: invalid appointment object.' });
   }
@@ -145,9 +147,7 @@ const createAppointment = async (req: Request, res: Response): AsyncResObj => {
    */
   let subscriptions: PatientSubscription[] = [];
   try {
-    subscriptions = database.prepare(`
-      SELECT patientEmail FROM subscriptions WHERE dentistEmail = ?
-    `).all(email) as PatientSubscription[];
+    subscriptions = GET.SUBSCRIPTIONS_BY_DENTIST.all(email) as PatientSubscription[];
   } catch (err: Error | unknown) {
     return res.status(500).json({ message: 'Internal server error: database error.' });
   }

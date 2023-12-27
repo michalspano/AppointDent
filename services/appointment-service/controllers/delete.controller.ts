@@ -6,11 +6,19 @@
  */
 
 import database from '../db/config';
+import QUERY from '../utils/query';
 import { client } from '../mqtt/mqtt';
 import * as utils from '../utils';
 import type { Request, Response } from 'express';
-import { type Statement } from 'better-sqlite3';
-import { SessionResponse, type AsyncResObj, UserType, type WhoisResponse, type Appointment } from '../types/types';
+import {
+  UserType,
+  SessionResponse,
+  type AsyncResObj,
+  type Appointment,
+  type WhoisResponse
+} from '../types/types';
+
+const { DELETE } = QUERY;
 
 const TOPIC: string = utils.MQTT_PAIRS.whois.req;
 const RESPONSE_TOPIC: string = utils.MQTT_PAIRS.whois.res;
@@ -99,9 +107,8 @@ export const deleteAppointment = async (req: Request, res: Response): AsyncResOb
   }
 
   // All steps have been completed, proceed with deleting the appointment...
-  const stmt: Statement = database.prepare('DELETE FROM appointments WHERE id = ?');
   try {
-    stmt.run(id);
+    DELETE._APPOINTMENT_BY_ID.run(id);
   } catch (err: Error | unknown) {
     return res.status(500).json({
       message: 'Internal server error: query failed.'
