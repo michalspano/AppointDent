@@ -154,24 +154,6 @@ function loginPatient (patient: User): User {
   return patient;
 }
 
-// Simulate getting all unbooked appointments
-function getAllAppointments (patient: User): void {
-  const patientEmail: string = patient.email;
-  const cookies: string = patient.cookies;
-
-  const headers = {
-    'Content-Type': 'application/json',
-    Cookies: cookies
-  };
-
-  const res: RefinedResponse<'text'> = http.get(host + `/appointments/?userId=${patientEmail}`, { headers, tags: { name: 'GetAllAppointments' } });
-  // Check for expected status codes
-  check(res, {
-    'Status is 200': (r) => r.status === 200,
-    'Status is not 401': (r) => r.status !== 401
-  });
-}
-
 // Simulate patient booking an appointment
 function bookAppointment (patient: User, appointmentId: string): void {
   const patientEmail: string = patient.email;
@@ -208,6 +190,22 @@ function getAppointments (patient: User): void {
   });
 }
 
+// Simulate patient getting all of their appointments
+function getAppointment (dentist: User, patient: User): void {
+  const headers = {
+    'Content-Type': 'application/json',
+    Cookies: patient.cookies
+  };
+
+  const res: RefinedResponse<'text'> = http.get(host + `/appointments/dentists/${dentist.email}?userId=${patient.email}`, { headers, tags: { name: 'GetDentistAppointments' } });
+
+  // Check for expected status codes
+  check(res, {
+    'Status is 200': (r) => r.status === 200,
+    'Status is not 401': (r) => r.status !== 401
+  });
+}
+
 // Simulate patient unbooking an appointment
 function unbookAppointment (patient: User, appointmentId: string): void {
   const patientEmail: string = patient.email;
@@ -229,19 +227,16 @@ function unbookAppointment (patient: User, appointmentId: string): void {
 export default function (): void {
   // Simulate dentist registration
   let dentist: User = registerDentist();
-
   // Simulate dentist login
   dentist = loginDentist(dentist);
   // Simulate dentist creating an appointment
   const appointmentId: string = createAppointment(dentist);
-
   // Simulate patient registration
   let patient: User = registerPatient();
   // Simulate patient login
   patient = loginPatient(patient);
-  // Simulate patient getting all appointments
-  getAllAppointments(patient);
-
+  // Simulate patient getting single appointment
+  getAppointment(dentist, patient);
   // Simulate patient booking an appointment
   bookAppointment(patient, appointmentId);
   // Simulate patient getting all of their appointments
