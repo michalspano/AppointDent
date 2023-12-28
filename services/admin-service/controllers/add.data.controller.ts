@@ -8,7 +8,8 @@ async function addAnalyticsData (req: Request, res: Response): Promise<Response<
   if (database === undefined) {
     return res.status(500).json({ message: 'Internal server error: database connection failed.' });
   }
-  const request = {
+  const request: AnalyticsData = {
+    id: '',
     timestamp: Math.round(Date.now() / 1000),
     method: req.body?.method as string,
     path: req.body?.path as string,
@@ -29,7 +30,7 @@ async function addAnalyticsData (req: Request, res: Response): Promise<Response<
    * TODO: add proper error handling, so that the latter case is appropriately
    * handled with a 500 status code. */
   try {
-    const result: Database.RunResult = stmt.run(Object.values(request));
+    const result: Database.RunResult = stmt.run(request.timestamp, request.method, request.path, request.clientHash);
     const updatedRequest: AnalyticsData = {
       id: result.lastInsertRowid.toString(),
       timestamp: Math.round(Date.now() / 1000),
