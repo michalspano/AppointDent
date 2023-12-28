@@ -112,7 +112,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"dentist@example.com\", // this email was already registered\n  \"password\": \"secretpassword\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"clinicCountry\": \"Country\",\n  \"clinicCity\": \"City\",\n  \"clinicStreet\": \"Street\",\n  \"clinicHouseNumber\": \"123\",\n  \"clinicZipCode\": \"12345\",\n  \"picture\": \"base64encodedimage\",\n  \"longitude\": 57.706178,\n  \"latitude\": 11.969585\n}",
+							"raw": "{\n  \"email\": \"dentist@example.com\", // this email was already registered\n  \"password\": \"secretpassword\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"clinicCountry\": \"Country\",\n  \"clinicCity\": \"City\",\n  \"clinicStreet\": \"Street\",\n  \"clinicHouseNumber\": 123,\n  \"clinicZipCode\": 12345,\n  \"picture\": \"base64encodedimage\",\n  \"longitude\": 57.706178,\n  \"latitude\": 11.969585\n}",
 							"options": {
 								"raw": {
 									"language": "json"

@@ -111,7 +111,6 @@ const createAppointment = async (req: Request, res: Response): AsyncResObj => {
   try {
     queryResult = stmt.run(appointment.start_timestamp, appointment.end_timestamp, appointment.dentistId, appointment.patientId);
   } catch (err: Error | unknown) {
-    console.log(err);
     return res.status(400).json({ message: 'Bad request: invalid appointment object.' });
   }
 
