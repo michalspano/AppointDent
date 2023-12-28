@@ -27,7 +27,7 @@ In the `server` subdirectory, you can run:
 
 ### `npm run dev`
 
-Runs the server-side application in the development mode, in port `3000` and `localhost` by default.
+Runs the server-side application in the development mode, on port `3000` and `localhost` by default.
 
 ### `npm run build`
 
@@ -49,9 +49,17 @@ Runs the linter on the `server` folder and fixes the errors.
 
 Kills the service running at the specified port
 
+### `npm run dropdb:services`
+
+Drops all the tables from all the services. In other words, this command removes the data on all the services.
+
+### `npm run broker`
+
+Runs the broker on port `1883`.
+
 ### `npm run populate-db`
 
-Populates the database with 20 different patients and dentists. 
+Populates the database with 20 different patients and dentists. It also creates 20 appointments in future time for eah dentist.
 
 **Login details**
 - dentist1@example.com $\to$ dentist20@example.com
