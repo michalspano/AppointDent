@@ -5,7 +5,7 @@
  * @version     :: 1.0
  */
 
-import QUERY from '../utils/query';
+import QUERY from '../query';
 import database from '../db/config';
 import { client } from '../mqtt/mqtt';
 import * as utils from '../utils';
@@ -516,7 +516,7 @@ const getAppointmentCount = async (req: Request, res: Response): AsyncResObj => 
   // Verification successful, proceed with the request.
   let count: number;
   try {
-    const rawResult = GET.COUNT_APPOINTMENTS(getOnlyAvailable)
+    const rawResult = GET.APPOINTMENT_COUNT(getOnlyAvailable)
       .get() as { count: number };
     count = rawResult.count;
   } catch (err: Error | unknown) {

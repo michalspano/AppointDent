@@ -5,10 +5,10 @@
  * @version     :: 1.0
  */
 
+import QUERY from '../query';
 import { randomUUID } from 'crypto';
 import { client } from '../mqtt/mqtt';
 import * as utils from '../utils';
-import QUERY from '../utils/query';
 import database from '../db/config';
 import type { Request, Response } from 'express';
 import {

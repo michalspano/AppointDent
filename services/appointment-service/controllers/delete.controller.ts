@@ -5,8 +5,8 @@
  * @version     :: 1.0
  */
 
+import QUERY from '../query';
 import database from '../db/config';
-import QUERY from '../utils/query';
 import { client } from '../mqtt/mqtt';
 import * as utils from '../utils';
 import type { Request, Response } from 'express';
@@ -108,7 +108,7 @@ export const deleteAppointment = async (req: Request, res: Response): AsyncResOb
 
   // All steps have been completed, proceed with deleting the appointment...
   try {
-    DELETE._APPOINTMENT_BY_ID.run(id);
+    DELETE.APPOINTMENT_BY_ID.run(id);
   } catch (err: Error | unknown) {
     return res.status(500).json({
       message: 'Internal server error: query failed.'

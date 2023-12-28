@@ -1,6 +1,13 @@
+/**
+ * controllers/subscribe.controller.ts
+ *
+ * @description :: HTTP methods to manage subscriptions.
+ * @version     :: 1.0
+ */
+
+import QUERY from '../query';
 import database from '../db/config';
 import * as utils from '../utils';
-import QUERY from '../utils/query';
 import { client } from '../mqtt/mqtt';
 import type { Request, Response } from 'express';
 import {

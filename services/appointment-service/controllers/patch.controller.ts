@@ -5,8 +5,8 @@
  * @version     :: 1.0
  */
 
+import QUERY from '../query';
 import * as utils from '../utils';
-import QUERY from '../utils/query';
 import { type UUID } from 'crypto';
 import database from '../db/config';
 import { client } from '../mqtt/mqtt';
@@ -137,7 +137,7 @@ const bookAppointment = async (req: Request, res: Response): AsyncResObj => {
   appointment.patientId = toBook ? email as UUID : null;
 
   try {
-    const info: Database.RunResult = PATCH.BOOK_STATUS.run(appointment.patientId, appointment.id);
+    const info: Database.RunResult = PATCH.BOOKING_STATUS.run(appointment.patientId, appointment.id);
     if (info.changes !== 1) {
       return res.status(500).json({ message: 'Internal server error: query malformed.' });
     }
@@ -196,7 +196,7 @@ const bookAppointment = async (req: Request, res: Response): AsyncResObj => {
     let subscriptions: PatientSubscription[] = [];
     try {
       // The current user who unbooked the appointment should not be notified.
-      subscriptions = GET._SUBSCRIPTIONS_BY_DENTIST.all(
+      subscriptions = GET.SUBSCRIPTIONS_BY_DENTIST_UNBOOK.all(
         appointment.dentistId, email
       ) as PatientSubscription[];
     } catch (err: Error | unknown) {
