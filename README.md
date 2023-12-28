@@ -2,7 +2,7 @@
 
 <img src="docs/imgs/logo.png" align="left" alt="AppointDent Logo" width="200"/>
 
-&#129463;&#129701; `AppointDent` is a **full-stack web application** that allows residents of Sweden
+&#129463;&#129701; **AppointDent** is a **full-stack web application** that allows residents of Sweden
 manage their dentist appointments, as well as a tool for dentists to organize
 their work. The system, internally, relies on a **distributed system** infrastructure that combines various architectural styles, namely **microservices**, **publish-subscribe** and **client-server**.
 
@@ -46,7 +46,7 @@ and **client-server**.
 
 ## Pre-Requirements
 
-TODO: list all the pre-requirements for the system to run. This can be put to the individual READMEs of the sub-projects. Perhaps global dependencies can be listed here.
+The only technology that is needed to run all **services**, **APIGateway (server)**, the **client**, and **stress-testing** is [Node.js](https://nodejs.org/en/). Our project makes use of version `18.x.x`. So make sure that you have one of the version `18` variations installed on your machine.
 
 ### Installation, Setup, and Running
 
