@@ -30,15 +30,15 @@ In the `services/admin-service` subdirectory, you can run:
 
 ### `npm run dev`
 
-Runs the server-side application in the development mode, in port `3000` and `localhost` by default.
+Runs the current service in the development mode, in port `3006` and `localhost` by default.
 
 ### `npm run build`
 
-Builds the server-side application for production to the `dist` folder.
+Builds the current service for production to the `dist` folder.
 
 ### `npm run start`
 
-Runs the server-side application in the production mode, based on the `dist` folder.
+Runs the current service in the production mode, based on the `dist` folder.
 
 ### `npm run lint`
 
@@ -47,6 +47,10 @@ Runs the linter on the `server` folder.
 ### `npm run lint:fix`
 
 Runs the linter on the `server` folder and fixes the errors.
+
+### `npm run dropdb`
+
+Drops all the tables from the current service. In other words, this command removes all data from the current service.
 
 ### Additional scripts (based on the service's needs)
 
