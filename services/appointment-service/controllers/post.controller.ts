@@ -5,10 +5,10 @@
  * @version     :: 1.0
  */
 
-import { randomUUID } from 'crypto';
 import { client } from '../mqtt/mqtt';
 import * as utils from '../utils';
 import database from '../db/config';
+import type Database from 'better-sqlite3';
 import { type Statement } from 'better-sqlite3';
 import type { Request, Response } from 'express';
 import {
@@ -89,7 +89,7 @@ const createAppointment = async (req: Request, res: Response): AsyncResObj => {
 
   // All went well, proceed with creating the appointment.
   const appointment: Appointment = {
-    id: randomUUID(),
+    id: '',
     start_timestamp: req.body.start_timestamp,
     end_timestamp: req.body.end_timestamp,
     dentistId: req.body.dentistId,
@@ -98,16 +98,18 @@ const createAppointment = async (req: Request, res: Response): AsyncResObj => {
 
   const stmt: Statement = database.prepare(`
     INSERT INTO appointments
-    (id, start_timestamp, end_timestamp, dentistId, patientId)
-    VALUES (?, ?, ?, ?, ?)
+    (start_timestamp, end_timestamp, dentistId, patientId)
+    VALUES (?, ?, ?, ?)
   `);
+
+  let queryResult: Database.RunResult;
 
   /* A query can fail because of a bad request (e.g. invalid object),
    * or that something is wrong with the database (an internal server error).
    * TODO: add proper error handling, so that the latter case is appropriately
    * handled with a 500 status code. */
   try {
-    stmt.run(Object.values(appointment));
+    queryResult = stmt.run(appointment.start_timestamp, appointment.end_timestamp, appointment.dentistId, appointment.patientId);
   } catch (err: Error | unknown) {
     return res.status(400).json({ message: 'Bad request: invalid appointment object.' });
   }
@@ -164,9 +166,15 @@ const createAppointment = async (req: Request, res: Response): AsyncResObj => {
   } catch (err: Error | unknown) {
     return res.status(503).json((err as Error).message);
   }
-
+  const createdAppointment: Appointment = {
+    id: queryResult.lastInsertRowid.toString(),
+    start_timestamp: appointment.start_timestamp,
+    end_timestamp: appointment.end_timestamp,
+    dentistId: appointment.dentistId,
+    patientId: appointment.patientId
+  };
   // Everything went well, return the created object.
-  return res.status(201).json(appointment);
+  return res.status(201).json(createdAppointment);
 };
 
 /**

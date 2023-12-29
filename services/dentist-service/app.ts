@@ -19,8 +19,5 @@ app.get('/', (_req: Request, res: Response) => {
   res.send('Hello from: AppointDent - Dentists Service');
 });
 app.listen(port, () => {
-  console.log('AppointDent - Dentists Service');
-  console.log(`Server is running at http://localhost:${port}`);
-  console.log(`Using database: ${database?.name}`);
-  console.log(`Database connection: ${((database?.open) ?? false) ? 'OK' : 'ERROR'}`);
+  console.log(((database?.open) ?? false) ? 'OK' : 'ERROR');
 });

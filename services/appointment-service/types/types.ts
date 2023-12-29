@@ -14,7 +14,7 @@ import type { Response } from 'express';
  * generated using the crypto module.
  */
 export interface Appointment {
-  id: UUID
+  id: string
   start_timestamp: number
   end_timestamp: number
   dentistId: UUID

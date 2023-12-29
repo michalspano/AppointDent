@@ -18,7 +18,7 @@ function registerUser (): User {
     firstName: 'Patient',
     lastName: 'Doe',
     password: 'Password123!',
-    birthDate: '2000'
+    birthDate: 2000
 
   };
 

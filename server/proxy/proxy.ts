@@ -14,6 +14,7 @@ interface AnalyticsData {
 }
 
 const DATA_COLLECTOR_API = 'http://localhost:3006';
+const DATA_COLLECTOR_API_TIMEOUT = 10000;
 
 /**
  * Supposing that the services may be deployed to remote destinations (that are not localhost),
@@ -46,14 +47,23 @@ function constructProxies (targets: ProxyTargets): ProxyMap {
   return newProxies;
 }
 
-async function forwardAnalyticsRequest (url: string, method: string, clientHash: string): Promise<void> {
-  console.log(url);
+async function forwardAnalyticsRequest (url: string, method: string, clientHash: string, retries = 3): Promise<void> {
   const analyticsEntry: AnalyticsData = {
     method,
     path: url,
     clientHash
   };
-  void axios.post(DATA_COLLECTOR_API + '/requests', analyticsEntry);
+
+  // We optimistically send this to analytics, in hopes of it being processed at some point.
+  axios.post(DATA_COLLECTOR_API + '/requests', analyticsEntry, { timeout: 0 }).catch((err) => {
+    if (retries > 0) {
+      setTimeout(() => {
+        void forwardAnalyticsRequest(url, method, clientHash, retries - 1);
+      }, DATA_COLLECTOR_API_TIMEOUT);
+    } else {
+      console.error(err);
+    }
+  });
 }
 
 export function routeProxy (req: Request, res: Response, next: NextFunction): void {
@@ -63,7 +73,7 @@ export function routeProxy (req: Request, res: Response, next: NextFunction): vo
   let clientHash: string = '';
   if (!req.originalUrl.includes('admins')) {
     if (clientCookie !== undefined) {
-      crypto.pbkdf2(clientCookie, 'salt', 10, 64, 'sha256', (err, derivedKey) => {
+      crypto.pbkdf2(clientCookie, 'salt', 10, 32, 'sha256', (err, derivedKey) => {
         if (err != null) { throw new Error(err.message); }
         clientHash = derivedKey.toString('hex');
         void forwardAnalyticsRequest(url, method, clientHash);
@@ -74,7 +84,6 @@ export function routeProxy (req: Request, res: Response, next: NextFunction): vo
   }
 
   const pathParts = req.url.split('/'); // Use req.url to include query string if necessary.
-  console.log(pathParts);
   const service = pathParts[1];
   const target: httpProxy | undefined = proxies[service];
 
