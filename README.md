@@ -46,7 +46,7 @@ and **client-server**.
 
 ## Pre-Requirements
 
-The only technology that is needed to run all **services**, **APIGateway (server)**, the **client**, and **stress-testing** is [Node.js](https://nodejs.org/en/). Our project makes use of version `18.x.x`. So make sure that you have one of the version `18` variations installed on your machine.
+The only technology that is utilized in building and running **all services**, **APIGateway (server)**, the **client**, and **stress-testing** is [Node.js](https://nodejs.org/en/). Our project makes use of version `18.x.x`. So make sure that you have one of the version `18` variations installed on your machine. For those that do not know what **Node.js** is, **Node.js** is a cross-platform **JavaScript runtime environment**. It allows developers to run JavaScript outside of the browser. This allows Javascript to be used as a backend development programming language.
 
 ### Installation, Setup, and Running
 
