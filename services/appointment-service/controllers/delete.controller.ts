@@ -5,12 +5,20 @@
  * @version     :: 1.0
  */
 
+import QUERY from '../query';
 import database from '../db/config';
 import { client } from '../mqtt/mqtt';
 import * as utils from '../utils';
 import type { Request, Response } from 'express';
-import { type Statement } from 'better-sqlite3';
-import { SessionResponse, type AsyncResObj, UserType, type WhoisResponse, type Appointment } from '../types/types';
+import {
+  UserType,
+  SessionResponse,
+  type AsyncResObj,
+  type Appointment,
+  type WhoisResponse
+} from '../types/types';
+
+const { GET, DELETE } = QUERY;
 
 const TOPIC: string = utils.MQTT_PAIRS.whois.req;
 const RESPONSE_TOPIC: string = utils.MQTT_PAIRS.whois.res;
@@ -78,9 +86,7 @@ export const deleteAppointment = async (req: Request, res: Response): AsyncResOb
   const id: string = req.params.id; // id of the appointment to delete
   let objToDelete: Appointment | undefined;
   try {
-    objToDelete = database
-      .prepare('SELECT ROWID as id,* FROM appointments WHERE ROWID = ?')
-      .get(id) as Appointment;
+    objToDelete = GET.APPOINTMENT_BY_ID.get(id) as Appointment;
   } catch (err: Error | unknown) {
     return res.status(500).json({
       message: 'Internal server error: query failed.'
@@ -99,9 +105,8 @@ export const deleteAppointment = async (req: Request, res: Response): AsyncResOb
   }
 
   // All steps have been completed, proceed with deleting the appointment...
-  const stmt: Statement = database.prepare('DELETE FROM appointments WHERE ROWID = ?');
   try {
-    stmt.run(id);
+    DELETE.APPOINTMENT_BY_ID.run(id);
   } catch (err: Error | unknown) {
     return res.status(500).json({
       message: 'Internal server error: query failed.'
@@ -110,7 +115,7 @@ export const deleteAppointment = async (req: Request, res: Response): AsyncResOb
 
   // As the appointment has been deleted right now, we want to
   // send a notification to the patient (if not null) that had booked the appointment.
-  // finlly we sent a confirmation notification to the dentist who deleted it
+  // finally we sent a confirmation notification to the dentist who deleted it
   if (objToDelete.patientId !== null) {
     const patientMessage = `Your appointment on ${utils.formatDateTime(objToDelete.end_timestamp)} was canceled with your dentist. Please book another appointment.`;
     try {

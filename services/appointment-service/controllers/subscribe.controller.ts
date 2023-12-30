@@ -1,3 +1,11 @@
+/**
+ * controllers/subscribe.controller.ts
+ *
+ * @description :: HTTP methods to manage subscriptions.
+ * @version     :: 1.0
+ */
+
+import QUERY from '../query';
 import database from '../db/config';
 import * as utils from '../utils';
 import { client } from '../mqtt/mqtt';
@@ -9,6 +17,8 @@ import {
   type Subscription,
   type WhoisResponse
 } from '../types/types';
+
+const { GET, POST, DELETE } = QUERY;
 
 const TOPIC: string = utils.MQTT_PAIRS.whois.req;
 const RESPONSE_TOPIC: string = utils.MQTT_PAIRS.whois.res;
@@ -97,8 +107,7 @@ const subToDentist = async (req: Request, res: Response): AsyncResObj => {
      * so that the database is not filled with duplicate entries, and hence negatively
      * affecting the performance.
      */
-    const result: Subscription = database.prepare('SELECT * FROM subscriptions' +
-                                ' WHERE dentistEmail = ? AND patientEmail = ?').get(
+    const result: Subscription = GET.SUBSCRIPTIONS.get(
       dentistEmail, patientEmail
     ) as Subscription;
 
@@ -107,9 +116,7 @@ const subToDentist = async (req: Request, res: Response): AsyncResObj => {
     }
 
     // Proceed with the creation iff the subscription does not exist.
-    database.prepare('INSERT INTO subscriptions VALUES (?, ?)').run(
-      Object.values(subscription)
-    );
+    POST.SUBSCRIPTION.run(subscription.dentistEmail, subscription.patientEmail);
   } catch (error: Error | unknown) {
     return res.status(500).json({
       message: 'Internal server error: database error.'
@@ -191,9 +198,7 @@ const unsubFromDentist = async (req: Request, res: Response): AsyncResObj => {
 
   // Verification step successful, delete the subscription entry.
   try {
-    database.prepare('DELETE FROM subscriptions WHERE dentistEmail = ? AND patientEmail = ?').run(
-      dentistEmail, patientEmail
-    );
+    DELETE.SUBSCRIPTION_BY_IDS.run(dentistEmail, patientEmail);
   } catch (error: Error | unknown) {
     return res.status(500).json({ message: 'Internal server error: database error.' });
   }

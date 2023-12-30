@@ -5,13 +5,13 @@
  * @version     :: 1.0
  */
 
+import QUERY from '../query';
 import * as utils from '../utils';
 import { type UUID } from 'crypto';
 import database from '../db/config';
 import { client } from '../mqtt/mqtt';
 import type { MqttClient } from 'mqtt';
 import type Database from 'better-sqlite3';
-import { type Statement } from 'better-sqlite3';
 import type { Request, Response } from 'express';
 import {
   UserType,
@@ -22,6 +22,8 @@ import {
   type UserName,
   type PatientSubscription
 } from '../types/types';
+
+const { GET, PATCH } = QUERY;
 
 /**
  * @description the controller for the PATCH /appointments/:id route. In
@@ -98,9 +100,7 @@ const bookAppointment = async (req: Request, res: Response): AsyncResObj => {
   const id: string = req.params.id;
   let appointment: Appointment | undefined;
   try {
-    appointment = database
-      .prepare('SELECT ROWID as id,* FROM appointments WHERE id = ?')
-      .get(id) as Appointment;
+    appointment = GET.APPOINTMENT_BY_ID.get(id) as Appointment;
   } catch (err: Error | unknown) {
     return res.status(500).json({
       message: 'Internal server error: query failed.'
@@ -134,14 +134,8 @@ const bookAppointment = async (req: Request, res: Response): AsyncResObj => {
   // Update the appointment object with the patientId.
   appointment.patientId = toBook ? email as UUID : null;
 
-  const stmt: Statement = database.prepare(`
-    UPDATE appointments
-    SET patientId = ?
-    WHERE ROWID = ?
-  `);
-
   try {
-    const info: Database.RunResult = stmt.run(appointment.patientId, appointment.id);
+    const info: Database.RunResult = PATCH.BOOKING_STATUS.run(appointment.patientId, appointment.id);
     if (info.changes !== 1) {
       return res.status(500).json({ message: 'Internal server error: query malformed.' });
     }
@@ -200,9 +194,9 @@ const bookAppointment = async (req: Request, res: Response): AsyncResObj => {
     let subscriptions: PatientSubscription[] = [];
     try {
       // The current user who unbooked the appointment should not be notified.
-      subscriptions = database.prepare(`
-      SELECT patientEmail FROM subscriptions WHERE dentistEmail = ? AND patientEmail != ?
-    `).all(appointment.dentistId, email) as PatientSubscription[];
+      subscriptions = GET.SUBSCRIPTIONS_BY_DENTIST_UNBOOK.all(
+        appointment.dentistId, email
+      ) as PatientSubscription[];
     } catch (err: Error | unknown) {
       return res.status(500).json({ message: 'Internal server error: database error.' });
     }
