@@ -101,7 +101,7 @@ const bookAppointment = async (req: Request, res: Response): AsyncResObj => {
   let appointment: Appointment | undefined;
   try {
     appointment = database
-      .prepare('SELECT * FROM appointments WHERE id = ?')
+      .prepare('SELECT ROWID as id,* FROM appointments WHERE id = ?')
       .get(id) as Appointment;
   } catch (err: Error | unknown) {
     return res.status(500).json({

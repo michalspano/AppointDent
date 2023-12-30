@@ -23,7 +23,7 @@ const deleteAsyncNotification = async function (req: Request, res: Response): Pr
   let notToDelete: unknown;
 
   try {
-    notToDelete = database?.prepare('SELECT * FROM notifications WHERE id = ?').get(notId);
+    notToDelete = database?.prepare('SELECT ROWID as id,* FROM notifications WHERE ROWID = ?').get(notId);
   } catch (err) {
     console.log(err);
     return res.status(500).json({
@@ -38,7 +38,7 @@ const deleteAsyncNotification = async function (req: Request, res: Response): Pr
   }
 
   // Notification is found, process to delete it.
-  const delStmt: Statement = database.prepare('DELETE FROM notifications WHERE id = ?');
+  const delStmt: Statement = database.prepare('DELETE FROM notifications WHERE ROWID = ?');
   try {
     delStmt.run(notId);
   } catch (err) {
@@ -71,7 +71,7 @@ const deleteAsyncAllNotification = async function (req: Request, res: Response):
   // Array of notifications belonging to the user
   let notArray: unknown[];
   try {
-    notArray = database.prepare('SELECT * FROM notifications where email = ?').all(userEmail);
+    notArray = database.prepare('SELECT ROWID as id,* FROM notifications where email = ?').all(userEmail);
   } catch (err) {
     console.log(err);
     return res.status(500).json({

@@ -1,7 +1,6 @@
 -- Schema definitions for the appointment service database
 
 CREATE TABLE IF NOT EXISTS appointments (
-    id VARCHAR(64) PRIMARY KEY NOT NULL UNIQUE,
     start_timestamp INT NOT NULL, 
     end_timestamp INT NOT NULL, 
     dentistId VARCHAR(64) NOT NULL,

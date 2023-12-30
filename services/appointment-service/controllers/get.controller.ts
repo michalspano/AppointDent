@@ -445,7 +445,7 @@ const getAppointment = async (req: Request, res: Response): AsyncResObj => {
     return res.status(404).json({ message: 'Not found.' });
   }
 
-  return res.status(200).json(appointment);
+  return res.status(200).json({ id: (appointment as Appointment).id.toString(), ...appointment });
 };
 
 /**

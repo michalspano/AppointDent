@@ -87,7 +87,7 @@ export const deleteAppointment = async (req: Request, res: Response): AsyncResOb
   let objToDelete: Appointment | undefined;
   try {
     objToDelete = database
-      .prepare('SELECT * FROM appointments WHERE id = ?')
+      .prepare('SELECT ROWID as id,* FROM appointments WHERE ROWID = ?')
       .get(id) as Appointment;
   } catch (err: Error | unknown) {
     return res.status(500).json({
@@ -117,7 +117,7 @@ export const deleteAppointment = async (req: Request, res: Response): AsyncResOb
 
   // As the appointment has been deleted right now, we want to
   // send a notification to the patient (if not null) that had booked the appointment.
-  // finlly we sent a confirmation notification to the dentist who deleted it
+  // finally we sent a confirmation notification to the dentist who deleted it
   if (objToDelete.patientId !== null) {
     const patientMessage = `Your appointment on ${utils.formatDateTime(objToDelete.end_timestamp)} was canceled with your dentist. Please book another appointment.`;
     try {
