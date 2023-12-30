@@ -18,7 +18,7 @@ import {
   type WhoisResponse
 } from '../types/types';
 
-const { DELETE } = QUERY;
+const { GET, DELETE } = QUERY;
 
 const TOPIC: string = utils.MQTT_PAIRS.whois.req;
 const RESPONSE_TOPIC: string = utils.MQTT_PAIRS.whois.res;
@@ -86,9 +86,7 @@ export const deleteAppointment = async (req: Request, res: Response): AsyncResOb
   const id: string = req.params.id; // id of the appointment to delete
   let objToDelete: Appointment | undefined;
   try {
-    objToDelete = database
-      .prepare('SELECT ROWID as id,* FROM appointments WHERE ROWID = ?')
-      .get(id) as Appointment;
+    objToDelete = GET.APPOINTMENT_BY_ID.get(id) as Appointment;
   } catch (err: Error | unknown) {
     return res.status(500).json({
       message: 'Internal server error: query failed.'

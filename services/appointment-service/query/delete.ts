@@ -6,7 +6,7 @@ import type { Statement } from 'better-sqlite3';
  */
 const APPOINTMENT_BY_ID: Readonly<Statement<[string]>> = database?.prepare(`
   DELETE FROM appointments
-  WHERE id = ?
+  WHERE ROWID = ?
 `) as Statement;
 
 /**

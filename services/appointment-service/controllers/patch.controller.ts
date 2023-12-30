@@ -100,9 +100,7 @@ const bookAppointment = async (req: Request, res: Response): AsyncResObj => {
   const id: string = req.params.id;
   let appointment: Appointment | undefined;
   try {
-    appointment = database
-      .prepare('SELECT ROWID as id,* FROM appointments WHERE id = ?')
-      .get(id) as Appointment;
+    appointment = GET.APPOINTMENT_BY_ID.get(id) as Appointment;
   } catch (err: Error | unknown) {
     return res.status(500).json({
       message: 'Internal server error: query failed.'

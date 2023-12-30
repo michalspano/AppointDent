@@ -5,7 +5,7 @@ import type { Statement } from 'better-sqlite3';
  * @description retrieve a particular appointment based on its ID.
  */
 const APPOINTMENT_BY_ID: Readonly<Statement<[string]>> = database?.prepare(`
-  SELECT *
+  SELECT ROWID as id,*
   FROM appointments
   WHERE id = ?
 `) as Statement;
@@ -27,7 +27,7 @@ const APPOINTMENT_COUNT = (onlyAvailable: boolean): Readonly<Statement<[]>> =>
  * given patient.
  */
 const APPOINTMENTS_BY_PATIENT: Readonly<Statement<[string]>> = database?.prepare(`
-  SELECT *
+  SELECT ROWID as id,*
   FROM appointments
   WHERE patientId = ?
 `) as Statement;
@@ -42,7 +42,9 @@ const APPOINTMENTS_BY_PATIENT: Readonly<Statement<[string]>> = database?.prepare
  */
 const APPOINTMENTS_BY_DENTIST = (onlyAvailable: boolean, hasRange: boolean):
 Readonly<Statement<[string, number?, number?]>> => database?.prepare(`
-    SELECT * FROM appointments WHERE dentistId = ?
+    SELECT ROWID as id,*
+    FROM appointments
+    WHERE dentistId = ?
     ${onlyAvailable ? ' AND patientId IS NULL' : ''}
     ${hasRange ? ' AND start_timestamp >= ? AND end_timestamp <= ?' : ''}
 `) as Statement;
@@ -55,7 +57,7 @@ Readonly<Statement<[string, number?, number?]>> => database?.prepare(`
  */
 const UNASSIGNED_APPOINTMENTS = (hasRange: boolean): Readonly<Statement<[number?, number?]>> =>
   database?.prepare(`
-    SELECT *
+    SELECT ROWID as id,*
     FROM appointments
     WHERE patientId IS NULL
     ${hasRange ? ' AND start_timestamp >= ? AND end_timestamp <= ?' : ''}

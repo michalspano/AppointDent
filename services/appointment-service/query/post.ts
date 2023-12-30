@@ -4,10 +4,10 @@ import type { Statement } from 'better-sqlite3';
 /**
  * @description insert a new appointment into the database.
  */
-const APPOINTMENT: Readonly<Statement<[string, number, number, string, (string | null)]>> = database?.prepare(`
+const APPOINTMENT: Readonly<Statement<[number, number, string, (string | null)]>> = database?.prepare(`
   INSERT INTO appointments
-  (id, start_timestamp, end_timestamp, dentistId, patientId)
-  VALUES (?, ?, ?, ?, ?)
+  (start_timestamp, end_timestamp, dentistId, patientId)
+  VALUES (?, ?, ?, ?)
 `) as Statement;
 
 /**
