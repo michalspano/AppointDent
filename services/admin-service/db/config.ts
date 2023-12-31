@@ -10,22 +10,6 @@ import Database from 'better-sqlite3';
 import type { Database as DatabaseType } from 'better-sqlite3';
 
 /**
- * @description the options for the database connection.
- * The fileMustExit properly is set to default, which means,
- * that if the database file does not exist, it will be created.
- * We don't need to use a script to create the database file.
- *
- * We're using the verbose option to log all SQL queries to the console.
- * This is useful for debugging purposes.
- *
- * @see https://github.com/WiseLibs/better-sqlite3/blob/master/docs/api.md#new-databasepath-options
- */
-const options: object = Object.freeze({
-  verbose: console.log
-  // TODO: add more options
-});
-
-/**
  * @description the name of the database file.
  * When the test environment is used, the value of
  * DB_FILE is set to a custom path (typically <service>-test.db).
@@ -49,7 +33,7 @@ const schemaFilePath: string = './db/schema.sql';
  */
 const database: DatabaseType | undefined = (() => {
   try {
-    const db = new Database(DB_FILE, options);
+    const db = new Database(DB_FILE);
     db.pragma('journal_mode = WAL');
     // Load the schema file to the database.
     db.exec(readFileSync(schemaFilePath, 'utf8'));

@@ -1,5 +1,4 @@
 import cors from 'cors';
-import morgan from 'morgan';
 import express, { type NextFunction, type Express, type Request, type Response } from 'express';
 import cookieParser from 'cookie-parser';
 import queueMiddleware from 'express-queue';
@@ -37,8 +36,6 @@ app.use((req, res, next) => {
   // After initialising the event listener we move on to the next middleware.
   next();
 });
-
-app.use(morgan('dev')); // Add morgan HTTP request logger.
 
 interface CorsOptions {
   origin: boolean

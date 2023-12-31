@@ -3,14 +3,6 @@ import Database from 'better-sqlite3';
 import type { Database as DatabaseType } from 'better-sqlite3';
 
 /**
- * @description the options for the database connection.
- */
-const options: object = Object.freeze({
-  verbose: console.log
-  // TODO: add more options
-});
-
-/**
  * @description the name of the database file.
  * When the test environment is used, the value of
  * DB_FILE is set to a custom path (typically <service>-test.db).
@@ -34,7 +26,7 @@ const schemaFilePath: string = './db/schema.sql';
  */
 const database: DatabaseType | undefined = (() => {
   try {
-    const db = new Database(DB_FILE, options);
+    const db = new Database(DB_FILE);
     db.pragma('journal_mode = WAL');
     // Load the schema file to the database.
     db.exec(fs.readFileSync(schemaFilePath, 'utf8'));
