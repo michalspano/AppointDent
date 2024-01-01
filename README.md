@@ -56,15 +56,14 @@ The file contains the instructions on how to install all dependencies, it explai
 
 The following is a list of the available sub-folders:
 
-- [`client`](./client/README.md): the client-side application.
-- [`server`](./server/README.md): the server-side application (informally, the `APIGateway/Proxy`).
-- `services`:
-  - [`admin-service`](./services/admin-service/README.md): the additional service that adds an abstraction of an admin to observe the system's state and trends.
-  - [`appointment-service`](./services/appointment-service/README.md): the service that handles all the appointment-related operations.
-  - [`dentist-service`](./services/dentist-service/README.md): the service that handles all the dentist-related operations.
-  - [`notification-service`](./services/notification-service/README.md): the service that enables the system to send notifications to the users upon certain events.
-  - [`patient-service`](./services/patient-service/README.md): the service that handles all the patient-related operations.
-  - [`session-service`](./services/session-service/README.md): a central service that handles all sessions of the users to enforce authentication and authorization.
+- [**client**](./client/README.md): the client-side application.
+- [**server**](./server/README.md): the server-side application (informally, the `APIGateway/Proxy`).
+- [**services/admin-service**](./services/admin-service/README.md): the additional service that adds an abstraction of an admin to observe the system's state and trends.
+- [**services/appointment-service**](./services/appointment-service/README.md): the service that handles all the appointment-related operations.
+- [**services/dentist-service**](./services/dentist-service/README.md): the service that handles all the dentist-related operations.
+- [**services/notification-service**](./services/notification-service/README.md): the service that enables the system to send notifications to the users upon certain events.
+- [**services/patient-service**](./services/patient-service/README.md): the service that handles all the patient-related operations.
+- [**services/session-service**](./services/session-service/README.md): a central service that handles all sessions of the users to enforce authentication and authorization.
 
 *Note*: the `services` are not meant to be run individually, but rather as a part of the `server` application. They can be run individually for testing purposes or for the ease of development.
 
