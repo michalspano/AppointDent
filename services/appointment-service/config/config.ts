@@ -6,12 +6,10 @@
  */
 
 import cors from 'cors';
-import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import express, { type Express, type Request } from 'express';
 
 const app: Express = express();
-app.use(morgan('dev')); // Add morgan HTTP request logger.
 
 interface CorsOptions {
   origin: boolean

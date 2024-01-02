@@ -105,9 +105,7 @@ const createAppointment = async (req: Request, res: Response): AsyncResObj => {
    * TODO: add proper error handling, so that the latter case is appropriately
    * handled with a 500 status code. */
   try {
-    queryResult = POST.APPOINTMENT.run(
-      ...Object.values(appointment).slice(1) as [number, number, string, (string | null)]
-    );
+    queryResult = POST.APPOINTMENT.run(appointment.start_timestamp, appointment.end_timestamp, appointment.dentistId, appointment.patientId);
   } catch (err: Error | unknown) {
     return res.status(400).json({ message: 'Bad request: invalid appointment object.' });
   }
