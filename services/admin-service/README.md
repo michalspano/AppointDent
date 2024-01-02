@@ -69,10 +69,6 @@ Runs the linter on the `server` folder and fixes the errors.
 
 Drops all the tables from the current service. In other words, this command removes all data from the current service.
 
-### Additional scripts (based on the service's needs)
-
-The section is deleted if the service does not need additional scripts.
-
 ## Deployment
 
-TBD.
+The system currently operates on the local level, and any deployment instructions shall be documented here.

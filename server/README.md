@@ -92,4 +92,4 @@ Populates the database with 20 different patients and dentists. It also creates 
 
 ## Deployment
 
-TBD.
+The system currently operates on the local level, and any deployment instructions shall be documented here.

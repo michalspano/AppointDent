@@ -63,4 +63,4 @@ The build is minified and the filenames include the hashes.<br>
 
 ## Deployment
 
-TBD.
+The system currently operates on the local level, and any deployment instructions shall be documented here.
