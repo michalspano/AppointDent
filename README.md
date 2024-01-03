@@ -102,7 +102,19 @@ The following section aims to provide an overview of the **system's architecture
 
 ## Continuos Integration
 
-The development team made use of the **continuos integration (CI)** testing practice to improve the development process model (which was **Scrum**) tha was used in the development of the system. This allowed the team to continuously build and test the code in order to prevent pushing defected code into the **main** branch. The team made use of **Postman** as means of integration testing of the backend and the database of the system. Moreover, the team made use of static analysis (**ESLint**) to make sure good quality and readable code with no syntax bug is pushed into the **main** branch. In order to make use of CI, the team made use of **GitLab's CI/CD** feature. The `gitlab-ci.yml` file contains the instructions that are used by GitLab to run **Postman** tets, statically analyze code, and build the system.
+The development team made use of the **continuos integration (CI)** testing
+practice to improve the development process model (which was **Scrum**) tha was
+used in the development of the system. This allowed the team to continuously
+build and test the code in order to prevent pushing defected code into the
+**main** branch.
+The team made use of **Postman** as means of integration testing of the backend
+and the database of the system. Moreover, the team made use of static analysis
+(**ESLint**) to make sure good quality and readable code with no syntax bug is
+pushed into the **main** branch. 
+In order to make use of CI, the team made use of **GitLab's CI/CD** feature. The
+[`gitlab-ci.yml`](https://git.chalmers.se/courses/dit355/2023/student-teams/dit356-2023-02/group-02/-/blob/main/.gitlab-ci.yml?ref_type=heads)
+file contains the instructions that are used by GitLab to run
+**Postman** tests, statically analyze code, and build the system.
 
 ## Development team
 
