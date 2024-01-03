@@ -63,4 +63,5 @@ The build is minified and the filenames include the hashes.<br>
 
 ## Deployment
 
-The system currently operates on the local level, and any deployment instructions shall be documented here.
+The system currently operates on the local level, and any deployment
+instructions shall be documented here in the future.

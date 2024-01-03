@@ -71,4 +71,5 @@ Drops all the tables from the current service. In other words, this command remo
 
 ## Deployment
 
-The system currently operates on the local level, and any deployment instructions shall be documented here.
+The system currently operates on the local level, and any deployment
+instructions shall be documented here in the future.

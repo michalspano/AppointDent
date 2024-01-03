@@ -92,4 +92,5 @@ Populates the database with 20 different patients and dentists. It also creates 
 
 ## Deployment
 
-The system currently operates on the local level, and any deployment instructions shall be documented here.
+The system currently operates on the local level, and any deployment
+instructions shall be documented here in the future.

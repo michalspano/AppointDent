@@ -68,4 +68,5 @@ Runs the linter on the `server` folder and fixes the errors.
 
 ## Deployment
 
-The system currently operates on the local level, and any deployment instructions shall be documented here.
+The system currently operates on the local level, and any deployment
+instructions shall be documented here in the future.
