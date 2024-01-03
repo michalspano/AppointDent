@@ -18,11 +18,16 @@
 
 ## Usage
 
-Install dependencies with:
+Install `node` dependencies with:
 
 ```bash
+# This will not install k6
 $ npm install
 ```
+
+For the **stress-testing** to work, a **global** installation of `k6` is
+required. The instructions can be found
+[here](https://k6.io/docs/get-started/installation/).
 
 ## Directory structure
 
@@ -69,7 +74,3 @@ Stress-tests the **appointment creation** functionality (end-point) that resides
 ### `npm run book-appointment`
 
 Stress-tests the **appointment booking** functionality (end-point) that resides in the **Appointment** service.
-
-## Deployment
-
-The system currently operates on the local level, and any deployment instructions shall be documented here.
