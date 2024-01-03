@@ -59,7 +59,7 @@ Stress-tests the **Dentist** service.
 
 Stress-tests the **Patient** service.
 
-### `npm run Session`
+### `npm run session`
 
 Stress-tests the **Session** service.
 
