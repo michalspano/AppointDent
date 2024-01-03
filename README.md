@@ -65,6 +65,7 @@ The following is a list of the available sub-folders:
 - [**services/notification-service**](./services/notification-service/README.md): the service that enables the system to send notifications to the users upon certain events.
 - [**services/patient-service**](./services/patient-service/README.md): the service that handles all the patient-related operations.
 - [**services/session-service**](./services/session-service/README.md): a central service that handles all sessions of the users to enforce authentication and authorization.
+- [**stress-testing**](./stress-testing/README.md): a folder that contains the scripts that are used to stress-test the system at a high load.
 
 *Note*: the `services` are not meant to be run individually, but rather as a part of the `server` application. They can be run individually for testing purposes or for the ease of development.
 
