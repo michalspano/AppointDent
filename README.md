@@ -14,7 +14,7 @@ their work. The system, internally, relies on a **distributed system** infrastru
 - [Tech-stack](#tech-stack)
 - [Pre-Requirements](#pre-requirements)
   - [Installation, Setup, and Running](#installation-setup-and-running)
-  - [API](#api)
+- [Architecture](#architecture)
 - [System's Overview](#systems-overview)
 - [Continuos Integration](#continuos-integration)
 - [Development team](#development-team)
@@ -47,7 +47,12 @@ and **client-server**.
 
 ## Pre-Requirements
 
-The only technology that is utilized in building and running **all services**, **APIGateway (server)**, the **client**, and **stress-testing** is [Node.js](https://nodejs.org/en/). Our project makes use of version `18.x.x`. So make sure that you have one of the version `18` variations installed on your machine. For those that do not know what **Node.js** is, **Node.js** is a cross-platform **JavaScript runtime environment**. It allows developers to run JavaScript outside of the browser. This allows Javascript to be used as a backend development programming language.
+The only technology that is utilized in building and running **all services**, **APIGateway (server)**, the **client**, and **stress-testing** is `Node.js`. Our project makes use of version `18.x.x`. Ensure that you have a compatible version installed on your machine (we recommend `18.12.2`). Read more about `Node.js` (and `npm`) [here](https://nodejs.org/en/).
+
+For the `Solid.js` framework, we recommend using `npm` as the package manager and installing the version from the `package.json` file with `Vite.js` as the build tool.
+Alternatively, install `^1.7.8` version of `Solid.js` (+`^4.4.5` of `Vite.js`) with the help of your preferred package manager/environment utility.
+
+In terms of **stress-testing** the system, we recommend using the **latest** version of [`k6`](https://k6.io/). Navigate to [`stress-testing`](./stress-testing/README.md) for more information.
 
 ### Installation, Setup, and Running
 
@@ -69,11 +74,19 @@ The following is a list of the available sub-folders:
 
 *Note*: the `services` are not meant to be run individually, but rather as a part of the `server` application. They can be run individually for testing purposes or for the ease of development.
 
-### API
+## Architecture
 
-To support further development of the system, we aim to maintain a comprehensive
-`API` documentation on how to work with the system. The
-documentation is available on the project's [`wiki`](https://git.chalmers.se/courses/dit355/2023/student-teams/dit356-2023-02/group-02/-/wikis/Api).
+Our system is a **distributed** one and we have therefore decided to use a
+**Microservices-based architecture**. This means that different services are to
+be installed on different computers and are completely independent. The `MQTT`
+(Message Queue Telemetry Transport) protocol is implemented as the primary
+communication utility between the individual services of our system.
+See our [Component Diagram](#systems-overview) for a detailed overview of the
+architecture in use.
+
+Furthermore, several other decisions that have a substantial
+impact on the architecture that the team members dealt with during the project's
+development may be traced with the [**ADRs**](https://git.chalmers.se/courses/dit355/2023/student-teams/dit356-2023-02/group-02/-/tree/main/docs/adrs?ref_type=heads).
 
 ## System's Overview
 
