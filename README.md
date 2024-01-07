@@ -118,7 +118,7 @@ The following section aims to provide an overview of the **system's architecture
 The development team made use of the **continuos integration (CI)** testing
 practice to improve the development process model (which was **Scrum**) that was
 used in the development of the system. This allowed the team to continuously
-build and test the code in order to prevent pushing defect code into the
+build and test the code in order to prevent pushing defective code into the
 **main** branch.
 The team made use of **Postman** as means of integration testing of the backend
 and the database of the system. Moreover, the team made use of static analysis
