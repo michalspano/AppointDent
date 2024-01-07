@@ -16,7 +16,7 @@ their work. The system, internally, relies on a **distributed system** infrastru
   - [Installation, Setup, and Running](#installation-setup-and-running)
 - [Architecture](#architecture)
 - [System's Overview](#systems-overview)
-- [Continuos Integration](#continuos-integration)
+- [Continuous Integration](#continuous-integration)
 - [Development team](#development-team)
 
 <!-- table of contents subject to be updated -->
@@ -113,12 +113,12 @@ The following section aims to provide an overview of the **system's architecture
 
 </details>
 
-## Continuos Integration
+## Continuous Integration
 
 The development team made use of the **continuos integration (CI)** testing
-practice to improve the development process model (which was **Scrum**) tha was
+practice to improve the development process model (which was **Scrum**) that was
 used in the development of the system. This allowed the team to continuously
-build and test the code in order to prevent pushing defected code into the
+build and test the code in order to prevent pushing defect code into the
 **main** branch.
 The team made use of **Postman** as means of integration testing of the backend
 and the database of the system. Moreover, the team made use of static analysis
