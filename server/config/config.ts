@@ -42,9 +42,17 @@ interface CorsOptions {
   credentials: boolean
 }
 
-const allowedOrigins = ['http://localhost:5173'];
 /**
- * This function has the responsibility of dynamically setitng the
+ * A collection of allowed origins. By default, only local origins are permitted.
+ * Adjust the origins per the requirements of your deployment schema.
+ */
+const allowedOrigins = Object.freeze([
+  'http://localhost:5173', // For `dev` mode in client
+  'http://localhost:4173'  // For production of client
+]);
+
+/**
+ * This function has the responsibility of dynamically setting the
  * Access-Control-Allow-Origin header by checking if the current origin
  * is present in the allowedOrigins array. This is a technical constraint
  * from modern browsers that we have to comply with.
@@ -60,6 +68,7 @@ const corsOptionsSetter = function (req: Request, corsCallback: (err: any, optio
   }
   corsCallback(null, corsOptions);
 };
+
 app.use(cors(corsOptionsSetter));
 app.use(cookieParser()); // Add cookie parser.
 
