@@ -91,7 +91,9 @@ development may be traced with the [**ADRs**](https://git.chalmers.se/courses/di
 
 ## System's Overview
 
-The following section aims to provide an overview of the **system's architecture**, as well as the **deployment strategy**. The individual diagrams can observed when clicking on the dropdowns.
+The following section aims to provide an overview of the **system's
+architecture**, as well as the **deployment strategy**. The individual diagrams
+can observed when clicking on the dropdowns.
 
 <details>
   <summary>1. Entity Relationship (ER) Diagram</summary>
@@ -116,12 +118,12 @@ The following section aims to provide an overview of the **system's architecture
 
 ## Continuous Integration
 
-The development team made use of the **continuos integration (CI)** testing
+The development team made use of the **continuous integration (CI)** testing
 practice to improve the development process model (which was **Scrum**) that was
 used in the development of the system. This allowed the team to continuously
 build and test the code in order to prevent pushing defective code into the
 **main** branch.
-The team made use of **Postman** as means of integration testing of the backend
+The team made use of **Postman** as means of integration testing of the back-end
 and the database of the system. Moreover, the team made use of static analysis
 (**ESLint**) to make sure good quality and readable code with no syntax bug is
 pushed into the **main** branch. 
@@ -133,7 +135,6 @@ file contains the instructions that are used by GitLab to run
 > The project was initially developed on the GitLab platform, but was later
 > migrated to GitHub. However, the CI/CD pipeline was not migrated yet, hence
 > the pipeline is not functional on GitHub.
-
 
 ## Development team
 
