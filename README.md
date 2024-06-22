@@ -126,6 +126,11 @@ In order to make use of CI, the team made use of **GitLab's CI/CD** feature. The
 [`gitlab-ci.yml`](https://github.com/michalspano/AppointDent/blob/main/.gitlab-ci.yml)
 file contains the instructions that are used by GitLab to run
 **Postman** tests, statically analyze code, and build the system.
+> [!IMPORTANT]
+> The project was initially developed on the GitLab platform, but was later
+> migrated to GitHub. However, the CI/CD pipeline was not migrated yet, hence
+> the pipeline is not functional on GitHub.
+
 
 ## Development team
 
