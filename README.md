@@ -1,12 +1,12 @@
-<h2 align="center">AppointDent</h2>
+<h2 align="center">AppointDent &#129463;&#129701;</h2>
 
-<img src="docs/imgs/logo.png" align="left" alt="AppointDent Logo" width="200"/>
+**AppointDent** is a **full-stack web application** that
+allows residents of Sweden manage their dentist appointments, as well as a tool
+for dentists to organize their work. The system, internally, relies on a
+**distributed system** infrastructure that combines various architectural
+styles, namely **microservices**, **publish-subscribe** and **client-server**.
 
-&#129463;&#129701; **AppointDent** is a **full-stack web application** that allows residents of Sweden
-manage their dentist appointments, as well as a tool for dentists to organize
-their work. The system, internally, relies on a **distributed system** infrastructure that combines various architectural styles, namely **microservices**, **publish-subscribe** and **client-server**.
-
-<br>
+<img src="docs/imgs/appointdent-teaser.png" alt="AppointDent Teaser"/><br>
 
 **Table of Contents**
 
@@ -18,8 +18,6 @@ their work. The system, internally, relies on a **distributed system** infrastru
 - [System's Overview](#systems-overview)
 - [Continuous Integration](#continuous-integration)
 - [Development team](#development-team)
-
-<!-- table of contents subject to be updated -->
 
 ## Introduction
 
@@ -125,7 +123,7 @@ and the database of the system. Moreover, the team made use of static analysis
 (**ESLint**) to make sure good quality and readable code with no syntax bug is
 pushed into the **main** branch. 
 In order to make use of CI, the team made use of **GitLab's CI/CD** feature. The
-[`gitlab-ci.yml`](https://git.chalmers.se/courses/dit355/2023/student-teams/dit356-2023-02/group-02/-/blob/main/.gitlab-ci.yml?ref_type=heads)
+[`gitlab-ci.yml`](https://github.com/michalspano/AppointDent/blob/main/.gitlab-ci.yml)
 file contains the instructions that are used by GitLab to run
 **Postman** tests, statically analyze code, and build the system.
 
@@ -133,11 +131,11 @@ file contains the instructions that are used by GitLab to run
 
 The project has been developed over the course of **10 weeks** by the following:
 
-| Name               | username (Chalmers GitLab) |
+| Name               | username (GitHub) |
 |--------------------|----------------------------|
-| Agrima Singh       | @agrima                    |
-| Mariia Zabolotnia  | @mariiaz                   |
-| Alexander Säfström | @alesaf                    |
-| Michal Spano       | @spano                     |
-| Kaisa Arumeel      | @arumeel                   |
-| Omid Khodaparast   | @omidk                     |
+| Agrima Singh       | @agrimasingh2503           |
+| Mariia Zabolotnia  | @marichkazb                |
+| Alexander Säfström | @starkbamse                |
+| Michal Spano       | @michalspano               |
+| Kaisa Arumeel      | @kaisaarumeel              |
+| Omid Khodaparast   | @OmidKhodaparast2002       |
