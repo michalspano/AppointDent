@@ -70,7 +70,10 @@ The following is a list of the available sub-folders:
 - [**services/session-service**](./services/session-service/README.md): a central service that handles all sessions of the users to enforce authentication and authorization.
 - [**stress-testing**](./stress-testing/README.md): a folder that contains the scripts that are used to stress-test the system at a high load.
 
-*Note*: the `services` are not meant to be run individually, but rather as a part of the `server` application. They can be run individually for testing purposes or for the ease of development.
+> [!NOTE]
+> The `services` are not meant to be run individually, but rather as a part of
+> the `server` application. They can be run individually for testing purposes
+> or for the ease of development.
 
 ## Architecture
 
