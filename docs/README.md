@@ -6,7 +6,7 @@ their work. The system relies on a **distributed system** infrastructure that
 combines various architectural styles: namely **microservices**, *pub-sub* and
 *client-server*.
 
-<img src="docs/imgs/appointdent-teaser.png" alt="AppointDent Teaser"/><br>
+<img src="imgs/appointdent-teaser.png" alt="AppointDent Teaser"/><br>
 
 **Table of Contents**
 
@@ -43,18 +43,10 @@ and **client-server**.
 - [Sqlite3](https://www.sqlite.org/index.html) (`node` wrapper: [better-sqlite3](https://github.com/WiseLibs/better-sqlite3)) \[services\]
 - [Tailwind CSS](https://tailwindcss.com/) (client)
 
-## Pre-Requirements
-
-The only technology that is utilized in building and running **all services**, **APIGateway (server)**, the **client**, and **stress-testing** is `Node.js`. Our project makes use of version `18.x.x`. Ensure that you have a compatible version installed on your machine (we recommend `18.12.2`). Read more about `Node.js` (and `npm`) [here](https://nodejs.org/en/).
-
-For the `Solid.js` framework, we recommend using `npm` as the package manager and installing the version from the `package.json` file with `Vite.js` as the build tool.
-Alternatively, install `^1.7.8` version of `Solid.js` (+`^4.4.5` of `Vite.js`) with the help of your preferred package manager/environment utility.
-
-In terms of **stress-testing** the system, we recommend using the **latest** version of [`k6`](https://k6.io/). Navigate to [`stress-testing`](./stress-testing/README.md) for more information.
-
 ### Installation, Setup, and Running
 
-This repository utilizes a **monorepo** structure, where the individual sub-folders represent a particular component of the system, wherein each component has its own `README.md` file.
+The codebase is hosted in this **monorepo** with system components having their
+subfolders (and `README.md` files with specific instructions).
 
 The file contains the instructions on how to install all dependencies, it explains the structure of the directory, and it lists all the available scripts (with possible clarifications).
 
@@ -87,7 +79,7 @@ architecture in use.
 
 Furthermore, several other decisions that have a substantial
 impact on the architecture that the team members dealt with during the project's
-development may be traced with the [**ADRs**](docs/adrs).
+development may be traced with the [**ADRs**](./adrs/).
 
 ## System's Overview
 
@@ -98,53 +90,20 @@ can observed when clicking on the dropdowns.
 <details>
   <summary>1. Entity Relationship (ER) Diagram</summary>
 
-  ![ER Diagram](./docs/diagrams/ERdiagram.png)
+  ![ER Diagram](./diagrams/ERdiagram.png)
 
 </details>
 
 <details>
   <summary>2. Component Diagram</summary>
 
-  ![Component Diagram](./docs/diagrams/ComponentDiagram.png)
+  ![Component Diagram](./diagrams/ComponentDiagram.png)
 
 </details>
 
 <details>
   <summary>3. Deployment Diagram</summary>
 
-  ![DeploymentDiagram](./docs/diagrams/DeploymentDiagram.png)
+  ![DeploymentDiagram](./diagrams/DeploymentDiagram.png)
 
 </details>
-
-## Continuous Integration
-
-The development team made use of the **continuous integration (CI)** testing
-practice to improve the development process model (which was **Scrum**) that was
-used in the development of the system. This allowed the team to continuously
-build and test the code in order to prevent pushing defective code into the
-**main** branch.
-The team made use of **Postman** as means of integration testing of the back-end
-and the database of the system. Moreover, the team made use of static analysis
-(**ESLint**) to make sure good quality and readable code with no syntax bug is
-pushed into the **main** branch. 
-In order to make use of CI, the team made use of **GitLab's CI/CD** feature. The
-[`gitlab-ci.yml`](https://github.com/michalspano/AppointDent/blob/main/.gitlab-ci.yml)
-file contains the instructions that are used by GitLab to run
-**Postman** tests, statically analyze code, and build the system.
-> [!IMPORTANT]
-> The project was initially developed on the GitLab platform, but was later
-> migrated to GitHub. However, the CI/CD pipeline was not migrated yet, hence
-> the pipeline is not functional on GitHub.
-
-## Development team
-
-The project has been developed over the course of **10 weeks** by the following:
-
-| Name               | username (GitHub) |
-|--------------------|----------------------------|
-| Agrima Singh       | @agrimasingh2503           |
-| Mariia Zabolotnia  | @marichkazb                |
-| Alexander Säfström | @starkbamse                |
-| Michal Spano       | @michalspano               |
-| Kaisa Arumeel      | @kaisaarumeel              |
-| Omid Khodaparast   | @OmidKhodaparast2002       |
